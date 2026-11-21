@@ -577,6 +577,38 @@ details.cust summary{min-height:48px;display:flex;align-items:center;font-size:1
 .st-h{position:relative}
 .st-h::before{content:'';position:absolute;left:50%;top:-10px;width:min(620px,92%);height:calc(100% + 20px);transform:translateX(-50%);z-index:-1;background:radial-gradient(ellipse at center,rgba(10,5,4,.82),rgba(10,5,4,.55) 55%,transparent 78%);filter:blur(8px)}
 .st-h::before{width:min(700px,96%);background:radial-gradient(ellipse at center,rgba(10,5,4,.96),rgba(10,5,4,.82) 50%,rgba(10,5,4,.3) 72%,transparent 86%)}
+
+/* ===== 桌面雙欄：劇本（左 59%）＋設定（右 41%），首屏看齊 ===== */
+@media(min-width:1100px){
+ .start2 .st-in{width:min(95vw,1720px);padding:18px 0 28px;display:grid;grid-template-columns:minmax(0,59fr) minmax(0,41fr);grid-template-areas:"h h" "c p" "cta cta" "note note";column-gap:30px;row-gap:0;align-items:start}
+ .st-h{grid-area:h;margin-bottom:14px}
+ .st-h h1{font-size:clamp(2.2rem,3.6vw,3.2rem);line-height:1.15}
+ .st-line{margin:0 auto 4px}
+ .st-h .intro{margin:0 auto;font-size:1rem;max-width:60em}
+ .start2 .scns2{grid-area:c;gap:14px}
+ .start2 .stp{grid-area:p;margin-top:0;align-self:stretch;display:flex;flex-direction:column}
+ .start2 .stp-b{flex:1;padding:18px 22px 20px}
+ .st-cta{grid-area:cta;margin-top:20px;gap:10px}
+ .st-note{grid-area:note;margin-top:12px}
+ .sc{padding:5px}
+ .sc-cap{padding:0 12px 12px}.sc-cap b{font-size:clamp(1.4rem,1.9vw,2rem)}
+ .sc-body{padding:10px 12px 12px;font-size:.95rem;line-height:1.6}.sc-trait{margin-bottom:4px}
+ .sc.on{transform:translateY(-4px)}
+ .fld{margin-bottom:14px}
+ .op{min-height:52px;padding:8px 12px}
+ .stp input#nm{min-height:46px}
+ .st-cta{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px 22px}
+ .st-cta .st-sum{order:0}.st-cta .seal-main{order:1}.st-cta .st-sec{order:2}
+}
+@media(min-width:1100px) and (max-width:1400px){
+ .start2 .st-in{column-gap:20px}
+ .sc-body{font-size:.9rem}.sc-trait{font-size:.95rem}
+}
+@media(min-width:1100px){
+ .st-cta{flex-direction:column;flex-wrap:nowrap;gap:10px;margin-top:18px}
+ .st-cta .st-sum{order:0;padding:2px 18px;font-size:.95rem}.st-cta .seal-main{order:1}.st-cta .st-sec{order:2}
+ .st-note{margin-top:10px;font-size:.88rem}
+}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
