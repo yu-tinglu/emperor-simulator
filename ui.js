@@ -109,13 +109,22 @@ function startScreen(){document.body.classList.remove('ingame');document.documen
    +'<div class="sp-title"><div class="sp-sub"><span>登基前夜</span></div><h1>皇帝模擬器</h1><div class="sp-line"><i></i></div><div class="sp-tag">'+(q=>'「'+q[0]+'」<small>—— '+q[1]+'</small>')(SPQ[Math.floor(Math.random()*SPQ.length)])+'</div></div>'
    +'<div class="sp-cta"><button class="gold" data-act="enter">入　殿</button>'+(hasSave('auto')?'<button data-act="loadauto" class="ghost">繼續上次</button>':'')+'</div></div>';
   document.body.dataset.scn='';return}
- const S=UI.start;document.body.dataset.scn=S.scn;
- $('#app').innerHTML='<div class="start"><h1>擇　一　朝</h1><p class="dim intro">你將執掌的是一個不圍繞你運轉的王朝。朝臣會結黨、妃嬪會爭寵、皇子會奪嫡、邊疆會烽煙；你死後，史書自會評說。</p>'
- +'<div class="scns">'+Object.keys(SCN).map(k=>'<div class="scn '+(S.scn===k?'on':'')+'" data-act="scn" data-arg="'+k+'"><div class="art">'+artScn(k)+'<div class="cap"><b>'+SCN[k].n+'</b><span>'+SCNL[k]+'</span></div></div><div class="small dim body">'+SCN[k].d+'</div></div>').join('')+'</div>'
- +'<div class="card namecard"><div class="row" style="align-items:center"><label>朕名　<input id="nm" value="'+esc(S.name)+'" maxlength="4" size="6"></label></div>'
- +'<details class="cust"><summary>自訂劇本（進階）</summary>'+Object.keys(CUST).map(k=>'<div class="small dim" style="margin:6px 0 2px">'+({tre:'起始國庫',foe:'外邦強弱',fac:'朝堂派系'}[k])+'</div><div class="chips">'+CUST[k].map((n,i)=>'<button class="sm '+(((S.cust||{tre:1,foe:1,fac:1})[k])===i?'on gold':'')+'" data-act="cust" data-arg="'+k+'|'+i+'">'+n+'</button>').join('')+'</div>').join('')+'</details>'+'<div class="small dim" style="margin:8px 0 4px">難度</div><div class="focuses diffs">'+Object.keys(DIFF).map(k=>'<button class="'+((S.diff||'n')===k?'on':'')+'" data-act="diff" data-arg="'+k+'">'+DIFF[k].n+'<small>'+DIFF[k].d+'</small></button>').join('')+'</div>'+'<div class="small dim" style="margin:8px 0 4px">天賦所長（開局該項能力較高）</div><div class="focuses">'+Object.keys(STN).map(k=>'<button class="'+(S.focus===k?'on':'')+'" data-act="focus" data-arg="'+k+'">'+STN[k]+'<small>'+FOCUSD[k]+'</small></button>').join('')+'</div></div>'
- +'<div class="startcta"><button class="gold big" data-act="begin">登　基</button>'+(hasSave('auto')?'<button data-act="loadauto">繼續上次</button>':'')+(hasSave('prev')?'<button data-act="loadprev">還原上月<small>存檔出錯時用</small></button>':'')+'<button data-act="daily">每日一局<small>'+(metaGet().daily&&metaGet().daily[dailyKey()]?'今日已留名：'+metaGet().daily[dailyKey()].y+'年':'同一種子，與人比較')+'</small></button><button data-act="coll">典藏</button></div>'
- +'<p class="small dim" style="margin-top:20px">每月三旬（三份精力）：上朝、批奏摺、召見、教導皇嗣都要花費精力；用完後按「靜觀一月」。但不論你做不做，世界都會自己走。</p></div>'}
+ const S=UI.start;document.body.dataset.scn=S.scn;const CS=S.cust||{tre:1,foe:1,fac:1};
+ const opt=(on,act,arg,t,sm)=>'<button class="op'+(on?' on':'')+'" data-act="'+act+'" data-arg="'+arg+'" aria-pressed="'+(on?'true':'false')+'"><b>'+t+'</b>'+(sm?'<small>'+sm+'</small>':'')+'</button>';
+ const hist=metaGet();
+ $('#app').innerHTML='<div class="start2"><div class="sscene" aria-hidden="true">'+sceneSvg()+'</div><div class="st-in">'
+ +'<header class="st-h"><h1>擇　一　朝</h1><div class="st-line"><i></i></div><p class="intro">你將執掌的是一個不圍繞你運轉的王朝。朝臣會結黨、妃嬪會爭寵、皇子會奪嫡、邊疆會烽煙；你死後，史書自會評說。</p></header>'
+ +'<div class="scns2" role="radiogroup" aria-label="開局劇本">'+Object.keys(SCN).map(k=>'<div class="sc'+(S.scn===k?' on':'')+'" role="radio" aria-checked="'+(S.scn===k)+'" tabindex="0" data-act="scn" data-arg="'+k+'"><div class="sc-art"><img src="'+SCN_IMG[k]+'" alt="'+SCN[k].n+'"><div class="sc-cap"><b>'+SCN[k].n+'</b><em>'+SCNL[k]+'</em></div><span class="sc-on">已選</span></div><div class="sc-body"><div class="sc-tag">開局特性</div><div class="sc-trait">'+SCNL[k]+'</div><p>'+SCN[k].d+'</p></div></div>').join('')+'</div>'
+ +'<section class="stp"><div class="stp-h"><b>朕之人生</b><span>名號、難度與天賦，皆可於登基前調整</span></div>'
+ +'<div class="stp-b">'
+ +'<div class="fld"><label class="fl" for="nm">朕名</label><input id="nm" value="'+esc(S.name)+'" maxlength="4" size="6" autocomplete="off" aria-describedby="sthint"><span class="fs">至多四字</span></div>'
+ +'<div class="fld"><div class="fl">難度</div><div class="ops ops3">'+Object.keys(DIFF).map(k=>opt((S.diff||'n')===k,'diff',k,DIFF[k].n,DIFF[k].d)).join('')+'</div></div>'
+ +'<div class="fld"><div class="fl">天賦所長<span class="fs">開局該項能力較高</span></div><div class="ops ops3">'+Object.keys(STN).map(k=>opt(S.focus===k,'focus',k,STN[k],FOCUSD[k])).join('')+'</div></div>'
+ +'<details class="cust"><summary>自訂劇本（進階）</summary><div class="cust-b">'+Object.keys(CUST).map(k=>'<div class="fld"><div class="fl">'+({tre:'起始國庫',foe:'外邦強弱',fac:'朝堂派系'}[k])+'</div><div class="ops ops3 sm">'+CUST[k].map((n,i)=>opt(CS[k]===i,'cust',k+'|'+i,n)).join('')+'</div></div>').join('')+'</div></details>'
+ +'</div></section>'
+ +'<div class="st-cta"><div class="st-sum" id="sthint" role="status" aria-live="polite">'+SCN[S.scn].n+'　·　'+DIFF[S.diff||'n'].n+'　·　'+STN[S.focus||'pol']+'</div><button class="seal-main" data-act="begin">登　基</button>'
+ +'<div class="st-sec">'+(hasSave('auto')?'<button data-act="loadauto">繼續上次</button>':'')+(hasSave('prev')?'<button data-act="loadprev">還原上月<small>存檔出錯時用</small></button>':'')+'<button data-act="daily">每日一局<small>'+(hist.daily&&hist.daily[dailyKey()]?'今日已留名：'+hist.daily[dailyKey()].y+'年':'同一種子，與人比較')+'</small></button><button data-act="coll">典藏</button></div></div>'
+ +'<p class="st-note">每月三旬（三份精力）：上朝、批奏摺、召見、教導皇嗣都要花費精力；用完後按「靜觀一月」。但不論你做不做，世界都會自己走。</p></div></div>'}
 
 /* ---------- 四季氛圍 ---------- */
 const SEAS=[['春','sp'],['夏','su'],['秋','au'],['冬','wi']];
@@ -562,7 +571,7 @@ const ACT={
  tosave(){closeModal();TAB='sys';render();window.scrollTo(0,0)},close(){closeModal();render()},
  scn(a){UI.start.scn=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},
  cust(a){const[k,i]=a.split('|');UI.start.cust=Object.assign({tre:1,foe:1,fac:1},UI.start.cust||{});UI.start.cust[k]=+i;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen();const d=document.querySelector('details.cust');if(d)d.open=true},diff(a){UI.start.diff=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},focus(a){UI.start.focus=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},enter(){UI.splashDone=true;startScreen()},
- begin(){beginGame()},
+ begin(){const n=$('#nm');if(n&&!n.value.trim()){const h=$('#sthint');if(h){h.textContent='請先為朕定下名號（一至四字），再行登基。';h.classList.add('warn')}n.classList.add('bad');n.focus();return}beginGame()},
  pron(){UI.proPg++;proModal()},pros(){closeModal();render()},
  proc(a){const t=proApply(+a);closeModal();saveG('auto');render();toast(t);setTimeout(mandModal,350)},
  loadprev(){if(loadSlot('prev')){ALERTS.length=0;TAB='court';UI.overShown=false;UI.empId=G.emp;toast('已還原至上一個月的存檔。');render()}else toast('沒有可還原的存檔。',false)},loadauto(){if(loadSlot('auto')){ALERTS.length=0;TAB='court';UI.overShown=false;UI.empId=G.emp;render()}},
@@ -609,3 +618,6 @@ applySettings();
 (function(){let sx=0,sy=0,ok=false;const ap=document.getElementById('app');if(!ap)return;
  ap.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;ok=!e.target.closest('.mapwrap,.webwrap,table,.tl,svg,input,textarea')&&!document.getElementById('ov').classList.contains('on')},{passive:true});
  ap.addEventListener('touchend',e=>{if(!ok||!G||typeof TABS==='undefined')return;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)<80||Math.abs(dy)>45)return;const i=TABS.findIndex(x=>x[0]===TAB);const j=Math.max(0,Math.min(TABS.length-1,i+(dx<0?1:-1)));if(j!==i){TAB=TABS[j][0];render();window.scrollTo(0,0)}},{passive:true})})();
+
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('sc')){e.preventDefault();e.target.click()}});/*kbscn*/
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='nm'){e.target.classList.remove('bad');const h=document.getElementById('sthint');if(h&&h.classList.contains('warn')){h.classList.remove('warn');const S=UI.start;h.textContent=SCN[S.scn].n+'　·　'+DIFF[S.diff||'n'].n+'　·　'+STN[S.focus||'pol']}}});
