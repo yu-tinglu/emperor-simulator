@@ -2418,8 +2418,58 @@ function portrait(p,w){
   if(role==='consort'&&p.fav<25)return portImg(PORT_F[PORT_SAD[(h>>>3)%PORT_SAD.length]],w);
   return portImg(portPool()[portSlot(p)],w);
  }
+ if(p.g==='M'&&role!=='emp')return portraitInk(p,w);
  return portraitSvg(p,w);
 }
+function portraitInk(p,w){
+ const f=p.ft,a=age(p),st=stage(p),role=p.role,id=p.id;
+ const skin=['#f1d9bd','#ebcaa6','#e0b88f','#d2a47b','#bf8f66'][f[0]%5],skS=['#d9b793','#cfa985','#c29873','#b38762','#a07651'][f[0]%5];
+ const hairC=st===3?'#d8d4cc':a>=48?'#4a4644':'#17110e';
+ const bgs={official:['#27456b','#0b1422'],general:['#7a2f1c','#220d07'],eunuch:['#43434f','#121218'],prince:['#4a3a8a','#120d2c'],kin:['#46386a','#140f26'],son:['#2d6a74','#0a1f23']};
+ const bg=bgs[role]||bgs.official;let robe='#2a5d86',trim='#d8b45a';
+ if(role==='official'){const o=offDef(p.off);robe=!o?'#2f5e6a':o.r>=9?'#8c1b1b':o.r>=6?'#5a2a7a':o.r>=5?'#a32828':'#2a5d86'}
+ else if(role==='general')robe='#6d2418';else if(role==='eunuch'){robe='#2e2e38';trim='#8a8a9a'}else if(role==='prince'){robe='#3a2a7a'}else if(role==='kin')robe='#4a3a6a';else if(role==='son')robe='#2f5e6a';
+ if(st===0){robe='#d9b878'}
+ const tilt=((f[1]+f[5])%5-2)*1.6,u='i'+id;
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="'+w+'" height="'+Math.round(w*1.25)+'"><defs><radialGradient id="b'+u+'" cx="50%" cy="28%" r="85%"><stop offset="0" stop-color="'+bg[0]+'"/><stop offset="1" stop-color="'+bg[1]+'"/></radialGradient><radialGradient id="v'+u+'" cx="50%" cy="45%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient><linearGradient id="f'+u+'" x1="0" x2="1"><stop offset="0" stop-color="'+skS+'"/><stop offset=".35" stop-color="'+skin+'"/><stop offset="1" stop-color="'+skin+'"/></linearGradient><linearGradient id="r'+u+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs>';
+ s+='<rect width="120" height="150" fill="url(#b'+u+')"/><circle cx="60" cy="58" r="40" fill="#ffffff12"/>';
+ // 身體
+ s+='<path d="M4 150 Q8 112 60 106 Q112 112 116 150Z" fill="'+robe+'"/><path d="M4 150 Q8 112 60 106 Q112 112 116 150Z" fill="url(#r'+u+')"/>';
+ if(role==='general'){for(let i=0;i<5;i++)s+='<path d="M'+(14+i*5)+' 124 q4 6 8 0" fill="none" stroke="#b9b9c4" stroke-width="1.4" opacity=".7"/><path d="M'+(80+i*5)+' 124 q4 6 8 0" fill="none" stroke="#b9b9c4" stroke-width="1.4" opacity=".7"/>';s+='<path d="M10 122 Q26 108 44 112 L40 124 Q26 118 14 130Z M110 122 Q94 108 76 112 L80 124 Q94 118 106 130Z" fill="#8b8d98" stroke="#2a2a30" stroke-width="1"/>'}
+ if(role==='official'){s+='<rect x="44" y="124" width="32" height="24" rx="2" fill="#e5c777" stroke="#7a5a1a" stroke-width="1.2"/><circle cx="60" cy="136" r="6" fill="none" stroke="#7a1f1f" stroke-width="2"/><path d="M52 142 Q60 130 68 142" fill="none" stroke="#7a1f1f" stroke-width="1.6"/>'}
+ if(role==='prince'||role==='kin'){s+='<circle cx="60" cy="134" r="11" fill="none" stroke="'+trim+'" stroke-width="1.6"/><path d="M52 134 Q60 124 68 134 Q60 144 52 134Z" fill="'+trim+'" opacity=".7"/>'}
+ s+='<path d="M40 108 L60 136 L80 108 L74 106 L60 124 L46 106Z" fill="#f3ead6" stroke="#2a2a30" stroke-width=".8"/><path d="M60 124 L60 150" stroke="#00000044" stroke-width="1"/>';
+ s+='<rect x="51" y="90" width="18" height="20" fill="'+skS+'"/>';
+ s+='<g transform="rotate('+tilt+' 60 100)">';
+ // 髮與冠(後)
+ if(role==='son'||role==='prince'||role==='kin'){if(st>=1)s+='<ellipse cx="60" cy="22" rx="9" ry="10" fill="'+hairC+'"/>'}
+ // 臉
+ const sh=f[1]%3;
+ if(sh===0)s+='<path d="M31 56 Q31 33 60 32 Q89 33 89 56 Q89 82 74 98 Q60 108 46 98 Q31 82 31 56Z" fill="url(#f'+u+')" stroke="#00000033" stroke-width=".8"/>';
+ else if(sh===1)s+='<path d="M33 54 Q33 32 60 31 Q87 32 87 54 L85 80 Q78 104 60 106 Q42 104 35 80Z" fill="url(#f'+u+')" stroke="#00000033" stroke-width=".8"/>';
+ else s+='<path d="M30 54 Q30 32 60 31 Q90 32 90 54 Q88 78 72 98 Q60 106 48 98 Q32 78 30 54Z" fill="url(#f'+u+')" stroke="#00000033" stroke-width=".8"/>';
+ s+='<ellipse cx="30" cy="62" rx="3.6" ry="7" fill="'+skin+'" stroke="#00000033" stroke-width=".6"/><ellipse cx="90" cy="62" rx="3.6" ry="7" fill="'+skin+'" stroke="#00000033" stroke-width=".6"/>';
+ // 五官
+ const bro=f[2]%3,ey=62+(f[3]%3)-1;
+ s+='<path d="M40 '+(ey-8-bro)+' Q47 '+(ey-12-bro)+' 55 '+(ey-8)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/><path d="M65 '+(ey-8)+' Q73 '+(ey-12-bro)+'80 '+(ey-8-bro)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/>';
+ for(const x of [47,73]){s+='<path d="M'+(x-6)+' '+ey+' Q'+x+' '+(ey-4)+' '+(x+6)+' '+ey+' Q'+x+' '+(ey+3)+' '+(x-6)+' '+ey+'Z" fill="#fbf6ea" stroke="#17110e" stroke-width=".9"/><circle cx="'+x+'" cy="'+(ey-.4)+'" r="2.6" fill="#2a1a12"/><circle cx="'+(x+.9)+'" cy="'+(ey-1.2)+'" r=".8" fill="#fff"/>'}
+ s+='<path d="M60 '+(ey+2)+' Q57 '+(ey+12)+' 60 '+(ey+14)+' Q64 '+(ey+14)+' 63 '+(ey+12)+'" fill="none" stroke="'+skS+'" stroke-width="1.5" stroke-linecap="round"/>';
+ const mood=(f[4]%3)-1;
+ // 鬍鬚
+ const bd=role==='eunuch'||st<=1?0:(f[5]+f[6])%4;
+ if(bd>=1)s+='<path d="M48 '+(ey+22)+' Q54 '+(ey+19)+' 60 '+(ey+21)+' Q66 '+(ey+19)+' 72 '+(ey+22)+' Q66 '+(ey+24)+' 60 '+(ey+23)+' Q54 '+(ey+24)+' 48 '+(ey+22)+'Z" fill="'+hairC+'"/>';
+ if(bd>=2)s+='<path d="M56 '+(ey+26)+' Q60 '+(ey+30+bd*3)+' 64 '+(ey+26)+' Q62 '+(ey+24)+' 60 '+(ey+24)+' Q58 '+(ey+24)+' 56 '+(ey+26)+'Z" fill="'+hairC+'"/>';
+ if(bd===3)s+='<path d="M38 '+(ey+14)+' Q40 '+(ey+40)+' 60 '+(ey+46)+' Q80 '+(ey+40)+' 82 '+(ey+14)+' Q76 '+(ey+30)+' 60 '+(ey+34)+' Q44 '+(ey+30)+' 38 '+(ey+14)+'Z" fill="'+hairC+'"/>';
+ s+='<path d="M54 '+(ey+24+(bd?-1:0))+' Q60 '+(ey+26+mood+(bd?0:1))+' 66 '+(ey+24+(bd?-1:0))+'" fill="none" stroke="#7a3a30" stroke-width="1.6" stroke-linecap="round"/>';
+ if(a>=45)s+='<path d="M42 '+(ey+10)+' q3 4 6 5 M78 '+(ey+10)+' q-3 4 -6 5 M50 '+(ey-14)+' h20" fill="none" stroke="#00000030" stroke-width=".9"/>';
+ // 帽冠
+ if(role==='official'){const wl=18+(f[2]%3)*3;s+='<path d="M34 46 Q34 14 60 14 Q86 14 86 46 Q86 34 60 32 Q34 34 34 46Z" fill="#14100e" stroke="#000" stroke-width="1"/><path d="M36 44 Q60 36 84 44 L84 49 Q60 42 36 49Z" fill="#e5c777"/><rect x="'+(34-wl)+'" y="31" width="'+wl+'" height="5" rx="2.5" fill="#14100e" stroke="#e5c777" stroke-width=".8"/><rect x="86" y="31" width="'+wl+'" height="5" rx="2.5" fill="#14100e" stroke="#e5c777" stroke-width=".8"/>'}
+ else if(role==='general'){s+='<path d="M30 48 Q30 12 60 10 Q90 12 90 48 Q90 36 60 33 Q30 36 30 48Z" fill="#8b8d98" stroke="#1d1d22" stroke-width="1.2"/><path d="M60 2 L60 18" stroke="#b3281f" stroke-width="5" stroke-linecap="round"/><path d="M60 3 Q70 -2 74 8 Q66 8 60 14Z" fill="#b3281f"/><rect x="34" y="40" width="52" height="4" fill="#d9c27a"/>'}
+ else if(role==='eunuch'){s+='<path d="M38 44 Q38 4 60 4 Q82 4 82 44 Q82 34 60 32 Q38 34 38 44Z" fill="#17171d" stroke="#000" stroke-width="1"/><rect x="38" y="38" width="44" height="5" fill="#8a8a9a"/><circle cx="60" cy="8" r="2.4" fill="#d9c27a"/>'}
+ else if(role==='prince'||role==='kin'){s+='<path d="M36 40 Q38 28 60 27 Q82 28 84 40 Q72 34 60 34 Q48 34 36 40Z" fill="'+hairC+'"/><path d="M46 28 L50 12 Q60 8 70 12 L74 28 Q60 24 46 28Z" fill="#e5c777" stroke="#7a5a1a" stroke-width="1"/><rect x="56" y="14" width="8" height="10" rx="2" fill="#3f9b7c"/><path d="M36 38 L36 52 M84 38 L84 52" stroke="#e5c777" stroke-width="1.4"/>'}
+ else{s+='<path d="M32 50 Q32 28 60 28 Q88 28 88 50 Q86 38 60 36 Q34 38 32 50Z" fill="'+hairC+'"/>'+(st>=1?'<rect x="34" y="30" width="52" height="4" rx="2" fill="'+robe+'"/>':'')}
+ s+='</g><rect x="1.5" y="1.5" width="117" height="147" fill="none" stroke="#c9a45a" stroke-width="1.5" opacity=".8"/><rect width="120" height="150" fill="url(#v'+u+')"/></svg>';
+ return s}
 function portraitSvg(p,w){
  const f=p.ft,a=age(p),st=stage(p),M=p.g==='M',role=p.role;
  const skin=['#f7e0c9','#f1d2b3','#e9c39d','#dcae86','#cb9a72'][f[0]],skD=['#e2bfa0','#d8ae8c','#cc9c76','#bc8c66','#aa7c55'][f[0]];
@@ -2568,7 +2618,8 @@ function webData(){const e=emp();
  const grp={};for(const p of off){const k=facOf(p);(grp[k]=grp[k]||[]).push(p)}
  return{e,roy,grp}}
 function medallion(p,x,y,r,ring,gold){const id='cp'+p.id;let s=portrait(p,r*2);
- s=s.replace(/<svg xmlns="[^"]*" viewBox="0 0 120 150" width="[^"]*" height="[^"]*">/,'<svg x="'+(x-r+2)+'" y="'+(y-r+2)+'" width="'+(2*r-4)+'" height="'+(2*r-4)+'" viewBox="20 12 80 80" preserveAspectRatio="xMidYMid slice">');
+ if(s.slice(0,4)==='<img'){const m=s.match(/src="([^"]+)"/);s='<svg x="'+(x-r+2)+'" y="'+(y-r+2)+'" width="'+(2*r-4)+'" height="'+(2*r-4)+'" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><image href="'+m[1]+'" x="-4" y="-2" width="108" height="135" preserveAspectRatio="xMidYMin slice"/></svg>'}
+ else s=s.replace(/<svg xmlns="[^"]*" viewBox="0 0 120 150" width="[^"]*" height="[^"]*">/,'<svg x="'+(x-r+2)+'" y="'+(y-r+2)+'" width="'+(2*r-4)+'" height="'+(2*r-4)+'" viewBox="20 12 80 80" preserveAspectRatio="xMidYMid slice">');
  return '<clipPath id="'+id+'"><circle cx="'+x+'" cy="'+y+'" r="'+(r-2)+'"/></clipPath><circle cx="'+x+'" cy="'+y+'" r="'+(r+5)+'" fill="#F6F8F6" opacity=".85"/><circle cx="'+x+'" cy="'+y+'" r="'+(r-1)+'" fill="#26343F"/>'+s
   +'<circle cx="'+x+'" cy="'+y+'" r="'+(r-1)+'" fill="none" stroke="'+ring+'" stroke-width="3"/>'+(gold?'<circle cx="'+x+'" cy="'+y+'" r="'+(r+4)+'" fill="none" stroke="#8C6A1F" stroke-width="1"/>':'')}
 function webSvg(pw){pw=pw||G.pow;const W=920,C=460;const {e,roy,grp}=webData();const L=UI.webL||(UI.webL={kin:1,rel:1,arc:1});
