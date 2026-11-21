@@ -196,9 +196,9 @@ body.ingame .seg{display:flex;max-width:100%}body.ingame .seg button{flex:1 1 0;
 @keyframes spzoom{from{transform:scale(1.14)}to{transform:scale(1.02)}}
 .sp-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 46% 40% at 50% 56%,rgba(255,170,70,.20),transparent 70%);mix-blend-mode:screen;animation:spbreath 5s ease-in-out infinite alternate}
 @keyframes spbreath{from{opacity:.55}to{opacity:1}}
-.sp-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,7,18,.9) 0,rgba(4,7,18,.78) 30%,rgba(4,7,18,.35) 48%,rgba(4,7,18,0) 60%,rgba(4,7,18,0) 70%,rgba(4,7,18,.8) 100%),radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(2,3,10,.65))}
+.sp-shade{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 48% 24% at 50% 17%,rgba(4,7,18,.62),transparent 75%),linear-gradient(180deg,rgba(4,7,18,.28) 0,rgba(4,7,18,.08) 40%,rgba(4,7,18,0) 60%,rgba(4,7,18,.5) 100%),radial-gradient(ellipse at 50% 50%,transparent 62%,rgba(2,3,10,.4))}
 .sp-fx i{background:#F7B9CB;box-shadow:0 0 6px rgba(255,190,210,.7);width:8px;height:8px;border-radius:80% 0 80% 20%;top:-14px}
-.sp-title{top:5vh}.sp-title h1{font-size:clamp(3rem,9vw,6rem)}
+.sp-title{top:5vh}.sp-title h1{font-size:clamp(2.7rem,8.1vw,5.4rem)}
 .sp-title h1{font-size:clamp(3rem,10.5vw,7rem);letter-spacing:.24em;padding-left:.24em;background:linear-gradient(180deg,#FFF8DD 8%,#F3D58A 52%,#C48F3E 96%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 22px rgba(255,170,70,.55)) drop-shadow(0 4px 6px rgba(0,0,0,.85))}
 .sp-sub{display:flex;align-items:center;justify-content:center;gap:16px;letter-spacing:.7em;padding-left:.7em;color:#F1DDA6;font-size:1.05rem;text-shadow:0 2px 8px #000}
 .sp-sub::before,.sp-sub::after{content:'';width:clamp(30px,8vw,90px);height:1px;background:linear-gradient(90deg,transparent,#E3C77E)}
@@ -206,7 +206,7 @@ body.ingame .seg{display:flex;max-width:100%}body.ingame .seg button{flex:1 1 0;
 .sp-line{height:14px;background:none;position:relative;margin:2px auto 0}
 .sp-line::before{content:'';position:absolute;left:0;right:0;top:6px;height:1px;background:linear-gradient(90deg,transparent,#E3C77E,transparent)}
 .sp-line i{position:absolute;left:50%;top:3px;width:8px;height:8px;margin-left:-4px;background:#B3281F;border:1px solid #F3D58A;transform:rotate(45deg)}
-.sp-tag{opacity:0;animation:fadein 1.6s 3s forwards;margin-top:10px;letter-spacing:.5em;padding-left:.5em;color:#E4D2A4;font-size:.92rem;text-shadow:0 2px 8px #000}
+.sp-tag{opacity:0;animation:fadein 1.6s 3s forwards}
 .sp-cta{bottom:calc(7vh + env(safe-area-inset-bottom))}
 .sp-cta button{border-radius:30px;font-size:1.2rem;padding:12px 44px;letter-spacing:.4em;padding-left:calc(44px + .4em)}
 .sp-cta .gold{color:#FFF1C9;background:linear-gradient(180deg,#c43624,#7a1810);border:2px solid #E3C77E;box-shadow:inset 0 1px 0 rgba(255,214,170,.45),0 4px 0 #3e0b07,0 10px 26px rgba(0,0,0,.6),0 0 30px rgba(255,150,60,.35)}
@@ -221,3 +221,11 @@ body:not(.ingame)[data-scn]::before{content:'';position:fixed;inset:0;z-index:0;
 body:not(.ingame) .start h1{font-family:var(--brush);font-weight:400;letter-spacing:.3em;font-size:clamp(2.2rem,6vw,3.4rem);background:linear-gradient(180deg,#FFF8DD,#E5C374);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 6px rgba(0,0,0,.8))}
 body:not(.ingame) .start .intro{color:#DCCBA2!important;text-shadow:0 1px 4px #000}
 body:not(.ingame) #wrap{position:relative;z-index:1}
+
+/* 帝王題詞 */
+.sp-tag{margin-top:12px;font-family:var(--brush);font-size:clamp(1.05rem,2.4vw,1.5rem);letter-spacing:.32em;padding-left:.32em;color:#F3E2B0;text-shadow:0 2px 10px #000,0 0 18px rgba(0,0,0,.7)}
+.sp-tag small{display:block;margin-top:4px;font-family:var(--body);font-size:.72rem;letter-spacing:.3em;color:#CDB98A;opacity:.9}
+.sp-tag{position:relative;display:inline-block;padding:6px 40px 8px}
+.sp-tag::before{content:'';position:absolute;inset:-4px -10px;z-index:-1;background:radial-gradient(ellipse at center,rgba(4,7,18,.72),rgba(4,7,18,.5) 55%,transparent 80%);filter:blur(6px)}
+.sp-tag small{font-size:.8rem;color:#E6D3A2}
+.sp-title{display:flex;flex-direction:column;align-items:center}

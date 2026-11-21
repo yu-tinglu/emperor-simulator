@@ -101,11 +101,12 @@ function hasSave(slot){try{return !!localStorage.getItem(SAVEKEY+'_'+slot)}catch
 /* ---------- 開場 ---------- */
 const FOCUSD={lit:'詩文書畫，清流愛才',mil:'騎射兵法，將門敬重',pol:'吏治民政，理事老練',sch:'洞察人心，識破陰謀',biz:'錢糧賬目，國庫精算',med:'醫藥養生，龍體安康'};
 const SCNL={a:'十七歲登基，太后與權臣把持朝政',b:'三十而立，朝堂與後宮皆已成形',c:'新朝初立，國庫空虛、將門功高'};
+const SPQ=[['天下為局，萬人落子。','登基前夜'],['一朝登極，千秋功過。','史官'],['江山易得，人心難守。','先帝遺訓'],['朕之一念，天下皆動。','御前'],['九重宮闕，寂寞最深。','內侍'],['得民心者得天下。','太傅'],['居安思危，戒奢以儉。','先帝遺詔'],['成敗不在今夜，在往後每一日。','老臣'],['龍椅之上，無人可信，亦無人可棄。','太后'],['青史無情，不問初衷。','史官']];
 function startScreen(){document.body.classList.remove('ingame');document.documentElement.style.setProperty('--hero','url('+SPLASH_IMG+')');
  $('#top').style.display='none';ambience();
  if(!UI.splashDone){
   $('#app').innerHTML='<div class="splash" data-act="enter"><img class="sp-bg" alt="" src="'+SPLASH_IMG+'"><div class="sp-glow"></div><div class="sp-fx">'+Array.from({length:26},(_,i)=>'<i style="left:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*12).toFixed(1)+'s;animation-duration:'+(9+Math.random()*9).toFixed(1)+'s;opacity:'+(.45+Math.random()*.5).toFixed(2)+';transform:scale('+(.7+Math.random()*.9).toFixed(2)+')"></i>').join('')+'</div><div class="sp-shade"></div>'
-   +'<div class="sp-title"><div class="sp-sub"><span>登基前夜</span></div><h1>皇帝模擬器</h1><div class="sp-line"><i></i></div><div class="sp-tag">天下為局　一人落子</div></div>'
+   +'<div class="sp-title"><div class="sp-sub"><span>登基前夜</span></div><h1>皇帝模擬器</h1><div class="sp-line"><i></i></div><div class="sp-tag">'+(q=>'「'+q[0]+'」<small>—— '+q[1]+'</small>')(SPQ[Math.floor(Math.random()*SPQ.length)])+'</div></div>'
    +'<div class="sp-cta"><button class="gold" data-act="enter">入　殿</button>'+(hasSave('auto')?'<button data-act="loadauto" class="ghost">繼續上次</button>':'')+'</div></div>';
   document.body.dataset.scn='';return}
  const S=UI.start;document.body.dataset.scn=S.scn;
