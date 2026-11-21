@@ -17,7 +17,24 @@ function ambLabel(p){const v=shown(p,p.amb);return v>=78?'野心勃勃':v>=58?'�
 function corLabel(p){const v=shown(p,p.cor+10);return v>=60?'疑有貪墨':v>=40?'不甚清廉':'清廉自守'}
 
 /* ---------- 立繪 ---------- */
+function portHash(id){let h=0;const t=String(id);for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return h}
+function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" draggable="false">'}
 function portrait(p,w){
+ const st=stage(p),role=p.role;
+ if(role==='emp'&&st>=1)return portImg(PORT_EMP,w,'emp');
+ if(role==='dowager')return portImg(PORT_DOW,w,'dow');
+ if(p.g!=='M'&&st>=2&&(role==='consort'||role==='maiden'||role==='wife'||role==='princess')){
+  const h=portHash(p.id);
+  if(role==='consort'&&h%5===0)return portImg(PORT_X[(h>>3)%PORT_X.length],w);
+  const low=role==='consort'&&p.fav<25;
+  if(low){const k=PORT_SAD[(h>>3)%PORT_SAD.length];return portImg(PORT_F[k],w)}
+  const pool=[];for(let i=0;i<PORT_F.length;i++)if(PORT_SAD.indexOf(i)<0)pool.push(PORT_F[i]);
+  const n=pool.length+PORT_F2.length,k=(h>>3)%n;
+  return portImg(k<pool.length?pool[k]:PORT_F2[k-pool.length],w);
+ }
+ return portraitSvg(p,w);
+}
+function portraitSvg(p,w){
  const f=p.ft,a=age(p),st=stage(p),M=p.g==='M',role=p.role;
  const skin=['#f7e0c9','#f1d2b3','#e9c39d','#dcae86','#cb9a72'][f[0]],skD=['#e2bfa0','#d8ae8c','#cc9c76','#bc8c66','#aa7c55'][f[0]];
  const hairC=st===3?'#dcd8d2':st===2&&a>=45?'#4a4644':['#1c1411','#2a1a12','#33221a','#1a1417','#241812'][f[6]%5];
@@ -380,13 +397,21 @@ function intelCard(it){const sus=P(it.sus);
 
 /* ---------- 分頁 ---------- */
 function fw(k,t,b,d){if(!b)return'';const o=UI.fold&&UI.fold[k]!=null?UI.fold[k]:d;return '<div class="fold"><button class="foldh" data-act="fold" data-arg="'+k+'">'+(o?'▾':'▸')+' '+t+'</button>'+(o?b:'')+'</div>'}
+function courtHero(){const e=emp(),nS=G.sit.length,nM=G.memo.length,nI=G.intel.length;
+ const m=G.mandate,md=m&&!m.done?MAND[m.k]:null,mp=md?Math.round(mandProg()*100):0;
+ const chip=(c,lab,n,act)=>'<'+(act?'button':'span')+' class="dchip '+c+(n?' on':'')+'"'+(act?' data-act="'+act+'"':'')+'><b>'+n+'</b>'+lab+'</'+(act?'button':'span')+'>';
+ let pips='';for(let i=0;i<Math.max(G.ap,0);i++)pips+='<i></i>';
+ return '<div class="chero"><div class="ch-med">'+portImg(PORT_EMP,84,'emp')+'</div><div class="ch-t"><h1>朝　堂</h1><p>'+esc(nm(e))+' · '+G.era.n+'年號 · '+age(e)+'歲　<span class="dim">今日朝會，百官候旨</span></p></div></div>'
+ +'<div class="duty">'+chip('c1','急報',nS)+chip('c2','奏摺',nM)+chip('c3','密報',nI)+'<span class="dchip ap"><em class="pips">'+pips+'</em>精力 '+G.ap+' 旬</span>'
+ +(md?'<button class="dchip mdc" data-act="mandpick"><span class="mp" style="width:'+mp+'%"></span><span class="mt">天命：'+md.n+' '+mp+'%</span></button>':'<button class="dchip mdc" data-act="mandpick"><span class="mt">立志 · 為這一朝定個方向</span></button>')+'</div>'}
 function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).length;
- if(UI.last)h+='<div class="card '+(UI.last.ok?'good':'alert')+'"><div class="small dim">最近一次行動</div>'+esc(UI.last.msg).replace(/\n/g,'<br>')+'</div>';
- h+=guideHtml()+fw('mand','天命志向',mandHtml(),!G.mandate)+digestHtml()+fw('arcs','人物故事線',arcsHtml(),false);const urgent=G.sit.filter(s=>s.k!=='case');const cases=G.sit.filter(s=>s.k==='case');
+ h+=courtHero();
+ if(UI.last)h+='<div class="lastbar '+(UI.last.ok?'ok':'no')+'"><span>最近</span>'+esc(UI.last.msg).replace(/\n/g,'　')+'</div>';
+ h+=digestHtml()+fw('arcs','人物故事線',arcsHtml(),false);const urgent=G.sit.filter(s=>s.k!=='case');const cases=G.sit.filter(s=>s.k==='case');
  if(urgent.length||cases.length){h+='<h4>急報與要務</h4>'+urgent.map(sitCard).join('')+cases.map(sitCard).join('')}
  h+='<div class="row sp"><h4 style="flex:1">奏摺（'+G.memo.length+'）</h4><span class="small dim">每批閱三份耗一旬 · 今已批 '+G.mw+' 份'+(nIdle>=2?' <button class="sm" data-act="idleall">閒事'+nIdle+'件一併留中</button>':'')+(G.memo.length>8?' <span class="bad">積壓過多，權臣趁機代批</span>':'')+'</span></div>';
- const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);const PS=3,np=Math.max(1,Math.ceil(ms.length/PS));UI.mi=Math.min(Math.max(UI.mi||0,0),np-1);
- h+=ms.length?ms.slice(UI.mi*PS,UI.mi*PS+PS).map((m,i)=>memoCard(m,i)).join('')+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="card dim">案頭暫無奏摺。</div>';
+ const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);const PS=6,np=Math.max(1,Math.ceil(ms.length/PS));UI.mi=Math.min(Math.max(UI.mi||0,0),np-1);
+ h+=ms.length?'<div class="mgrid">'+ms.slice(UI.mi*PS,UI.mi*PS+PS).map((m,i)=>memoCard(m,i)).join('')+'</div>'+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="empty">今日無事，可靜觀一月。</div>';
  if(G.intel.length)h+='<h4>密報（'+G.intel.length+'）</h4>'+G.intel.slice(0,6).map(intelCard).join('');
  h+=fw('feed','近事（最近四十條）','<div class="card feed">'+G.log.slice(0,40).map(l=>'<div class="'+l.cls+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join('')+'</div>',false);return h}
 function tabSelf(){const e=emp();

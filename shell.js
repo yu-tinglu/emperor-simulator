@@ -34,9 +34,9 @@ function sideHtml(kind){
  if(kind==='gov')return sdBox('gov','本月朝政要務','court',dutyBody())+sdBox('hist','朝廷動態','hist',newsBody(6));
  const rg=Object.values(G.reg).map(r=>{const s=regState(r);return '<div class="rg"><i class="'+s[1]+'"></i>'+esc(r.n)+'：<b class="'+s[1]+'">'+s[0]+'</b></div>'}).join('');
  const world='<div class="wd"><div class="mini" data-act="tab" data-arg="map">'+mapSvg()+'</div><div class="rgs">'+rg+'</div></div>';
- const who=[['首輔',holder('chan')],['皇后',consorts().find(c=>c.rank===6)],['太后',alivePs().find(p=>p.role==='dowager')],['太子',G.heir!=null?P(G.heir):null]];
- const ppl='<div class="pps">'+who.map(([l,p])=>p&&p.alive?'<div class="pp" data-act="person" data-arg="'+p.id+'"><div class="pf">'+portrait(p,64)+'</div><span>'+l+'</span></div>':'<div class="pp empty"><div class="pf">'+ico('people',30)+'</div><span>'+l+'（未立）</span></div>').join('')+'</div>';
- return sdBox('hist','朝廷動態','hist',newsBody(4))+sdBox('map','天下形勢','map',world)+sdBox('web','人物關係','web',ppl)}
+ const who=[['皇帝',emp()],['首輔',holder('chan')],['皇后',consorts().find(c=>c.rank===6)],['太后',alivePs().find(p=>p.role==='dowager')],['太子',G.heir!=null?P(G.heir):null]];
+ const ppl='<div class="pps">'+who.map(([l,p])=>p&&p.alive?'<div class="pp" data-act="person" data-arg="'+p.id+'"><div class="pf">'+portrait(p,64)+'</div><span>'+l+'</span></div>':'<div class="pp empty"><div class="pf">'+ico('people',30)+'</div><span>'+l+'<br><small>未立</small></span></div>').join('')+'</div>';
+ return sdBox('hist','朝廷動態','hist',newsBody(3))+sdBox('map','天下形勢','map',world)+sdBox('web','人物關係','web',ppl)}
 function heroHtml(t,s){return '<div class="hero"><h1>'+t+'</h1><p>'+s+'</p></div>'}
 const PROPS='<svg class="props" viewBox="0 0 520 120" aria-hidden="true"><defs><linearGradient id="jd" x1="0" x2="1"><stop offset="0" stop-color="#3f7a5c"/><stop offset=".5" stop-color="#9fd2b0"/><stop offset="1" stop-color="#2c5a43"/></linearGradient><linearGradient id="pt" x1="0" x2="1"><stop offset="0" stop-color="#1a0e0a"/><stop offset=".5" stop-color="#5a3320"/><stop offset="1" stop-color="#150a07"/></linearGradient></defs>'
  +'<g transform="translate(18 20)"><rect x="6" y="38" width="46" height="58" rx="6" fill="url(#pt)"/><rect x="6" y="38" width="46" height="8" rx="3" fill="#d2ae62" opacity=".6"/><path d="M16 38L10 2M26 38L24 -6M36 38L40 -2M46 38L54 6" stroke="#2a1a10" stroke-width="3" stroke-linecap="round"/><path d="M10 2l-2-8M24-6l0-8M40-2l3-8M54 6l5-7" stroke="#c9b48a" stroke-width="2.4" stroke-linecap="round"/></g>'
