@@ -236,6 +236,131 @@ details.cust{margin:8px 0;border:1px dashed var(--line);padding:6px 10px}details
 .fold{margin:6px 0}.foldh{width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 2px;font-family:inherit;font-size:1rem;color:var(--ink);cursor:pointer}
 body.hc{--ink:#000;--dim:#2c343a;--line:#6b7679}body.hc .dim,body.hc .small.dim{color:#2c343a!important}body.hc .card{border-color:#6b7679}body.rm *,body.rm *::before,body.rm *::after{animation:none!important;transition:none!important}body.rm .sp-title h1{clip-path:none}body.rm .sp-sub,body.rm .sp-cta{opacity:1}
 .focuses.diffs{grid-template-columns:repeat(3,1fr)}.focuses.diffs button small{font-size:.7rem}.startcta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.startcta .big{grid-column:1/-1;padding:14px}.startcta button{min-height:46px}
+
+/* ============ 朝堂改版（body.ingame） ============ */
+body.ingame{--paper:#EFE5CE;--paper2:#F8F1DF;--panel:#F8F1DF;--panel2:#EBDFC3;--ink:#2B1E14;--ink2:#160E0A;--dim:#76624A;--line:#CDB98F;--indigo:#5A3A1C;--gold:#8C6A1F;--goldhi:#E8D5A0;
+ background:#110B08;background-image:radial-gradient(ellipse at 50% -10%,#3a1d14 0,#110B08 60%);color:#E7DAC0}
+body.ingame #wrap{max-width:1500px;padding:0 14px 110px}
+/* 頂欄 */
+body.ingame #top{margin:0 -14px;padding:8px 18px;background:linear-gradient(180deg,#2a140f,#170d09);border-bottom:2px solid #8E6B2F;box-shadow:0 2px 0 #000a,0 6px 18px #0008;color:#E7DAC0;position:relative;overflow:hidden}
+body.ingame #top::after{content:'';position:absolute;right:0;top:0;bottom:0;width:46%;pointer-events:none;background:radial-gradient(circle at 78% 30%,#f3e3b844 0 18px,transparent 19px),linear-gradient(90deg,transparent,#6a2a1a33);opacity:.9}
+body.ingame #top>*{position:relative;z-index:1}
+body.ingame #top .date{font-size:1.55rem;color:#F1DFAA;text-shadow:0 1px 0 #000}
+body.ingame #top .date .seas{display:inline-flex;align-items:center;justify-content:center;width:1.5em;height:1.5em;margin-right:.5em;background:#8d1f17;border:1px solid #E8D5A0;color:#fff;font-size:.9rem;border-radius:3px;vertical-align:.1em}
+body.ingame #top .date small{color:#BCA982}
+body.ingame .ap{color:#BCA982}
+body.ingame .pip{border-color:#C9A24B}body.ingame .pip.on{background:#D8392B;border-color:#D8392B;box-shadow:0 0 0 2px #160E0A,0 0 0 3px #D8392B88}
+.acts{display:flex;gap:6px}
+.acts button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:54px;padding:6px 8px 4px;background:#24130e;border:1px solid #8E6B2F;color:#E8D5A0;box-shadow:inset 0 0 0 1px #00000066;font-size:.72rem;border-radius:3px}
+.acts button:hover{background:#3a1f16;box-shadow:inset 0 0 0 1px #E8D5A055}
+.acts .ico{display:block}
+/* 數值列 */
+body.ingame #stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin:12px 0 10px;background:linear-gradient(180deg,#24130e,#190e0a);border:1px solid #8E6B2F;border-radius:4px;box-shadow:inset 0 0 0 2px #0008,0 4px 14px #0007}
+body.ingame .chip{display:flex;gap:9px;align-items:center;padding:9px 12px;border:0;border-right:1px solid #4a3220;color:#BCA982;font-size:.8rem}
+body.ingame .chip:last-child{border-right:0}
+body.ingame .chip .ci{color:#D9B866;display:flex}
+body.ingame .chip .cb{flex:1;min-width:0}
+body.ingame .chip .cl{display:block;font-size:.76rem;color:#BCA982}
+body.ingame .chip b{display:block;font-size:1.25rem;color:#F5E9CC;line-height:1.25;font-weight:700}
+body.ingame .chip b small,body.ingame .chip small{color:#BCA982}
+body.ingame .chip small.good{color:#7ED29A}body.ingame .chip small.bad{color:#FF8E7E}
+body.ingame .chip[data-act]:hover{background:#ffffff0a}body.ingame .chip[data-act]:hover b{color:#fff}
+body.ingame .chip .bar{background:#00000066;height:5px;margin-top:3px}
+/* 殼：左導覽｜主區｜右欄 */
+#shell{display:grid;grid-template-columns:172px minmax(0,1fr);gap:16px;align-items:start}
+body.ingame #shell:has(#side){grid-template-columns:172px minmax(0,1fr) 318px}
+body.ingame .tabs{display:flex;flex-direction:column;gap:7px;margin:0;border:0;overflow:visible;position:sticky;top:78px}
+body.ingame .tabs button{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;font-size:1.02rem;color:#D9C8A3;background:linear-gradient(180deg,#2c1811,#1e110c);border:1px solid #6b4f2a;border-radius:4px;box-shadow:inset 0 0 0 1px #000a;border-bottom:1px solid #6b4f2a;white-space:nowrap}
+body.ingame .tabs button:hover{background:linear-gradient(180deg,#3a2016,#26150e);color:#fff}
+body.ingame .tabs button.on{color:#FFF1C9;background:linear-gradient(180deg,#8d2a1f,#5e1710);border-color:#E8D5A0;font-weight:700;box-shadow:inset 0 0 0 1px #000a,0 0 14px #b3342d55}
+body.ingame .tabs .ico{flex:none;color:#D9B866}
+body.ingame .tabs button.on .ico{color:#FFE9A8}
+body.ingame .tabs .dot{position:absolute;top:-5px;right:-5px;background:#D8392B;border:1px solid #E8D5A0}
+body.ingame .tabs button{position:relative}
+/* 主區（深色底、宣紙卡片） */
+body.ingame #pane{min-width:0;color:#E7DAC0}
+body.ingame #pane h4{color:#F1DFAA;border-bottom:1px solid #6b4f2a}
+body.ingame #pane h4::before{background:#B3342D}
+body.ingame #pane .dim,body.ingame #pane .small.dim{color:#B9A57F}
+body.ingame #pane .card,body.ingame #pane .card .dim,body.ingame #pane .card .small.dim{color:var(--dim)}
+body.ingame #pane .card{color:var(--ink);background:linear-gradient(180deg,#FBF4E2,#F3E8CE);border:1px solid #B8924A;box-shadow:inset 0 0 0 3px #F3E8CE,inset 0 0 0 4px #D6BE86,0 3px 10px #0007}
+body.ingame #pane .card h3{color:#4a2a14}
+body.ingame #pane .card h4{color:var(--ink);border-bottom-color:var(--line)}
+body.ingame .foldh{color:#F1DFAA;border-bottom:1px solid #6b4f2a}
+body.ingame .fold{margin:8px 0}
+body.ingame #pane a{color:#7A2418}
+body.ingame #pane>a,body.ingame #pane .dim a{color:#E8B86A}
+/* 右欄 */
+#side{display:flex;flex-direction:column;gap:12px;position:sticky;top:78px}
+.sd{background:linear-gradient(180deg,#2a1710,#1b0f0b);border:1px solid #8E6B2F;border-radius:4px;box-shadow:inset 0 0 0 2px #0008,0 4px 14px #0007;overflow:hidden}
+.sdh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #5a4024;background:linear-gradient(180deg,#3a2016,#26150e);color:#E8D5A0}
+.sdh b{flex:1;font-size:1.05rem;letter-spacing:.08em;font-weight:700}
+.sdh a{font-size:.78rem;color:#BCA982;cursor:pointer}.sdh a:hover{color:#fff}
+.nw{padding:7px 12px;font-size:.88rem;color:#E1D3B4;border-bottom:1px dashed #4a3220;line-height:1.5}
+.nw:last-child{border-bottom:0}.nw time{display:block;font-size:.72rem;color:#9c8861}
+.nw.crit,.nw.warn{color:#FFB09F}
+.wd{display:grid;grid-template-columns:1fr 112px;gap:8px;padding:8px}
+.mini{cursor:pointer;border:1px solid #6b4f2a;border-radius:3px;overflow:hidden;background:#EADFC4}
+.mini svg{display:block;width:100%;height:auto}.mini svg *{pointer-events:none}
+.rgs{display:flex;flex-direction:column;gap:6px;justify-content:center;font-size:.84rem;color:#E1D3B4}
+.rgs .rg{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.rgs i{width:9px;height:9px;border-radius:50%;background:#7ED29A;flex:none}.rgs i.r{background:#E5483B}.rgs i.o{background:#E8A04A}
+.rgs b.r{color:#FF8E7E}.rgs b.o{color:#F0B25A}.rgs b.g{color:#7ED29A}
+.pps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}
+.pp{text-align:center;font-size:.76rem;color:#D9C8A3;cursor:pointer}
+.pp .pf{border:1px solid #8E6B2F;border-radius:3px;overflow:hidden;aspect-ratio:1/1.15;background:#1a0f0b;display:flex;align-items:center;justify-content:center}
+.pp .pf>*{max-width:100%;height:auto;display:block}.pp.empty{cursor:default;opacity:.7}.pp.empty .pf{color:#7a6648}
+.pp span{display:block;margin-top:3px}
+/* 底欄 */
+body.ingame #qb{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:14px;align-items:stretch;justify-content:center;padding:10px 18px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#24130e,#120a07);border-top:2px solid #8E6B2F;box-shadow:0 -6px 20px #000a}
+.qb-sc{display:flex;gap:8px;flex:1;max-width:1000px}
+.qb-sc button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 8px;background:linear-gradient(180deg,#2c1811,#1e110c);border:1px solid #6b4f2a;color:#E8D5A0;border-radius:4px;box-shadow:inset 0 0 0 1px #000a}
+.qb-sc button:hover{background:linear-gradient(180deg,#3d2217,#2a170f);color:#fff}
+.qb-adv{display:flex;gap:8px;align-items:stretch}
+.qb-adv .adv{padding:10px 26px;font-size:1.12rem;letter-spacing:.14em;color:#FFF1C9;background:linear-gradient(180deg,#a8321f,#6a1810);border:2px solid #E8D5A0;border-radius:6px;box-shadow:inset 0 0 0 1px #000a,0 0 16px #b3342d66}
+.qb-adv .adv:hover{background:linear-gradient(180deg,#c13c27,#7c1d13)}
+.qb-sub{display:flex;flex-direction:column;gap:5px}.qb-sub button{padding:2px 10px;font-size:.78rem;background:#24130e;border:1px solid #6b4f2a;color:#D9C8A3}
+body.ingame #toasts{bottom:96px}
+/* 手機 */
+@media(max-width:1180px){body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr)}body.ingame #side{grid-column:1/-1;position:static;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.acts button span{display:none}.acts button{min-width:40px}}
+@media(max-width:760px){
+ body.ingame #wrap{padding:0 10px 150px}
+ body.ingame #top{margin:0 -10px;padding:6px 12px}body.ingame #top .date{font-size:1.2rem}body.ingame #top::after{display:none}
+ .acts{position:absolute;right:10px;top:6px}.acts button{min-width:34px;padding:4px 6px}.acts button:nth-child(-n+3){display:none}
+ body.ingame #stats{display:flex;overflow-x:auto;margin:8px -10px 6px;border-radius:0;scrollbar-width:none}body.ingame .chip{flex:none;min-width:136px}
+ #shell,body.ingame #shell:has(#side){display:block}
+ body.ingame .tabs{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:31;flex-direction:row;gap:0;overflow-x:auto;background:#140b08;border-top:2px solid #8E6B2F;padding:2px 4px calc(2px + env(safe-area-inset-bottom));scrollbar-width:none}
+ body.ingame .tabs button{flex:1 0 auto;flex-direction:column;gap:1px;padding:6px 12px;font-size:.78rem;background:none;border:0;border-bottom:3px solid transparent;box-shadow:none;border-radius:0}
+ body.ingame .tabs button.on{background:none;box-shadow:none;border-bottom-color:#E8D5A0;color:#FFE9A8}
+ body.ingame .tabs .dot{top:2px;right:6px}
+ body.ingame #qb{left:8px;right:8px;bottom:calc(56px + env(safe-area-inset-bottom));padding:0;background:none;border:0;box-shadow:none;gap:8px}
+ .qb-sc{gap:6px}.qb-sc button{padding:9px 4px;font-size:.84rem;box-shadow:0 3px 12px #0008}.qb-sc button:nth-child(n+3){display:none}.qb-sc .ico{display:none}
+ .qb-adv .adv{padding:9px 14px;font-size:1rem;letter-spacing:.06em}.qb-sub{display:none}
+ body.ingame #side{display:block;margin-top:12px}body.ingame #side .sd{margin-bottom:10px}
+ body.ingame #toasts{bottom:132px}
+}
+body.hc.ingame #pane .dim{color:#E0D2B0}
+
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--brush);font-size:1.8rem;color:#F1DFAA;letter-spacing:.08em;text-shadow:0 2px 0 #000;padding-right:18px;border-right:1px solid #5a4024}
+body.ingame .foldh{box-shadow:none;background:transparent;border-radius:0;border-left:0;border-right:0;border-top:0}
+body.ingame .foldh:hover{background:#ffffff0d;box-shadow:none}
+@media(max-width:760px){.brand{display:none}}
+body.ingame #pane h3,body.ingame #pane h2{color:#F1DFAA}
+body.ingame #pane .card h2{color:var(--ink)}
+body.ingame #pane label,body.ingame #pane .small{color:#D9C8A3}
+body.ingame #pane .card label,body.ingame #pane .card .small{color:var(--ink)}
+body.ingame #pane .card .small.dim,body.ingame #pane .card .dim{color:var(--dim)}
+
+.card.memo.shut{cursor:pointer}.card.memo.shut .sum{color:var(--ink)}.card.memo.shut:hover{filter:brightness(1.03)}
+.card.memo .more{float:right;color:#7A2418;font-size:.8rem}
+@media(max-width:760px){body.ingame .tabs .dot{top:0;right:2px;font-size:.6rem;line-height:13px}}
+body.ingame #md{color:var(--ink)}
+body.ingame #md .dim,body.ingame #md .small.dim{color:var(--dim)}
+body.ingame #md .small,body.ingame #md label{color:var(--ink)}
+body.ingame #md h2,body.ingame #md h3{color:var(--ink)}
+body.ingame #md h4{color:var(--ink);border-bottom-color:var(--line)}
+body.ingame #md a{color:#7A2418}
+body.ingame #md .good{color:#2E6B57}body.ingame #md .bad{color:#B3281F}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -1693,6 +1818,43 @@ function artScn(k){
   +'<g fill="#0A0606"><circle cx="130" cy="96" r="8"/><path d="M114 138 L120 108 C124 100 136 100 140 108 L146 138Z"/><path d="M122 88 L130 78 L138 88Z"/><rect x="150" y="62" width="2.6" height="62"/><path d="M146 66 L156 66 L151 56Z"/></g>'
   +'<path d="M0 200 L360 200 L360 184 L0 184Z" fill="#0A0606"/></svg>'}
 
+/* ---------- 朝堂改版外框：圖示、導覽、右側動態 ---------- */
+const IC={
+ court:'<path d="M3 9l9-5 9 5M5 9v9M9 9v9M15 9v9M19 9v9M3 20h18"/>',
+ self:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+ gov:'<path d="M6 3h11a2 2 0 012 2v14H8a2 2 0 01-2-2zM6 17a2 2 0 012-2h11M10 8h6M10 11h6"/>',
+ map:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
+ harem:'<path d="M12 20c-5-1-8-4-8-8 3 0 6 1 8 4 2-3 5-4 8-4 0 4-3 7-8 8zM12 16c-1-4-1-7 0-10 1 3 1 6 0 10z"/>',
+ family:'<circle cx="8" cy="9" r="2.6"/><circle cx="16" cy="9" r="2.6"/><path d="M3 19c.6-3 2.5-5 5-5s4.4 2 5 5M11 19c.6-3 2.5-5 5-5s4.4 2 5 5"/>',
+ people:'<circle cx="12" cy="8" r="3.2"/><path d="M6 20v-2a6 6 0 0112 0v2zM9 4l3-2 3 2"/>',
+ web:'<circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M8 8l3 8M16 8l-3 8M8.4 7h7.2"/>',
+ hist:'<path d="M12 6c-2-2-5-2-8-1v13c3-1 6-1 8 1 2-2 5-2 8-1V5c-3-1-6-1-8 1zM12 6v13"/>',
+ sys:'<path d="M4 8h16v11H4zM3 5h18v3H3zM10 12h4"/>',
+ coin:'<circle cx="12" cy="12" r="8"/><rect x="9.5" y="9.5" width="5" height="5"/>',
+ sack:'<path d="M9 4h6l-1 3c4 2 5 6 4 11-1 2-3 3-6 3s-5-1-6-3c-1-5 0-9 4-11zM10 12h4"/>',
+ crown:'<path d="M4 17l-1-9 5 4 4-7 4 7 5-4-1 9zM4 20h16"/>',
+ star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+ flag:'<path d="M6 21V4M6 5h11l-2 3.5 2 3.5H6"/>',
+ save:'<path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/>',
+ load:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+ trophy:'<path d="M8 4h8v5a4 4 0 01-8 0zM8 6H5v2a3 3 0 003 3M16 6h3v2a3 3 0 01-3 3M12 13v4M8 20h8M10 17h4"/>',
+ exit:'<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>'};
+function ico(k,s){return '<svg class="ico" viewBox="0 0 24 24" width="'+(s||20)+'" height="'+(s||20)+'" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(IC[k]||'')+'</svg>'}
+function navHtml(dots){return TABS.map(([k,n])=>'<button class="'+(TAB===k?'on':'')+'" data-act="tab" data-arg="'+k+'">'+ico(k,20)+'<span>'+n+'</span>'+(dots[k]?'<span class="dot"'+(k==='sys'?' data-sys="1"':'')+'>'+dots[k]+'</span>':'')+'</button>').join('')}
+function topActs(){return '<div class="acts">'+[['save','存檔','qsave',''],['load','讀檔','tab','sys'],['gear','設定','tab','sys'],['trophy','典藏','coll',''],['exit','離開','exit','']].map(([i,n,a,g])=>'<button data-act="'+a+'"'+(g?' data-arg="'+g+'"':'')+' title="'+n+'">'+ico(i,22)+'<span>'+n+'</span></button>').join('')+'</div>'}
+function qbHtml(nm_){const dm=G.memo.length;return '<div class="qb-sc"><button data-act="court">'+ico('court',18)+'<span>上朝</span></button><button data-act="tab" data-arg="court">'+ico('gov',18)+'<span>批閱奏摺'+(dm?'（'+dm+'）':'')+'</span></button><button data-act="tab" data-arg="gov">'+ico('people',18)+'<span>朝政</span></button><button data-act="tab" data-arg="map">'+ico('map',18)+'<span>疆域</span></button><button data-act="tab" data-arg="harem">'+ico('harem',18)+'<span>後宮</span></button><button data-act="tab" data-arg="family">'+ico('family',18)+'<span>皇族</span></button></div>'
+ +'<div class="qb-adv"><button class="adv" data-act="adv" data-arg="1">推進時間 ▶</button><div class="qb-sub"><button data-act="adv" data-arg="3">三月</button><button data-act="adv" data-arg="12">一年</button></div></div>'}
+function regState(r){return G.sit.some(s=>s.k==='war'&&s.reg===r.id)?['戰事','r']:G.sit.some(s=>s.k==='revolt'&&s.reg===r.id)||r.rebel?['民變','r']:G.sit.some(s=>s.k==='disaster'&&s.reg===r.id)?['災荒','o']:r.un>65?['民怨','o']:['平穩','g']}
+function sideHtml(){
+ const lg=G.log.slice(0,4);
+ const news='<div class="sd"><div class="sdh">'+ico('hist',18)+'<b>朝廷動態</b><a data-act="tab" data-arg="hist">更多 ›</a></div>'+(lg.length?lg.map(l=>'<div class="nw '+(l.cls||'')+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join(''):'<div class="nw dim">朝野尚無大事。</div>')+'</div>';
+ const rg=Object.values(G.reg).map(r=>{const s=regState(r);return '<div class="rg"><i class="'+s[1]+'"></i>'+esc(r.n)+'：<b class="'+s[1]+'">'+s[0]+'</b></div>'}).join('');
+ const world='<div class="sd"><div class="sdh">'+ico('map',18)+'<b>天下形勢</b><a data-act="tab" data-arg="map">更多 ›</a></div><div class="wd"><div class="mini" data-act="tab" data-arg="map">'+mapSvg()+'</div><div class="rgs">'+rg+'</div></div></div>';
+ const who=[['首輔',holder('chan')],['皇后',consorts().find(c=>c.rank===6)],['太后',alivePs().find(p=>p.role==='dowager')],['太子',G.heir!=null?P(G.heir):null]];
+ const ppl='<div class="sd"><div class="sdh">'+ico('web',18)+'<b>人物關係</b><a data-act="tab" data-arg="web">更多 ›</a></div><div class="pps">'+who.map(([l,p])=>p&&p.alive?'<div class="pp" data-act="person" data-arg="'+p.id+'"><div class="pf">'+portrait(p,64)+'</div><span>'+l+'</span></div>':'<div class="pp empty"><div class="pf">'+ico('people',30)+'</div><span>'+l+'（未立）</span></div>').join('')+'</div></div>';
+ return news+world+ppl}
+
 'use strict';
 /* ============ 介面 ============ */
 const $=s=>document.querySelector(s);
@@ -1796,7 +1958,7 @@ function hasSave(slot){try{return !!localStorage.getItem(SAVEKEY+'_'+slot)}catch
 /* ---------- 開場 ---------- */
 const FOCUSD={lit:'詩文書畫，清流愛才',mil:'騎射兵法，將門敬重',pol:'吏治民政，理事老練',sch:'洞察人心，識破陰謀',biz:'錢糧賬目，國庫精算',med:'醫藥養生，龍體安康'};
 const SCNL={a:'十七歲登基，太后與權臣把持朝政',b:'三十而立，朝堂與後宮皆已成形',c:'新朝初立，國庫空虛、將門功高'};
-function startScreen(){
+function startScreen(){document.body.classList.remove('ingame');
  $('#top').style.display='none';ambience();
  if(!UI.splashDone){
   $('#app').innerHTML='<div class="splash" data-act="enter">'+splashSvg()+'<div class="sp-fx">'+Array.from({length:22},(_,i)=>'<i style="left:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*9).toFixed(1)+'s;animation-duration:'+(8+Math.random()*8).toFixed(1)+'s;opacity:'+(.3+Math.random()*.5).toFixed(2)+'"></i>').join('')+'</div>'
@@ -1820,11 +1982,11 @@ function ambience(){const a=$('#amb');if(!a)return;if(!G){a.innerHTML='';a.class
  a.innerHTML=Array.from({length:se==='wi'?20:14},()=>'<i style="left:'+(Math.random()*100).toFixed(1)+'%;animation-delay:-'+(Math.random()*14).toFixed(1)+'s;animation-duration:'+(10+Math.random()*10).toFixed(1)+'s;--s:'+(.6+Math.random()*.9).toFixed(2)+'"></i>').join('')}
 /* ---------- 頂部與狀態 ---------- */
 function topHtml(){const e=emp();
- return '<div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
+ return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
  +'<div class="ap">旬 '+[0,1,2].map(i=>'<span class="pip '+(i<G.ap?'on':'')+'"></span>').join('')+(G.ap===0?' 精力用盡':'')+'</div>'
- +'<div class="btns"><button class="pri" data-act="adv" data-arg="1">靜觀一月 ▶</button><button data-act="adv" data-arg="3">三月</button><button data-act="adv" data-arg="12">一年</button></div>'}
+ +topActs()}
 function statsHtml(){const f=G.fin||{inc:0,exp:0};const net=f.inc-f.exp;
- const chip=(l,v,b,k)=>'<div class="chip"'+(k?' data-act="why" data-arg="'+k+'" title="點擊查看成因"':'')+'>'+l+'<b>'+v+'</b>'+(b||'')+'</div>';
+ const IK={tre:'coin',gra:'sack',mind:'people',auth:'crown',rep:'star',army:'flag',burden:'sys'};const chip=(l,v,b,k)=>'<div class="chip"'+(k?' data-act="why" data-arg="'+k+'" title="點擊查看成因"':'')+'><span class="ci">'+ico(IK[k]||'coin',22)+'</span><div class="cb"><span class="cl">'+l+'</span><b>'+v+'</b>'+(b||'')+'</div></div>';
  return chip('國庫',n0(G.tre)+'萬兩 <small class="'+(net>=0?'good':'bad')+'">'+(net>=0?'+':'')+n0(net)+'/月</small>',null,'tre')
  +chip('糧倉',n0(G.gra),null,'gra')+chip('民心',n0(G.mind),bar(G.mind,G.mind<35?'r':'g'),'mind')+chip('皇權',n0(G.auth),bar(G.auth,G.auth<30?'r':''),'auth')
  +chip('威望',n0(G.rep),bar(G.rep,'b'),'rep')+chip('軍力',n0(G.army)+'萬 <small>軍心'+n0(G.morale)+'</small>',bar(G.morale,G.morale<35?'r':'w'),'army')+chip('賦稅負擔',n0(G.burden),bar(G.burden,G.burden>60?'r':'w'),'burden')}
@@ -2054,7 +2216,9 @@ function sitCard(s){const r=s.reg?G.reg[s.reg]:null;let t='',b='',cls='alert';co
  return '<div class="card '+cls+'"><h3>'+t+'</h3><div>'+b+'</div><div class="opts">'+O.map((o,i)=>'<button class="sm" data-act="sit" data-arg="'+s.id+'|'+i+'" title="'+esc(o.h||'')+'">'+esc(o.l)+(o.h?'<small>'+esc(o.h)+'</small>':'')+'</button>').join('')+'</div></div>'}
 function memoTier(m){if(['warreq','bj','sky','dil','arc'].includes(m.k)||G.t-m.t>=3)return 0;if(/賀|慶典|宴|祭祀|規格|壽|節|獻瑞/.test(m.txt))return 2;return 1}
 const TIERN=['急','常','閒'];
-function memoCard(m){const O=memoOpts(m);const f=m.from?P(m.from):null;const tr=memoTier(m);
+function memoCard(m,ix){const O=memoOpts(m);const f=m.from?P(m.from):null;const tr=memoTier(m);const many=G.memo.length>3;const open=!many||ix===0||(UI.mopen&&UI.mopen[m.id]);
+ const bd=(m.k==='dil'?'<b class="badge">兩難</b> ':m.k==='sky'?'<b class="badge">'+(OMEN[m.x.o].n)+'</b> ':m.k==='emb'?'<b class="badge">使節</b> ':m.k==='xpol'?'<b class="badge">科舉</b> ':m.k==='bj'?'<b class="badge">邊將</b> ':m.k==='evt'?'<b class="badge">雜事</b> ':m.k==='echo'?'<b class="badge">舊事重提</b> ':'');
+ if(!open)return '<div class="card memo t'+tr+' shut" data-act="mopen" data-arg="'+m.id+'"><div class="small dim"><b class="tier t'+tr+'">'+TIERN[tr]+'</b> '+bd+(f?esc(nmt(f)):'')+' · '+(G.t-m.t)+'月前呈上<span class="more">展開 ▾</span></div><div class="sum">'+esc(m.txt.length>40?m.txt.slice(0,40)+'…':m.txt)+'</div></div>';
  return '<div class="card memo t'+tr+(m.k==='dil'?' dil':'')+'"><div class="small dim"><b class="tier t'+tr+'">'+TIERN[tr]+'</b> '+(m.k==='dil'?'<b class="badge">兩難</b> ':m.k==='sky'?'<b class="badge">'+(OMEN[m.x.o].n)+'</b> ':m.k==='emb'?'<b class="badge">使節</b> ':m.k==='xpol'?'<b class="badge">科舉</b> ':m.k==='bj'?'<b class="badge">邊將</b> ':m.k==='evt'?'<b class="badge">雜事</b> ':m.k==='echo'?'<b class="badge">舊事重提</b> ':'')+(f?esc(nmt(f)):'')+' · '+(G.t-m.t)+'月前呈上</div><div>'+esc(m.txt)+'</div><div class="opts">'+O.map((o,i)=>'<button class="sm" data-act="memo" data-arg="'+m.id+'|'+i+'">'+esc(o.l)+(o.h?'<small>'+esc(o.h)+'</small>':'')+'</button>').join('')+'<button class="sm" data-act="leave" data-arg="'+m.id+'">留中</button></div></div>'}
 function intelCard(it){const sus=P(it.sus);
  return '<div class="card alert"><div class="small dim">密報 · '+dateStr(it.t)+'</div><div>'+esc(it.txt)+'</div><div class="opts"><button class="sm" data-act="inv" data-arg="'+it.id+'">徹查<small>1旬</small></button>'
@@ -2069,7 +2233,7 @@ function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).lengt
  if(urgent.length||cases.length){h+='<h4>急報與要務</h4>'+urgent.map(sitCard).join('')+cases.map(sitCard).join('')}
  h+='<div class="row sp"><h4 style="flex:1">奏摺（'+G.memo.length+'）</h4><span class="small dim">每批閱三份耗一旬 · 今已批 '+G.mw+' 份'+(nIdle>=2?' <button class="sm" data-act="idleall">閒事'+nIdle+'件一併留中</button>':'')+(G.memo.length>8?' <span class="bad">積壓過多，權臣趁機代批</span>':'')+'</span></div>';
  const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);const PS=3,np=Math.max(1,Math.ceil(ms.length/PS));UI.mi=Math.min(Math.max(UI.mi||0,0),np-1);
- h+=ms.length?ms.slice(UI.mi*PS,UI.mi*PS+PS).map(memoCard).join('')+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="card dim">案頭暫無奏摺。</div>';
+ h+=ms.length?ms.slice(UI.mi*PS,UI.mi*PS+PS).map((m,i)=>memoCard(m,i)).join('')+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="card dim">案頭暫無奏摺。</div>';
  if(G.intel.length)h+='<h4>密報（'+G.intel.length+'）</h4>'+G.intel.slice(0,6).map(intelCard).join('');
  h+=fw('feed','近事（最近四十條）','<div class="card feed">'+G.log.slice(0,40).map(l=>'<div class="'+l.cls+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join('')+'</div>',false);return h}
 function tabSelf(){const e=emp();
@@ -2163,7 +2327,8 @@ function render(){if(!G){startScreen();return}
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
  const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
- $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div class="tabs">'+TABS.map(([k,n])=>'<button class="'+(TAB===k?'on':'')+'" data-act="tab" data-arg="'+k+'">'+n+(dots[k]?'<span class="dot"'+(k==='sys'?' data-sys="1"':'')+'>'+dots[k]+'</span>':'')+'</button>').join('')+'</div><div id="pane">'+fn()+'</div><div id="qb"><button data-act="court">上朝</button><button data-act="tab" data-arg="court">朝堂'+(dots.court?'('+dots.court+')':'')+'</button><button class="pri" data-act="adv" data-arg="1">靜觀一月 ▶</button></div>';
+ document.body.classList.add('ingame');
+ $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'?'<aside id="side">'+sideHtml()+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
  window.scrollTo(0,y);
  if(TAB==='web'){const w=$('.webwrap');if(w&&!UI.webScrolled){w.scrollLeft=(w.scrollWidth-w.clientWidth)/2;UI.webScrolled=1}}
  if(UI.empId==null)UI.empId=G.emp;
@@ -2269,7 +2434,7 @@ const ACT={
  dism(a){res(actDismiss(a))},
  memo(a){const[i,j]=a.split('|').map(Number);const m=G.memo.find(x=>x.id===i);if(!m)return;const o=memoOpts(m)[j];
   if(o.ask)askModal(o.ask,id=>{closeModal();const r=(G.mw%3===0&&G.ap<1)?NO('精力不足。'):o.fn(isNaN(+id)?id:+id);if(r.ok){G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}res(r)});else{const r0=runMemo(i,j);if(r0&&r0.ok)zhupi(o.l);res(r0)}},
- tut(a){if(a==='done'){const M=metaGet();M.tut=1;metaSave();closeModal()}else tutModal(+a)},fold(a){UI.fold=UI.fold||{};const o=UI.fold[a]!=null?UI.fold[a]:(a==='mand'?!G.mandate:false);UI.fold[a]=!o;render()},set(a){const s=setg();const[k,v]=a.split('|');if(k==='fs')s.fs=+v;else s[k]=s[k]?0:1;metaSave();applySettings();if(k==='snd'&&s.snd)sfx('bell');render()},idleall(){G.memo=G.memo.filter(m=>memoTier(m)!==2);toast('已將閒事一併留中。');autosave();render()},leave(a){zhupi('留中');res(leaveMemo(+a))},ping(a){res(actPing(a))},jia(a){res(actJia(a))},bdr(a){const[r,m]=a.split('|');res(actBorder(r,m))},bjread(a){bjModal(+a)},daily(){beginGame({daily:true})},legpick(a){legacyBegin(a)},leg(){legModal()},
+ tut(a){if(a==='done'){const M=metaGet();M.tut=1;metaSave();closeModal()}else tutModal(+a)},fold(a){UI.fold=UI.fold||{};const o=UI.fold[a]!=null?UI.fold[a]:(a==='mand'?!G.mandate:false);UI.fold[a]=!o;render()},set(a){const s=setg();const[k,v]=a.split('|');if(k==='fs')s.fs=+v;else s[k]=s[k]?0:1;metaSave();applySettings();if(k==='snd'&&s.snd)sfx('bell');render()},qsave(){saveG('auto');toast('已存檔。')},exit(){saveG('auto');G=null;closeModal();document.body.classList.remove('ingame');startScreen()},mopen(a){UI.mopen=UI.mopen||{};UI.mopen[a]=true;render()},idleall(){G.memo=G.memo.filter(m=>memoTier(m)!==2);toast('已將閒事一併留中。');autosave();render()},leave(a){zhupi('留中');res(leaveMemo(+a))},ping(a){res(actPing(a))},jia(a){res(actJia(a))},bdr(a){const[r,m]=a.split('|');res(actBorder(r,m))},bjread(a){bjModal(+a)},daily(){beginGame({daily:true})},legpick(a){legacyBegin(a)},leg(){legModal()},
  sit(a){const[i,j]=a.split('|').map(Number);const s=G.sit.find(x=>x.id===i);if(!s)return;const o=sitOpts(s)[j];if(!o)return;
   if(o.ask)askModal(o.ask,id=>{closeModal();res(o.fn(isNaN(+id)?id:+id))});else res(o.fn())},
  inv(a){askModal({title:'指派何人追查',items:alivePs().filter(p=>(p.role==='official'||p.role==='eunuch'||p.role==='general')&&age(p)>=25).sort((x,y)=>y.st.sch-x.st.sch).slice(0,8).map(p=>({id:p.id,label:nmt(p),sub:'權謀'+n0(p.st.sch)+'　操守：'+corLabel(p)}))},id=>{closeModal();res(actInvestigate(+a,+id))})},

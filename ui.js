@@ -101,7 +101,7 @@ function hasSave(slot){try{return !!localStorage.getItem(SAVEKEY+'_'+slot)}catch
 /* ---------- 開場 ---------- */
 const FOCUSD={lit:'詩文書畫，清流愛才',mil:'騎射兵法，將門敬重',pol:'吏治民政，理事老練',sch:'洞察人心，識破陰謀',biz:'錢糧賬目，國庫精算',med:'醫藥養生，龍體安康'};
 const SCNL={a:'十七歲登基，太后與權臣把持朝政',b:'三十而立，朝堂與後宮皆已成形',c:'新朝初立，國庫空虛、將門功高'};
-function startScreen(){
+function startScreen(){document.body.classList.remove('ingame');
  $('#top').style.display='none';ambience();
  if(!UI.splashDone){
   $('#app').innerHTML='<div class="splash" data-act="enter">'+splashSvg()+'<div class="sp-fx">'+Array.from({length:22},(_,i)=>'<i style="left:'+(Math.random()*100)+'%;animation-delay:'+(Math.random()*9).toFixed(1)+'s;animation-duration:'+(8+Math.random()*8).toFixed(1)+'s;opacity:'+(.3+Math.random()*.5).toFixed(2)+'"></i>').join('')+'</div>'
@@ -125,11 +125,11 @@ function ambience(){const a=$('#amb');if(!a)return;if(!G){a.innerHTML='';a.class
  a.innerHTML=Array.from({length:se==='wi'?20:14},()=>'<i style="left:'+(Math.random()*100).toFixed(1)+'%;animation-delay:-'+(Math.random()*14).toFixed(1)+'s;animation-duration:'+(10+Math.random()*10).toFixed(1)+'s;--s:'+(.6+Math.random()*.9).toFixed(2)+'"></i>').join('')}
 /* ---------- 頂部與狀態 ---------- */
 function topHtml(){const e=emp();
- return '<div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
+ return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
  +'<div class="ap">旬 '+[0,1,2].map(i=>'<span class="pip '+(i<G.ap?'on':'')+'"></span>').join('')+(G.ap===0?' 精力用盡':'')+'</div>'
- +'<div class="btns"><button class="pri" data-act="adv" data-arg="1">靜觀一月 ▶</button><button data-act="adv" data-arg="3">三月</button><button data-act="adv" data-arg="12">一年</button></div>'}
+ +topActs()}
 function statsHtml(){const f=G.fin||{inc:0,exp:0};const net=f.inc-f.exp;
- const chip=(l,v,b,k)=>'<div class="chip"'+(k?' data-act="why" data-arg="'+k+'" title="點擊查看成因"':'')+'>'+l+'<b>'+v+'</b>'+(b||'')+'</div>';
+ const IK={tre:'coin',gra:'sack',mind:'people',auth:'crown',rep:'star',army:'flag',burden:'sys'};const chip=(l,v,b,k)=>'<div class="chip"'+(k?' data-act="why" data-arg="'+k+'" title="點擊查看成因"':'')+'><span class="ci">'+ico(IK[k]||'coin',22)+'</span><div class="cb"><span class="cl">'+l+'</span><b>'+v+'</b>'+(b||'')+'</div></div>';
  return chip('國庫',n0(G.tre)+'萬兩 <small class="'+(net>=0?'good':'bad')+'">'+(net>=0?'+':'')+n0(net)+'/月</small>',null,'tre')
  +chip('糧倉',n0(G.gra),null,'gra')+chip('民心',n0(G.mind),bar(G.mind,G.mind<35?'r':'g'),'mind')+chip('皇權',n0(G.auth),bar(G.auth,G.auth<30?'r':''),'auth')
  +chip('威望',n0(G.rep),bar(G.rep,'b'),'rep')+chip('軍力',n0(G.army)+'萬 <small>軍心'+n0(G.morale)+'</small>',bar(G.morale,G.morale<35?'r':'w'),'army')+chip('賦稅負擔',n0(G.burden),bar(G.burden,G.burden>60?'r':'w'),'burden')}
@@ -359,7 +359,9 @@ function sitCard(s){const r=s.reg?G.reg[s.reg]:null;let t='',b='',cls='alert';co
  return '<div class="card '+cls+'"><h3>'+t+'</h3><div>'+b+'</div><div class="opts">'+O.map((o,i)=>'<button class="sm" data-act="sit" data-arg="'+s.id+'|'+i+'" title="'+esc(o.h||'')+'">'+esc(o.l)+(o.h?'<small>'+esc(o.h)+'</small>':'')+'</button>').join('')+'</div></div>'}
 function memoTier(m){if(['warreq','bj','sky','dil','arc'].includes(m.k)||G.t-m.t>=3)return 0;if(/賀|慶典|宴|祭祀|規格|壽|節|獻瑞/.test(m.txt))return 2;return 1}
 const TIERN=['急','常','閒'];
-function memoCard(m){const O=memoOpts(m);const f=m.from?P(m.from):null;const tr=memoTier(m);
+function memoCard(m,ix){const O=memoOpts(m);const f=m.from?P(m.from):null;const tr=memoTier(m);const many=G.memo.length>3;const open=!many||ix===0||(UI.mopen&&UI.mopen[m.id]);
+ const bd=(m.k==='dil'?'<b class="badge">兩難</b> ':m.k==='sky'?'<b class="badge">'+(OMEN[m.x.o].n)+'</b> ':m.k==='emb'?'<b class="badge">使節</b> ':m.k==='xpol'?'<b class="badge">科舉</b> ':m.k==='bj'?'<b class="badge">邊將</b> ':m.k==='evt'?'<b class="badge">雜事</b> ':m.k==='echo'?'<b class="badge">舊事重提</b> ':'');
+ if(!open)return '<div class="card memo t'+tr+' shut" data-act="mopen" data-arg="'+m.id+'"><div class="small dim"><b class="tier t'+tr+'">'+TIERN[tr]+'</b> '+bd+(f?esc(nmt(f)):'')+' · '+(G.t-m.t)+'月前呈上<span class="more">展開 ▾</span></div><div class="sum">'+esc(m.txt.length>40?m.txt.slice(0,40)+'…':m.txt)+'</div></div>';
  return '<div class="card memo t'+tr+(m.k==='dil'?' dil':'')+'"><div class="small dim"><b class="tier t'+tr+'">'+TIERN[tr]+'</b> '+(m.k==='dil'?'<b class="badge">兩難</b> ':m.k==='sky'?'<b class="badge">'+(OMEN[m.x.o].n)+'</b> ':m.k==='emb'?'<b class="badge">使節</b> ':m.k==='xpol'?'<b class="badge">科舉</b> ':m.k==='bj'?'<b class="badge">邊將</b> ':m.k==='evt'?'<b class="badge">雜事</b> ':m.k==='echo'?'<b class="badge">舊事重提</b> ':'')+(f?esc(nmt(f)):'')+' · '+(G.t-m.t)+'月前呈上</div><div>'+esc(m.txt)+'</div><div class="opts">'+O.map((o,i)=>'<button class="sm" data-act="memo" data-arg="'+m.id+'|'+i+'">'+esc(o.l)+(o.h?'<small>'+esc(o.h)+'</small>':'')+'</button>').join('')+'<button class="sm" data-act="leave" data-arg="'+m.id+'">留中</button></div></div>'}
 function intelCard(it){const sus=P(it.sus);
  return '<div class="card alert"><div class="small dim">密報 · '+dateStr(it.t)+'</div><div>'+esc(it.txt)+'</div><div class="opts"><button class="sm" data-act="inv" data-arg="'+it.id+'">徹查<small>1旬</small></button>'
@@ -374,7 +376,7 @@ function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).lengt
  if(urgent.length||cases.length){h+='<h4>急報與要務</h4>'+urgent.map(sitCard).join('')+cases.map(sitCard).join('')}
  h+='<div class="row sp"><h4 style="flex:1">奏摺（'+G.memo.length+'）</h4><span class="small dim">每批閱三份耗一旬 · 今已批 '+G.mw+' 份'+(nIdle>=2?' <button class="sm" data-act="idleall">閒事'+nIdle+'件一併留中</button>':'')+(G.memo.length>8?' <span class="bad">積壓過多，權臣趁機代批</span>':'')+'</span></div>';
  const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);const PS=3,np=Math.max(1,Math.ceil(ms.length/PS));UI.mi=Math.min(Math.max(UI.mi||0,0),np-1);
- h+=ms.length?ms.slice(UI.mi*PS,UI.mi*PS+PS).map(memoCard).join('')+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="card dim">案頭暫無奏摺。</div>';
+ h+=ms.length?ms.slice(UI.mi*PS,UI.mi*PS+PS).map((m,i)=>memoCard(m,i)).join('')+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="card dim">案頭暫無奏摺。</div>';
  if(G.intel.length)h+='<h4>密報（'+G.intel.length+'）</h4>'+G.intel.slice(0,6).map(intelCard).join('');
  h+=fw('feed','近事（最近四十條）','<div class="card feed">'+G.log.slice(0,40).map(l=>'<div class="'+l.cls+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join('')+'</div>',false);return h}
 function tabSelf(){const e=emp();
@@ -468,7 +470,8 @@ function render(){if(!G){startScreen();return}
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
  const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
- $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div class="tabs">'+TABS.map(([k,n])=>'<button class="'+(TAB===k?'on':'')+'" data-act="tab" data-arg="'+k+'">'+n+(dots[k]?'<span class="dot"'+(k==='sys'?' data-sys="1"':'')+'>'+dots[k]+'</span>':'')+'</button>').join('')+'</div><div id="pane">'+fn()+'</div><div id="qb"><button data-act="court">上朝</button><button data-act="tab" data-arg="court">朝堂'+(dots.court?'('+dots.court+')':'')+'</button><button class="pri" data-act="adv" data-arg="1">靜觀一月 ▶</button></div>';
+ document.body.classList.add('ingame');
+ $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'?'<aside id="side">'+sideHtml()+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
  window.scrollTo(0,y);
  if(TAB==='web'){const w=$('.webwrap');if(w&&!UI.webScrolled){w.scrollLeft=(w.scrollWidth-w.clientWidth)/2;UI.webScrolled=1}}
  if(UI.empId==null)UI.empId=G.emp;
@@ -574,7 +577,7 @@ const ACT={
  dism(a){res(actDismiss(a))},
  memo(a){const[i,j]=a.split('|').map(Number);const m=G.memo.find(x=>x.id===i);if(!m)return;const o=memoOpts(m)[j];
   if(o.ask)askModal(o.ask,id=>{closeModal();const r=(G.mw%3===0&&G.ap<1)?NO('精力不足。'):o.fn(isNaN(+id)?id:+id);if(r.ok){G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}res(r)});else{const r0=runMemo(i,j);if(r0&&r0.ok)zhupi(o.l);res(r0)}},
- tut(a){if(a==='done'){const M=metaGet();M.tut=1;metaSave();closeModal()}else tutModal(+a)},fold(a){UI.fold=UI.fold||{};const o=UI.fold[a]!=null?UI.fold[a]:(a==='mand'?!G.mandate:false);UI.fold[a]=!o;render()},set(a){const s=setg();const[k,v]=a.split('|');if(k==='fs')s.fs=+v;else s[k]=s[k]?0:1;metaSave();applySettings();if(k==='snd'&&s.snd)sfx('bell');render()},idleall(){G.memo=G.memo.filter(m=>memoTier(m)!==2);toast('已將閒事一併留中。');autosave();render()},leave(a){zhupi('留中');res(leaveMemo(+a))},ping(a){res(actPing(a))},jia(a){res(actJia(a))},bdr(a){const[r,m]=a.split('|');res(actBorder(r,m))},bjread(a){bjModal(+a)},daily(){beginGame({daily:true})},legpick(a){legacyBegin(a)},leg(){legModal()},
+ tut(a){if(a==='done'){const M=metaGet();M.tut=1;metaSave();closeModal()}else tutModal(+a)},fold(a){UI.fold=UI.fold||{};const o=UI.fold[a]!=null?UI.fold[a]:(a==='mand'?!G.mandate:false);UI.fold[a]=!o;render()},set(a){const s=setg();const[k,v]=a.split('|');if(k==='fs')s.fs=+v;else s[k]=s[k]?0:1;metaSave();applySettings();if(k==='snd'&&s.snd)sfx('bell');render()},qsave(){saveG('auto');toast('已存檔。')},exit(){saveG('auto');G=null;closeModal();document.body.classList.remove('ingame');startScreen()},mopen(a){UI.mopen=UI.mopen||{};UI.mopen[a]=true;render()},idleall(){G.memo=G.memo.filter(m=>memoTier(m)!==2);toast('已將閒事一併留中。');autosave();render()},leave(a){zhupi('留中');res(leaveMemo(+a))},ping(a){res(actPing(a))},jia(a){res(actJia(a))},bdr(a){const[r,m]=a.split('|');res(actBorder(r,m))},bjread(a){bjModal(+a)},daily(){beginGame({daily:true})},legpick(a){legacyBegin(a)},leg(){legModal()},
  sit(a){const[i,j]=a.split('|').map(Number);const s=G.sit.find(x=>x.id===i);if(!s)return;const o=sitOpts(s)[j];if(!o)return;
   if(o.ask)askModal(o.ask,id=>{closeModal();res(o.fn(isNaN(+id)?id:+id))});else res(o.fn())},
  inv(a){askModal({title:'指派何人追查',items:alivePs().filter(p=>(p.role==='official'||p.role==='eunuch'||p.role==='general')&&age(p)>=25).sort((x,y)=>y.st.sch-x.st.sch).slice(0,8).map(p=>({id:p.id,label:nmt(p),sub:'權謀'+n0(p.st.sch)+'　操守：'+corLabel(p)}))},id=>{closeModal();res(actInvestigate(+a,+id))})},

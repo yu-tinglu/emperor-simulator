@@ -4,7 +4,7 @@ JS="""
 (seedN)=>{
  const errs=[];window.addEventListener('error',e=>errs.push(String(e.message)));
  const clk=e=>e.dispatchEvent(new MouseEvent('click',{bubbles:true}));
- const SKIP=new Set(['restart','load','import','export','save','loadauto','begin','scn','close']);
+ const SKIP=new Set(['restart','load','import','export','save','loadauto','begin','scn','close','exit','loadprev','daily','legpick','leg']);
  let s=seedN;const rnd=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};
  console.error=(...a)=>{errs.push('CE '+a.map(x=>x&&x.stack?x.stack.split(String.fromCharCode(10)).slice(0,4).join(' | '):x).join(' '));};
  let months=0,clicks=0;
