@@ -19,18 +19,22 @@ function corLabel(p){const v=shown(p,p.cor+10);return v>=60?'疑有貪墨':v>=40
 /* ---------- 立繪 ---------- */
 function portHash(id){let h=7;const t=String(id);for(let i=0;i<t.length;i++)h=(Math.imul(h^t.charCodeAt(i),2654435761)+0x9e3779b9)>>>0;h=Math.imul(h^(h>>>15),2246822519)>>>0;return (h^(h>>>13))>>>0}
 function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" draggable="false">'}
+const PORT_ROLES={consort:1,maiden:1,wife:1,princess:1},PORT_SLOT={consort:1};
+let _pm=null,_pmKey='';
+function portPool(){if(!portPool.a){const a=[];for(let i=0;i<PORT_F.length;i++)if(PORT_SAD.indexOf(i)<0)a.push(PORT_F[i]);portPool.a=a.concat(PORT_F2,PORT_X)}return portPool.a}
+function portSlot(p){const ids=Object.keys(G.P),key=ids.length+':'+(G.seed||'')+':'+(G.P[ids[0]]&&G.P[ids[0]].born);
+ if(!_pm||_pmKey!==key){_pm={};_pmKey=key;const n=portPool().length,used=new Uint8Array(n);
+  const fs=ids.map(Number).sort((a,b)=>a-b).map(i=>G.P[i]).filter(q=>q&&q.g!=='M'&&PORT_SLOT[q.role]);
+  for(const q of fs){let k=portHash(q.id)%n,t=0;while(used[k]&&t<n){k=(k+1)%n;t++}used[k]=1;_pm[q.id]=k}}
+ if(_pm[p.id]==null){_pm[p.id]=portHash(p.id)%portPool().length}return _pm[p.id]}
 function portrait(p,w){
  const st=stage(p),role=p.role;
  if(role==='emp'&&st>=1)return portImg(PORT_EMP,w,'emp');
  if(role==='dowager')return portImg(PORT_DOW,w,'dow');
- if(p.g!=='M'&&st>=1&&(role==='consort'||role==='maiden'||role==='wife'||role==='princess')){
+ if(p.g!=='M'&&st>=1&&PORT_ROLES[role]){
   const h=portHash(p.id);
-  if(role==='consort'&&h%7===0)return portImg(PORT_X[(h>>>3)%PORT_X.length],w);
-  const low=role==='consort'&&p.fav<25;
-  if(low){const k=PORT_SAD[(h>>>3)%PORT_SAD.length];return portImg(PORT_F[k],w)}
-  const pool=[];for(let i=0;i<PORT_F.length;i++)if(PORT_SAD.indexOf(i)<0)pool.push(PORT_F[i]);
-  const n=pool.length+PORT_F2.length,k=(h>>>3)%n;
-  return portImg(k<pool.length?pool[k]:PORT_F2[k-pool.length],w);
+  if(role==='consort'&&p.fav<25)return portImg(PORT_F[PORT_SAD[(h>>>3)%PORT_SAD.length]],w);
+  return portImg(portPool()[portSlot(p)],w);
  }
  return portraitSvg(p,w);
 }
