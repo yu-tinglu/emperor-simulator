@@ -299,3 +299,43 @@ details.cust[open] summary{border-bottom:1px dashed rgba(142,107,47,.45)}
 }
 @media(prefers-reduced-motion:reduce){.sc,.sc-art img,.sc-on{transition:none!important}}
 .sc-cap em{display:none}
+
+/* ===== 擇一朝 排版修正：統一寬度、可讀字級、背景提亮 ===== */
+html,body{font-size:16px}
+.start2 .st-in{width:min(90vw,1200px);max-width:none;margin:0 auto;padding:36px 0 72px;box-sizing:border-box}
+.start2 .scns2,.start2 .stp{width:100%;max-width:none;margin-left:0;margin-right:0;box-sizing:border-box}
+.start2 .stp{margin-top:34px}
+.sscene svg{filter:brightness(1.55) saturate(1.1)}
+.sscene::after{background:linear-gradient(180deg,rgba(8,4,3,.18),rgba(8,4,3,.4) 45%,rgba(8,4,3,.62))}
+.st-h h1{font-size:clamp(2.6rem,5vw,3.8rem)}
+.st-h .intro{font-size:1.05rem;max-width:44em}
+.sc-cap b{font-size:clamp(1.5rem,2.4vw,2.2rem)}
+.sc-body{font-size:.95rem;padding:14px 16px 16px}.sc-trait{font-size:1rem}.sc-tag{font-size:.8rem}
+.stp-h b{font-size:1.6rem}.stp-h span{font-size:.92rem}
+.stp-b{padding:24px 28px 28px;font-size:1rem}
+.fld{margin-bottom:20px}
+.fl{font-size:1.05rem}.fs{font-size:.9rem}
+.stp input#nm{min-height:48px;font-size:1.5rem;width:11em}
+.op{min-height:56px;font-size:1.05rem;padding:10px 14px}.op small{font-size:.86rem}
+.ops.sm .op{min-height:48px}
+details.cust summary{min-height:48px;display:flex;align-items:center;font-size:1.05rem}
+.st-sum{font-size:1rem}
+.seal-main{min-width:280px;min-height:56px;padding:14px 60px 14px 70px;font-size:1.8rem}
+.st-sec button{min-height:44px;font-size:1rem}.st-sec button small{font-size:.8rem}
+.st-note{font-size:.92rem;color:#C9B68E}
+@media(max-width:900px){
+ .start2 .st-in{width:min(92vw,720px)}
+ .scns2{grid-template-columns:1fr;gap:16px}
+ .sc{flex-direction:row}.sc-art{width:38%;flex:none}.sc-cap{padding:0 10px 12px}.sc-cap em{display:none}
+ .sc-cap b{font-size:1.4rem}.sc-body{flex:1;font-size:.95rem}
+ .sc.on,.sc:hover{transform:none}
+}
+@media(max-width:700px){
+ .start2 .st-in{width:92vw;padding:22px 0 56px}
+ .ops3{grid-template-columns:1fr 1fr}.ops.sm.ops3{grid-template-columns:repeat(3,1fr)}
+ .stp-b{padding:16px 14px 18px}.sc-body{font-size:.95rem}.sc-cap b{font-size:1.3rem}
+ .seal-main{width:min(320px,90vw);min-width:0;padding:14px 20px 14px 36px}
+}
+.st-h{position:relative}
+.st-h::before{content:'';position:absolute;left:50%;top:-10px;width:min(620px,92%);height:calc(100% + 20px);transform:translateX(-50%);z-index:-1;background:radial-gradient(ellipse at center,rgba(10,5,4,.82),rgba(10,5,4,.55) 55%,transparent 78%);filter:blur(8px)}
+.st-h::before{width:min(700px,96%);background:radial-gradient(ellipse at center,rgba(10,5,4,.96),rgba(10,5,4,.82) 50%,rgba(10,5,4,.3) 72%,transparent 86%)}
