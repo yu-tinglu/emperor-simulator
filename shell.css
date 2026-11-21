@@ -451,3 +451,30 @@ body.ingame .decree.war{background:linear-gradient(180deg,#e7c2b4,#d9a592 60%,#c
 body.ingame .decree.dis{background:linear-gradient(180deg,#ead8a6,#d9bf7e)}body.ingame .decree.dis .dh{color:#8a5a12}
 body.ingame .decree.win{background:linear-gradient(180deg,#e2e8bf,#c9d79b)}body.ingame .decree.win .dh{color:#2f6b3f}
 body.ingame .decree .opts button{min-width:140px;padding:10px 18px}
+
+/* ===== 手機版強化 (≤760px) ===== */
+@media(max-width:760px){
+ body.ingame #stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;padding:4px 6px;gap:2px 0}
+ body.ingame #stats .chip{min-width:0;padding:5px 4px;display:block;text-align:center}
+ body.ingame #stats .chip svg{display:none}
+ body.ingame #stats .chip b{font-size:1.05rem}
+ body.ingame #stats .chip small,body.ingame #stats .chip .dl{display:block;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ body.ingame button,body.ingame select,body.ingame input[type=text],body.ingame input:not([type]){min-height:44px}
+ body.ingame button.sm{min-height:40px;padding:6px 12px}
+ body.ingame .card table:has(td.av){display:block}
+ body.ingame .card table:has(td.av) tbody{display:block}
+ body.ingame .card table:has(td.av) tr:first-child{display:none}
+ body.ingame .card table:has(td.av) tr.click{display:grid;grid-template-columns:52px repeat(3,minmax(0,1fr));grid-template-areas:"av nm nm ag" "av rl rl rl" "av fc at am";align-items:center;gap:2px 6px;padding:8px 4px;border-bottom:1px solid rgba(120,90,50,.25)}
+ body.ingame .card table:has(td.av) td{display:block;padding:0;border:0;min-width:0}
+ body.ingame td.av{grid-area:av;width:auto}
+ body.ingame td.av~td:nth-of-type(2){grid-area:nm;font-weight:700;font-size:1.02rem}
+ body.ingame td.av~td:nth-of-type(3){grid-area:rl}
+ body.ingame td.av~td:nth-of-type(4){grid-area:ag;text-align:right}
+ body.ingame td.av~td:nth-of-type(5){grid-area:fc}
+ body.ingame td.av~td:nth-of-type(6){grid-area:at}
+ body.ingame td.av~td:nth-of-type(7){grid-area:am}
+ body.ingame #pane .row{flex-wrap:wrap;gap:8px}
+ body.ingame #md{max-width:calc(100vw - 16px);padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+ body.ingame #ov.on{padding:8px}
+}
+@media(max-width:760px){body.ingame #stats .chip b{font-size:.95rem;white-space:nowrap}body.ingame #stats .chip .cb{display:block}body.ingame #stats{margin-bottom:6px}}
