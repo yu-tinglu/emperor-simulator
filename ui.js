@@ -125,7 +125,7 @@ function ambience(){const a=$('#amb');if(!a)return;if(!G){a.innerHTML='';a.class
  a.innerHTML=Array.from({length:se==='wi'?20:14},()=>'<i style="left:'+(Math.random()*100).toFixed(1)+'%;animation-delay:-'+(Math.random()*14).toFixed(1)+'s;animation-duration:'+(10+Math.random()*10).toFixed(1)+'s;--s:'+(.6+Math.random()*.9).toFixed(2)+'"></i>').join('')}
 /* ---------- 頂部與狀態 ---------- */
 function topHtml(){const e=emp();
- return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
+ return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+(LIFEN[G.life]||'勤政')+(G.zeit&&G.zeit.k&&G.zeit.k!=='plain'&&ZN[G.zeit.k]?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
  +'<div class="ap">旬 '+[0,1,2].map(i=>'<span class="pip '+(i<G.ap?'on':'')+'"></span>').join('')+(G.ap===0?' 精力用盡':'')+'</div>'
  +topActs()}
 function statsHtml(){const f=G.fin||{inc:0,exp:0};const net=f.inc-f.exp;
@@ -382,7 +382,7 @@ function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).lengt
 function tabSelf(){const e=emp();
  let h='<div class="card"><div class="pm-top"><div class="port">'+portrait(e,150)+'</div><div class="pm-info"><h2>'+esc(nm(e))+' <small class="dim">'+age(e)+'歲 · '+G.era.n+'年號</small></h2><div class="small dim">龍體 '+n0(e.hp)+(e.ill?' <span class="bad">（染病）</span>':'')+'</div>'+bar(e.hp,e.hp<35?'r':'g')
  +'<div class="stg">'+Object.keys(STN).map(k=>'<div>'+STN[k]+' <b class="gold">'+n0(e.st[k])+'</b>'+bar(e.st[k],'')+'</div>').join('')+'</div>'+e.tr.map(t=>'<span class="tag">'+t+'</span>').join('')
- +'<div class="small dim" style="margin-top:6px">時代：<b class="warnc">'+ZN[(G.zeit||{k:'plain'}).k]+'</b>　朝會出席：'+n0(G.att)+'　畏懼度：'+n0(G.fear)+'　權謀影響你看穿人心的能力。</div></div></div></div>';
+ +'<div class="small dim" style="margin-top:6px">時代：<b class="warnc">'+(ZN[(G.zeit||{k:'plain'}).k]||'平世')+'</b>　朝會出席：'+n0(G.att)+'　畏懼度：'+n0(G.fear)+'　權謀影響你看穿人心的能力。</div></div></div></div>';
  h+='<h4>施政風格</h4><div class="grid2">'+Object.keys(LIFEN).map(k=>'<div class="card" style="'+(G.life===k?'border-color:var(--gold)':'')+'"><div class="row sp"><b>'+LIFEN[k]+'</b><button class="sm '+(G.life===k?'gold':'')+'" data-act="life" data-arg="'+k+'">'+(G.life===k?'當前':'採用')+'</button></div><div class="small dim">'+LIFED[k]+'</div></div>').join('')+'</div>';
  h+='<h4>朝務</h4><div class="opts"><button data-act="court">上朝聽政<small>1旬 · 鞏固皇權、增添奏摺</small></button><button data-act="recruit">下詔募兵<small>1旬 · 40萬兩 +6萬兵</small></button><button data-act="review">校場閱兵<small>1旬 · 10萬兩 士氣↑</small></button><button data-act="edit">潤飾實錄<small>1旬 · 影響後世評價</small></button><button data-act="sell">賣官鬻爵<small>1旬 · +80萬兩，吏治受損</small></button></div>';
  h+='<h4>修養（各耗1旬）</h4><div class="opts">'+Object.keys(STN).map(k=>'<button data-act="study" data-arg="'+k+'">'+({lit:'讀書習藝',mil:'練武騎射',pol:'研習政務',sch:'研讀權謀',biz:'鑽研理財',med:'研習醫術'}[k])+'<small>'+STN[k]+' '+n0(e.st[k])+'</small></button>').join('')+'</div>';
@@ -391,7 +391,7 @@ function tabSelf(){const e=emp();
 function tabGov(){
  const seg=(key,names,cur,act)=>'<div class="seg">'+names.map((n,i)=>'<button class="'+(cur===i+1?'on':'')+'" data-act="'+act+'" data-arg="'+(i+1)+'">'+n+'</button>').join('')+'</div>';
  const f=G.fin||{inc:0,exp:0,leak:0,army:0,crt:0,sal:0};
- let h=edictHtml()+'<div class="card"><h3>財政</h3><div class="small">月入 <b class="good">'+n0(f.inc)+'</b> ／月出 <b class="bad">'+n0(f.exp)+'</b>（軍費'+n0(f.army||0)+'、宮廷'+n0(f.crt||0)+'、俸祿'+n0(f.sal||0)+'）；官吏貪墨約 <b class="warnc">'+n0(f.leak||0)+'</b>/月。</div></div>';
+ let h=heroHtml('朝　政','綜理百務・治國安邦')+edictScroll()+'<div class="card"><h3>財政</h3><div class="small">月入 <b class="good">'+n0(f.inc)+'</b> ／月出 <b class="bad">'+n0(f.exp)+'</b>（軍費'+n0(f.army||0)+'、宮廷'+n0(f.crt||0)+'、俸祿'+n0(f.sal||0)+'）；官吏貪墨約 <b class="warnc">'+n0(f.leak||0)+'</b>/月。</div></div>';
  h+='<div class="grid3"><div class="card"><b>賦稅</b><div class="small dim">重稅增收但積累民間負擔，傷及長遠</div>'+seg('tax',TAXN,G.tax,'tax')+'</div><div class="card"><b>軍費</b><div class="small dim">影響兵員規模與軍心</div>'+seg('mil',MILN,G.mil,'mil')+'</div><div class="card"><b>宮廷用度</b><div class="small dim">影響後宮情緒與花費</div>'+seg('crt',CRTN,G.crt,'crt')+'</div></div>';
  h+='<h4>派系格局</h4><div class="card">'+['chan','clean','army','wai','eun','kin'].map(k=>{const L=facLeader(k);return '<div class="row" style="margin:3px 0"><span style="width:64px">'+facTag(k)+'</span><div style="flex:1;min-width:120px">'+bar(G.pow[k],G.pow[k]>46?'r':'')+'</div><span style="width:34px;text-align:right">'+n0(G.pow[k])+'</span><span class="small dim" style="width:150px">'+(L?lnk(L):'—')+'</span></div>'}).join('')+'<div class="small dim">任一派系超過46，便可能挾持朝局。</div></div>';
  h+='<h4>機構</h4><div class="opts">'+Object.keys(INST).map(k=>'<button class="'+(G.inst[k]?'gold':'')+'" data-act="inst" data-arg="'+k+'">'+(G.inst[k]?'✔ ':'')+INST[k].n+'<small>'+(G.inst[k]?'點擊裁撤':INST[k].cost+'萬兩 · '+INST[k].d)+'</small></button>').join('')+'</div>';
@@ -470,8 +470,8 @@ function render(){if(!G){startScreen();return}
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
  const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
- document.body.classList.add('ingame');
- $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'?'<aside id="side">'+sideHtml()+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
+ document.body.classList.add('ingame');if(!$('#scene')){const sc=document.createElement('div');sc.id='scene';sc.innerHTML=sceneSvg();document.body.prepend(sc)}
+ $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'||TAB==='gov'?'<aside id="side">'+sideHtml(TAB)+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
  window.scrollTo(0,y);
  if(TAB==='web'){const w=$('.webwrap');if(w&&!UI.webScrolled){w.scrollLeft=(w.scrollWidth-w.clientWidth)/2;UI.webScrolled=1}}
  if(UI.empId==null)UI.empId=G.emp;

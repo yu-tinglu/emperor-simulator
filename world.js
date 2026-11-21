@@ -100,7 +100,7 @@ const __mo5=memoOpts;memoOpts=function(m){return m.k==='bj'?bjOpts(m):__mo5(m)};
 /* ---------- 存檔相容：補欄位 ---------- */
 function migrate(g){if(!g||!g.P)return null;const d=(k,v)=>{if(g[k]==null)g[k]=v};
  ['memo','chr','snap','arcs','deeds','chaps','mdone','ach','xl','sit','plots','intel','log','emps'].forEach(k=>d(k,[]));
- d('nid',1000);d('zeit',{});d('mh',[]);d('pro',null);d('omenHid',0);d('reform',0);d('inst',{});d('proj',[]);d('visited',{});
+ d('nid',1000);if(!g.zeit||!g.zeit.k)g.zeit={k:'plain',t:g.t||0};if(!g.life)g.life='diligent';d('mh',[]);d('pro',null);d('omenHid',0);d('reform',0);d('inst',{});d('proj',[]);d('visited',{});
  d('fd',{});['chan','clean','army','kin','eun','wai'].forEach(k=>{if(g.fd[k]==null)g.fd[k]=0});
  for(const r of Object.values(g.reg||{})){if(r.ref==null)r.ref=0;if(r.foe&&r.mil==null){r.mil=18;r.loy=72}}
  for(const f of Object.values(g.foe||{})){if(f.att==null)f.att=0;if(f.str==null)f.str=50}

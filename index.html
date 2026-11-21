@@ -237,130 +237,196 @@ details.cust{margin:8px 0;border:1px dashed var(--line);padding:6px 10px}details
 body.hc{--ink:#000;--dim:#2c343a;--line:#6b7679}body.hc .dim,body.hc .small.dim{color:#2c343a!important}body.hc .card{border-color:#6b7679}body.rm *,body.rm *::before,body.rm *::after{animation:none!important;transition:none!important}body.rm .sp-title h1{clip-path:none}body.rm .sp-sub,body.rm .sp-cta{opacity:1}
 .focuses.diffs{grid-template-columns:repeat(3,1fr)}.focuses.diffs button small{font-size:.7rem}.startcta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.startcta .big{grid-column:1/-1;padding:14px}.startcta button{min-height:46px}
 
-/* ============ 朝堂改版（body.ingame） ============ */
-body.ingame{--paper:#EFE5CE;--paper2:#F8F1DF;--panel:#F8F1DF;--panel2:#EBDFC3;--ink:#2B1E14;--ink2:#160E0A;--dim:#76624A;--line:#CDB98F;--indigo:#5A3A1C;--gold:#8C6A1F;--goldhi:#E8D5A0;
- background:#110B08;background-image:radial-gradient(ellipse at 50% -10%,#3a1d14 0,#110B08 60%);color:#E7DAC0}
-body.ingame #wrap{max-width:1500px;padding:0 14px 110px}
-/* 頂欄 */
-body.ingame #top{margin:0 -14px;padding:8px 18px;background:linear-gradient(180deg,#2a140f,#170d09);border-bottom:2px solid #8E6B2F;box-shadow:0 2px 0 #000a,0 6px 18px #0008;color:#E7DAC0;position:relative;overflow:hidden}
-body.ingame #top::after{content:'';position:absolute;right:0;top:0;bottom:0;width:46%;pointer-events:none;background:radial-gradient(circle at 78% 30%,#f3e3b844 0 18px,transparent 19px),linear-gradient(90deg,transparent,#6a2a1a33);opacity:.9}
-body.ingame #top>*{position:relative;z-index:1}
-body.ingame #top .date{font-size:1.55rem;color:#F1DFAA;text-shadow:0 1px 0 #000}
-body.ingame #top .date .seas{display:inline-flex;align-items:center;justify-content:center;width:1.5em;height:1.5em;margin-right:.5em;background:#8d1f17;border:1px solid #E8D5A0;color:#fff;font-size:.9rem;border-radius:3px;vertical-align:.1em}
-body.ingame #top .date small{color:#BCA982}
-body.ingame .ap{color:#BCA982}
-body.ingame .pip{border-color:#C9A24B}body.ingame .pip.on{background:#D8392B;border-color:#D8392B;box-shadow:0 0 0 2px #160E0A,0 0 0 3px #D8392B88}
-.acts{display:flex;gap:6px}
-.acts button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:54px;padding:6px 8px 4px;background:#24130e;border:1px solid #8E6B2F;color:#E8D5A0;box-shadow:inset 0 0 0 1px #00000066;font-size:.72rem;border-radius:3px}
-.acts button:hover{background:#3a1f16;box-shadow:inset 0 0 0 1px #E8D5A055}
-.acts .ico{display:block}
-/* 數值列 */
-body.ingame #stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin:12px 0 10px;background:linear-gradient(180deg,#24130e,#190e0a);border:1px solid #8E6B2F;border-radius:4px;box-shadow:inset 0 0 0 2px #0008,0 4px 14px #0007}
-body.ingame .chip{display:flex;gap:9px;align-items:center;padding:9px 12px;border:0;border-right:1px solid #4a3220;color:#BCA982;font-size:.8rem}
+/* ===================================================================
+   朝堂改版 v2 —— 分層架構
+   L0 場景層 #scene（固定的宮殿內景，只作背景）
+   L1 框架層 頂欄／導覽／數值（半透明、不加框）
+   L2 內容層 宣紙(.card/.sdb/.sheet)與深木(.sdh/.tabs)兩種材質
+   L3 裝飾層 光影、案頭小物（pointer-events:none）
+   色彩職責：朱紅＝主要決策／選取／緊急；金＝標題與少量點綴；其餘為木與紙
+   =================================================================== */
+body.ingame{
+ --ink:#2B1E14;--ink2:#160E0A;--dim:#7A664C;--line:#D3BE92;
+ --paper:#EFE5CE;--paper2:#F8F1DF;--panel:#F8F1DF;--panel2:#EBDFC3;
+ --gold:#D2AE62;--goldhi:#EBD39A;--gold-d:#8E6B2F;--cin:#B3281F;--cin-d:#7A1810;--indigo:#5A3A1C;
+ --txt:#EADDBF;--mut:#B9A57F;
+ --paper-tex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .32 0 0 0 0 .18 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+ --paper-bg:var(--paper-tex),radial-gradient(ellipse at 28% 0,#FBF4E0,#F1E5C7 70%,#E8D8B2);
+ background:#0b0605;color:var(--txt)}
+body.ingame #scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body.ingame #scene svg{position:absolute;inset:0;width:100%;height:100%}
+body.ingame #scene::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,4,3,.18) 0,rgba(8,4,3,.5) 24%,rgba(8,4,3,.86) 52%,rgba(8,4,3,.94))}
+#scene{display:none}body.ingame #scene{display:block}
+body.ingame #wrap{position:relative;z-index:1;max-width:1560px;padding:0 18px 120px}
+body.ingame #amb{z-index:2}
+
+/* ---------- L1 頂欄 ---------- */
+body.ingame #top{margin:0 -18px;padding:6px 22px;background:linear-gradient(180deg,rgba(10,5,4,.94),rgba(10,5,4,.55));backdrop-filter:blur(6px);border-bottom:1px solid rgba(210,174,98,.26);box-shadow:none;color:var(--txt);overflow:visible}
+body.ingame #top::after{display:none}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--brush);font-size:1.7rem;color:var(--goldhi);letter-spacing:.1em;text-shadow:0 2px 6px #000;padding-right:20px;border-right:1px solid rgba(210,174,98,.25)}
+body.ingame #top .date{font-size:1.45rem;color:#F3E2B0;text-shadow:0 2px 6px #000}
+body.ingame #top .date .seas{display:inline-flex;align-items:center;justify-content:center;width:1.55em;height:1.55em;margin-right:.55em;background:var(--cin);color:#FFF1D0;font-size:.85rem;border-radius:3px;vertical-align:.1em;box-shadow:inset 0 0 0 1px rgba(255,236,190,.4)}
+body.ingame #top .date small{color:var(--mut);text-shadow:none}
+body.ingame .ap{color:var(--mut)}
+body.ingame .pip{border-color:var(--gold)}body.ingame .pip.on{background:var(--cin);border-color:var(--cin);box-shadow:0 0 0 2px #160E0A,0 0 0 3px rgba(179,40,31,.55)}
+.acts{display:flex;gap:2px}
+.acts button{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:50px;padding:5px 7px 3px;background:transparent;border:0;border-radius:6px;box-shadow:none;color:var(--goldhi);font-size:.68rem}
+.acts button:hover{background:rgba(255,236,190,.1);box-shadow:none}.acts button:active{transform:none}
+/* ---------- 數值列：緊湊自適應 ---------- */
+body.ingame #stats{display:flex;flex-wrap:wrap;gap:0;margin:10px 0 12px;padding:2px 4px;background:linear-gradient(90deg,rgba(16,8,5,.82),rgba(34,16,10,.82),rgba(16,8,5,.82));backdrop-filter:blur(6px);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,226,170,.1)}
+body.ingame .chip{flex:1 1 150px;display:flex;gap:8px;align-items:center;padding:6px 12px;border:0;border-right:1px solid rgba(210,174,98,.14);color:var(--mut);position:relative;min-width:0}
 body.ingame .chip:last-child{border-right:0}
-body.ingame .chip .ci{color:#D9B866;display:flex}
-body.ingame .chip .cb{flex:1;min-width:0}
-body.ingame .chip .cl{display:block;font-size:.76rem;color:#BCA982}
-body.ingame .chip b{display:block;font-size:1.25rem;color:#F5E9CC;line-height:1.25;font-weight:700}
-body.ingame .chip b small,body.ingame .chip small{color:#BCA982}
-body.ingame .chip small.good{color:#7ED29A}body.ingame .chip small.bad{color:#FF8E7E}
-body.ingame .chip[data-act]:hover{background:#ffffff0a}body.ingame .chip[data-act]:hover b{color:#fff}
-body.ingame .chip .bar{background:#00000066;height:5px;margin-top:3px}
-/* 殼：左導覽｜主區｜右欄 */
-#shell{display:grid;grid-template-columns:172px minmax(0,1fr);gap:16px;align-items:start}
-body.ingame #shell:has(#side){grid-template-columns:172px minmax(0,1fr) 318px}
-body.ingame .tabs{display:flex;flex-direction:column;gap:7px;margin:0;border:0;overflow:visible;position:sticky;top:78px}
-body.ingame .tabs button{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;font-size:1.02rem;color:#D9C8A3;background:linear-gradient(180deg,#2c1811,#1e110c);border:1px solid #6b4f2a;border-radius:4px;box-shadow:inset 0 0 0 1px #000a;border-bottom:1px solid #6b4f2a;white-space:nowrap}
-body.ingame .tabs button:hover{background:linear-gradient(180deg,#3a2016,#26150e);color:#fff}
-body.ingame .tabs button.on{color:#FFF1C9;background:linear-gradient(180deg,#8d2a1f,#5e1710);border-color:#E8D5A0;font-weight:700;box-shadow:inset 0 0 0 1px #000a,0 0 14px #b3342d55}
-body.ingame .tabs .ico{flex:none;color:#D9B866}
-body.ingame .tabs button.on .ico{color:#FFE9A8}
-body.ingame .tabs .dot{position:absolute;top:-5px;right:-5px;background:#D8392B;border:1px solid #E8D5A0}
-body.ingame .tabs button{position:relative}
-/* 主區（深色底、宣紙卡片） */
-body.ingame #pane{min-width:0;color:#E7DAC0}
-body.ingame #pane h4{color:#F1DFAA;border-bottom:1px solid #6b4f2a}
-body.ingame #pane h4::before{background:#B3342D}
-body.ingame #pane .dim,body.ingame #pane .small.dim{color:#B9A57F}
-body.ingame #pane .card,body.ingame #pane .card .dim,body.ingame #pane .card .small.dim{color:var(--dim)}
-body.ingame #pane .card{color:var(--ink);background:linear-gradient(180deg,#FBF4E2,#F3E8CE);border:1px solid #B8924A;box-shadow:inset 0 0 0 3px #F3E8CE,inset 0 0 0 4px #D6BE86,0 3px 10px #0007}
-body.ingame #pane .card h3{color:#4a2a14}
+body.ingame .chip .ci{color:var(--gold);display:flex;flex:none}
+body.ingame .chip .cb{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 7px}
+body.ingame .chip .cl{font-size:.74rem;color:var(--mut)}
+body.ingame .chip b{display:inline;font-size:1.08rem;color:#F6EAD0;font-weight:700;line-height:1.35;white-space:nowrap}
+body.ingame .chip b small,body.ingame .chip small{font-size:.7rem;color:var(--mut);font-weight:400}
+body.ingame .chip small.good{color:#7ED29A}body.ingame .chip small.bad{color:#FF9482}
+body.ingame .chip .bar{flex:1 1 100%;height:3px;margin-top:2px;background:rgba(0,0,0,.45);border-radius:2px}
+body.ingame .chip[data-act]:hover{background:rgba(255,236,190,.06)}
+/* ---------- 殼 ---------- */
+#shell{display:grid;grid-template-columns:166px minmax(0,1fr);gap:18px;align-items:start}
+body.ingame #shell:has(#side){grid-template-columns:166px minmax(0,1fr) 320px}
+/* 左導覽：深木牌匾 */
+body.ingame .tabs{display:flex;flex-direction:column;gap:6px;margin:0;border:0;overflow:visible;position:sticky;top:70px}
+body.ingame .tabs button{position:relative;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px 10px 14px;font-size:1rem;color:#D9C8A3;background:linear-gradient(180deg,rgba(62,34,22,.92),rgba(30,16,11,.94));border:0;border-radius:3px 12px 12px 3px;box-shadow:inset 0 1px 0 rgba(255,214,150,.12),0 3px 8px rgba(0,0,0,.5);white-space:nowrap}
+body.ingame .tabs button::before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:2px;background:transparent}
+body.ingame .tabs button:hover{background:linear-gradient(180deg,rgba(84,46,30,.95),rgba(40,21,14,.95));color:#fff;box-shadow:inset 0 1px 0 rgba(255,214,150,.18),0 3px 8px rgba(0,0,0,.5)}
+body.ingame .tabs button.on{color:#FFF1C9;font-weight:700;background:linear-gradient(180deg,#a92d20,#6a170f);box-shadow:inset 0 1px 0 rgba(255,220,170,.3),0 4px 14px rgba(179,40,31,.35)}
+body.ingame .tabs button.on::before{background:var(--gold)}
+body.ingame .tabs .ico{flex:none;color:var(--gold)}body.ingame .tabs button.on .ico{color:#FFE9A8}
+body.ingame .tabs .dot{position:absolute;top:-5px;right:-4px;background:var(--cin);color:#fff;border:1px solid #FFE9A8;font-size:.65rem;padding:0 5px;border-radius:9px;line-height:15px}
+
+/* ---------- 英雄區（頁面標題疊在場景上） ---------- */
+.hero{padding:6px 4px 14px}
+.hero h1{margin:0;font-family:var(--brush);font-weight:400;font-size:4rem;line-height:1.1;letter-spacing:.14em;background:linear-gradient(180deg,#FFF6DA 10%,#E6C77C 70%,#B9904A);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 5px rgba(0,0,0,.75))}
+.hero p{margin:4px 0 0;letter-spacing:.3em;color:#E9D7AB;font-size:.95rem;text-shadow:0 1px 4px #000}
+
+/* ---------- L2 材質：宣紙 ---------- */
+body.ingame #pane{min-width:0;color:var(--txt)}
+body.ingame #pane .card,body.ingame .sdb{background:var(--paper-bg);color:var(--ink);border:0;border-radius:3px;box-shadow:0 8px 18px rgba(0,0,0,.45),inset 0 0 0 1px rgba(142,107,47,.28)}
+body.ingame #pane .card{padding:12px 16px;margin:12px 0}
+body.ingame #pane .card h3{color:#4a2a14;font-size:1.05rem;margin:0 0 5px}
+body.ingame #pane .card h3::before{content:'';display:inline-block;width:6px;height:6px;background:var(--cin);transform:rotate(45deg);margin-right:8px;vertical-align:.18em}
+body.ingame #pane .card .dim,body.ingame #pane .card .small.dim{color:var(--dim)}
+body.ingame #pane .card .small,body.ingame #pane .card label{color:var(--ink)}
 body.ingame #pane .card h4{color:var(--ink);border-bottom-color:var(--line)}
-body.ingame .foldh{color:#F1DFAA;border-bottom:1px solid #6b4f2a}
-body.ingame .fold{margin:8px 0}
-body.ingame #pane a{color:#7A2418}
-body.ingame #pane>a,body.ingame #pane .dim a{color:#E8B86A}
-/* 右欄 */
-#side{display:flex;flex-direction:column;gap:12px;position:sticky;top:78px}
-.sd{background:linear-gradient(180deg,#2a1710,#1b0f0b);border:1px solid #8E6B2F;border-radius:4px;box-shadow:inset 0 0 0 2px #0008,0 4px 14px #0007;overflow:hidden}
-.sdh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #5a4024;background:linear-gradient(180deg,#3a2016,#26150e);color:#E8D5A0}
-.sdh b{flex:1;font-size:1.05rem;letter-spacing:.08em;font-weight:700}
-.sdh a{font-size:.78rem;color:#BCA982;cursor:pointer}.sdh a:hover{color:#fff}
-.nw{padding:7px 12px;font-size:.88rem;color:#E1D3B4;border-bottom:1px dashed #4a3220;line-height:1.5}
-.nw:last-child{border-bottom:0}.nw time{display:block;font-size:.72rem;color:#9c8861}
-.nw.crit,.nw.warn{color:#FFB09F}
-.wd{display:grid;grid-template-columns:1fr 112px;gap:8px;padding:8px}
-.mini{cursor:pointer;border:1px solid #6b4f2a;border-radius:3px;overflow:hidden;background:#EADFC4}
+body.ingame #pane h4{color:var(--goldhi);border-bottom:1px solid rgba(210,174,98,.25)}
+body.ingame #pane h4::before{background:var(--cin)}
+body.ingame #pane h3,body.ingame #pane h2{color:var(--goldhi)}
+body.ingame #pane .card h2{color:var(--ink)}
+body.ingame #pane .dim,body.ingame #pane .small.dim{color:var(--mut)}
+body.ingame #pane .small,body.ingame #pane label{color:#D9C8A3}
+body.ingame #pane a{color:#7A2418}body.ingame #pane>a,body.ingame #pane .dim a{color:#E8B86A}
+body.ingame .foldh{color:var(--goldhi);box-shadow:none;background:transparent;border-radius:0;border:0;border-bottom:1px solid rgba(210,174,98,.25)}
+body.ingame .foldh:hover{background:rgba(255,236,190,.07);box-shadow:none}
+/* 按鈕：紙籤（預設）／朱印（主要）／銅褐（次要） */
+body.ingame #pane button,body.ingame #md button{background:linear-gradient(180deg,#F8F0DB,#E8D9B3);border:1px solid #B79A62;border-radius:3px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 2px 3px rgba(0,0,0,.25);color:var(--ink)}
+body.ingame #pane button:hover,body.ingame #md button:hover{background:linear-gradient(180deg,#FFF8E4,#EFE0BA);box-shadow:0 1px 0 #fff inset,0 3px 6px rgba(0,0,0,.3)}
+body.ingame #pane button:active,body.ingame #md button:active{transform:translateY(1px);box-shadow:none}
+body.ingame #pane button.pri,body.ingame #md button.pri{background:linear-gradient(180deg,#7a5230,#4a2f18);border-color:#2e1c0e;color:#F6E9C8}
+body.ingame #pane button.gold,body.ingame #md button.gold,body.ingame #pane button.seal{background:linear-gradient(180deg,#b9301f,#7a1810);border-color:#4a0d08;color:#FFF1D0;box-shadow:inset 0 1px 0 rgba(255,210,160,.35),0 2px 4px rgba(0,0,0,.4)}
+body.ingame #pane button.warn,body.ingame #md button.warn{color:var(--cin-d);border-color:#B3281F}
+body.ingame #pane button:disabled{opacity:.45;box-shadow:none}
+body.ingame #pane input,body.ingame #pane select,body.ingame #pane textarea{background:rgba(255,251,240,.9);border:1px solid #B79A62;color:var(--ink);border-radius:3px}
+body.ingame #md{color:var(--ink)}body.ingame #md .dim,body.ingame #md .small.dim{color:var(--dim)}body.ingame #md .small,body.ingame #md label{color:var(--ink)}
+body.ingame #md h2,body.ingame #md h3,body.ingame #md h4{color:var(--ink)}body.ingame #md h4{border-bottom-color:var(--line)}
+body.ingame #md a{color:#7A2418}body.ingame #md .good{color:#2E6B57}body.ingame #md .bad{color:#B3281F}
+.tier.t0{background:var(--cin)}
+body.ingame .card.memo.t0{border-left:0;box-shadow:0 8px 18px rgba(0,0,0,.45),inset 4px 0 0 var(--cin),inset 0 0 0 1px rgba(142,107,47,.28)}
+
+/* ---------- 右欄：深木標題＋宣紙內文 ---------- */
+#side{display:flex;flex-direction:column;gap:14px;position:sticky;top:70px}
+.sd{border-radius:6px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.5)}
+.sdh{display:flex;align-items:center;gap:8px;padding:8px 14px;background:linear-gradient(180deg,rgba(74,38,24,.96),rgba(34,17,11,.98));color:var(--goldhi);box-shadow:inset 0 1px 0 rgba(255,214,150,.14)}
+.sdh b{flex:1;font-family:var(--brush);font-weight:400;font-size:1.3rem;letter-spacing:.12em}
+.sdh a{font-size:.76rem;color:var(--mut);cursor:pointer}.sdh a:hover{color:#fff}
+.sdb{border-radius:0 0 4px 4px!important;padding:10px 14px}
+.nw{padding:7px 0;font-size:.9rem;color:var(--ink);border-bottom:1px dashed rgba(142,107,47,.35);line-height:1.55}
+.nw:last-child{border-bottom:0}.nw time{display:block;font-size:.72rem;color:var(--dim)}
+.nw.crit,.nw.warn{color:var(--cin-d)}
+.gi{display:flex;align-items:center;gap:10px;padding:5px 0;color:var(--ink);font-size:1rem}
+.gi i{flex:none;width:18px;height:18px;border:2px solid #8a7a58;border-radius:50%;position:relative}
+.gi.done{color:#2E6B57}.gi.done i{border-color:#2E6B57;background:#2E6B57}.gi.done i::after{content:'✓';position:absolute;inset:0;color:#fff;font-size:12px;line-height:14px;text-align:center}
+.tip{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(142,107,47,.35);color:var(--cin-d);font-size:.88rem}.tip b{margin-right:8px}
+.wd{display:grid;grid-template-columns:1fr 110px;gap:10px}
+.mini{cursor:pointer;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(142,107,47,.4)}
 .mini svg{display:block;width:100%;height:auto}.mini svg *{pointer-events:none}
-.rgs{display:flex;flex-direction:column;gap:6px;justify-content:center;font-size:.84rem;color:#E1D3B4}
+.rgs{display:flex;flex-direction:column;gap:6px;justify-content:center;font-size:.84rem;color:var(--ink)}
 .rgs .rg{display:flex;align-items:center;gap:5px;white-space:nowrap}
-.rgs i{width:9px;height:9px;border-radius:50%;background:#7ED29A;flex:none}.rgs i.r{background:#E5483B}.rgs i.o{background:#E8A04A}
-.rgs b.r{color:#FF8E7E}.rgs b.o{color:#F0B25A}.rgs b.g{color:#7ED29A}
-.pps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}
-.pp{text-align:center;font-size:.76rem;color:#D9C8A3;cursor:pointer}
-.pp .pf{border:1px solid #8E6B2F;border-radius:3px;overflow:hidden;aspect-ratio:1/1.15;background:#1a0f0b;display:flex;align-items:center;justify-content:center}
-.pp .pf>*{max-width:100%;height:auto;display:block}.pp.empty{cursor:default;opacity:.7}.pp.empty .pf{color:#7a6648}
+.rgs i{width:9px;height:9px;border-radius:50%;background:#2E8B5A;flex:none}.rgs i.r{background:#C0392B}.rgs i.o{background:#D58A22}
+.rgs b.r{color:#B3281F}.rgs b.o{color:#A9650E}.rgs b.g{color:#2E6B57}
+.pps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pp{text-align:center;font-size:.76rem;color:var(--ink);cursor:pointer}
+.pp .pf{border-radius:3px;overflow:hidden;aspect-ratio:1/1.15;background:#1a0f0b;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(142,107,47,.5)}
+.pp .pf>*{max-width:100%;height:auto;display:block}.pp.empty{cursor:default;opacity:.65}.pp.empty .pf{color:#9a8660;background:#E4D6B4}
 .pp span{display:block;margin-top:3px}
-/* 底欄 */
-body.ingame #qb{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:14px;align-items:stretch;justify-content:center;padding:10px 18px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#24130e,#120a07);border-top:2px solid #8E6B2F;box-shadow:0 -6px 20px #000a}
-.qb-sc{display:flex;gap:8px;flex:1;max-width:1000px}
-.qb-sc button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 8px;background:linear-gradient(180deg,#2c1811,#1e110c);border:1px solid #6b4f2a;color:#E8D5A0;border-radius:4px;box-shadow:inset 0 0 0 1px #000a}
-.qb-sc button:hover{background:linear-gradient(180deg,#3d2217,#2a170f);color:#fff}
-.qb-adv{display:flex;gap:8px;align-items:stretch}
-.qb-adv .adv{padding:10px 26px;font-size:1.12rem;letter-spacing:.14em;color:#FFF1C9;background:linear-gradient(180deg,#a8321f,#6a1810);border:2px solid #E8D5A0;border-radius:6px;box-shadow:inset 0 0 0 1px #000a,0 0 16px #b3342d66}
-.qb-adv .adv:hover{background:linear-gradient(180deg,#c13c27,#7c1d13)}
-.qb-sub{display:flex;flex-direction:column;gap:5px}.qb-sub button{padding:2px 10px;font-size:.78rem;background:#24130e;border:1px solid #6b4f2a;color:#D9C8A3}
-body.ingame #toasts{bottom:96px}
-/* 手機 */
-@media(max-width:1180px){body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr)}body.ingame #side{grid-column:1/-1;position:static;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.acts button span{display:none}.acts button{min-width:40px}}
+
+/* ---------- 御案與聖旨（朝政） ---------- */
+.desk{position:relative;margin:4px 0 20px;padding:30px 26px 120px;border-radius:12px;background:linear-gradient(180deg,rgba(20,9,6,.0),rgba(38,18,11,.86) 18%,rgba(22,11,8,.94));box-shadow:0 16px 34px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,214,150,.1)}
+.desk::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:min(620px,62%);transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(122,24,16,.85) 8%,rgba(150,34,22,.9) 50%,rgba(122,24,16,.85) 92%,rgba(0,0,0,.35));box-shadow:inset 0 0 0 2px rgba(210,174,98,.0)}
+.desk::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:min(620px,62%);transform:translateX(-50%);background:linear-gradient(90deg,transparent 0 3%,rgba(210,174,98,.55) 3% 3.4%,transparent 3.4% 96.6%,rgba(210,174,98,.55) 96.6% 97%,transparent 97%),radial-gradient(circle at 50% 100%,rgba(0,0,0,.5),transparent 70%);pointer-events:none}
+.scroll{position:relative;z-index:1;max-width:760px;margin:0 auto;filter:drop-shadow(0 14px 12px rgba(0,0,0,.55))}
+.rod{display:block;height:28px;border-radius:14px;position:relative;background:linear-gradient(180deg,#8a2f20,#b8452e 30%,#5e1a11 72%,#2b0b07);box-shadow:inset 0 1px 0 rgba(255,210,160,.35)}
+.rod::before,.rod::after{content:'';position:absolute;top:-7px;width:20px;height:42px;border-radius:6px;background:linear-gradient(90deg,#8e6b2f,#f0d58a 45%,#8e6b2f)}
+.rod::before{left:-12px}.rod::after{right:-12px}
+.sheet{position:relative;margin:-7px 18px;padding:24px 30px 28px;background:var(--paper-bg);box-shadow:inset 0 14px 14px -12px rgba(70,34,12,.55),inset 0 -14px 14px -12px rgba(70,34,12,.55);color:var(--ink)}
+.sheet::before{content:'';position:absolute;inset:8px 12px;border:1px solid rgba(142,107,47,.28);pointer-events:none}
+.sh-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.sh-t{font-family:var(--brush);font-size:2rem;color:#4a1a10;letter-spacing:.14em}
+.sh-t::before{content:'詔';display:inline-flex;align-items:center;justify-content:center;width:1.25em;height:1.25em;margin-right:.45em;background:var(--cin);color:#FFF1D0;font-size:.55em;border-radius:3px;vertical-align:.25em;transform:rotate(-5deg);letter-spacing:0}
+.sh-s{font-size:.84rem;color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips a{cursor:pointer;padding:5px 13px;font-size:.92rem;color:#7a1f14;background:rgba(255,249,232,.75);border:1px solid rgba(160,110,50,.5);border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.15);text-decoration:none!important;border-bottom:1px solid rgba(160,110,50,.5)!important}
+.chips a:hover{background:#F6E1D4;border-color:var(--cin)}
+.sh-f{display:flex;gap:14px;align-items:center;margin-top:16px}
+.sh-f input{flex:1;min-width:0;padding:11px 14px;font-size:1.05rem}
+.sh-f button.seal{padding:10px 26px;border-radius:24px;letter-spacing:.25em;font-size:1.05rem;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,210,160,.4),0 3px 0 #4a0d08,0 6px 12px rgba(0,0,0,.4)}
+.props{position:absolute;left:4%;right:4%;bottom:-6px;width:92%;height:104px;z-index:2;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.6))}
+
+/* ---------- 推進時間：右下角浮動，不佔版面 ---------- */
+body.ingame #qb{position:fixed;right:22px;bottom:18px;left:auto;z-index:30;display:block;padding:0;background:none;border:0;box-shadow:none}
+.qb-adv{display:flex;align-items:flex-end;gap:10px}
+.qb-sub{display:flex;flex-direction:column;gap:5px}
+body.ingame .qb-sub button{padding:3px 12px;font-size:.78rem;background:rgba(26,13,9,.9);border:1px solid rgba(210,174,98,.35);color:#E2D1A9;border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+body.ingame .qb-adv .adv{display:flex;align-items:center;gap:10px;padding:13px 28px;font-size:1.15rem;letter-spacing:.16em;color:#FFF1C9;background:linear-gradient(180deg,#bb3322,#721710);border:2px solid #E3C77E;border-radius:30px;box-shadow:inset 0 1px 0 rgba(255,214,170,.4),0 4px 0 #3e0b07,0 10px 22px rgba(0,0,0,.55),0 0 22px rgba(179,40,31,.4)}
+body.ingame .qb-adv .adv:hover{background:linear-gradient(180deg,#cc3b29,#821a12)}
+body.ingame .qb-adv .adv:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,214,170,.4),0 2px 0 #3e0b07,0 6px 14px rgba(0,0,0,.5)}
+.qb-adv .adv i{font-style:normal;font-size:.9rem}
+body.ingame #toasts{bottom:92px}
+
+/* ---------- 版面自適應 ---------- */
+@media(max-width:1280px){body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr) 290px}.hero h1{font-size:3.4rem}}
+@media(max-width:1060px){
+ body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr)}
+ body.ingame #side{grid-column:1/-1;position:static;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+ .acts button span{display:none}.acts button{min-width:38px}.brand{font-size:1.4rem}}
 @media(max-width:760px){
  body.ingame #wrap{padding:0 10px 150px}
- body.ingame #top{margin:0 -10px;padding:6px 12px}body.ingame #top .date{font-size:1.2rem}body.ingame #top::after{display:none}
- .acts{position:absolute;right:10px;top:6px}.acts button{min-width:34px;padding:4px 6px}.acts button:nth-child(-n+3){display:none}
- body.ingame #stats{display:flex;overflow-x:auto;margin:8px -10px 6px;border-radius:0;scrollbar-width:none}body.ingame .chip{flex:none;min-width:136px}
+ body.ingame #top{margin:0 -10px;padding:6px 12px}body.ingame #top .date{font-size:1.15rem}.brand{display:none}
+ .acts{position:absolute;right:8px;top:6px}.acts button{min-width:34px;padding:4px 6px}.acts button:nth-child(-n+3){display:none}
+ body.ingame #stats{flex-wrap:nowrap;overflow-x:auto;margin:8px -10px 8px;border-radius:0;scrollbar-width:none}body.ingame .chip{flex:none;min-width:140px}
  #shell,body.ingame #shell:has(#side){display:block}
- body.ingame .tabs{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:31;flex-direction:row;gap:0;overflow-x:auto;background:#140b08;border-top:2px solid #8E6B2F;padding:2px 4px calc(2px + env(safe-area-inset-bottom));scrollbar-width:none}
- body.ingame .tabs button{flex:1 0 auto;flex-direction:column;gap:1px;padding:6px 12px;font-size:.78rem;background:none;border:0;border-bottom:3px solid transparent;box-shadow:none;border-radius:0}
- body.ingame .tabs button.on{background:none;box-shadow:none;border-bottom-color:#E8D5A0;color:#FFE9A8}
- body.ingame .tabs .dot{top:2px;right:6px}
- body.ingame #qb{left:8px;right:8px;bottom:calc(56px + env(safe-area-inset-bottom));padding:0;background:none;border:0;box-shadow:none;gap:8px}
- .qb-sc{gap:6px}.qb-sc button{padding:9px 4px;font-size:.84rem;box-shadow:0 3px 12px #0008}.qb-sc button:nth-child(n+3){display:none}.qb-sc .ico{display:none}
- .qb-adv .adv{padding:9px 14px;font-size:1rem;letter-spacing:.06em}.qb-sub{display:none}
- body.ingame #side{display:block;margin-top:12px}body.ingame #side .sd{margin-bottom:10px}
+ body.ingame .tabs{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:31;flex-direction:row;gap:0;overflow-x:auto;background:rgba(14,7,5,.96);backdrop-filter:blur(8px);border-top:1px solid rgba(210,174,98,.3);padding:2px 4px calc(2px + env(safe-area-inset-bottom));scrollbar-width:none}
+ body.ingame .tabs button{flex:1 0 auto;flex-direction:column;gap:1px;padding:6px 12px;font-size:.76rem;background:none;border:0;border-radius:0;box-shadow:none}
+ body.ingame .tabs button::before{display:none}
+ body.ingame .tabs button.on{background:none;box-shadow:none;color:#FFE9A8;border-bottom:3px solid var(--cin)}
+ body.ingame .tabs .dot{top:0;right:2px;font-size:.6rem;line-height:13px}
+ body.ingame #qb{right:10px;bottom:calc(60px + env(safe-area-inset-bottom))}.qb-sub{display:none}
+ body.ingame .qb-adv .adv{padding:10px 18px;font-size:1rem}
+ .hero h1{font-size:2.6rem}.hero p{letter-spacing:.2em;font-size:.82rem}
+ .desk{padding:18px 8px 30px}.desk::before,.desk::after{width:96%}.props{display:none}.sheet{margin:-7px 8px;padding:18px 16px 22px}.sh-t{font-size:1.6rem}.sh-f{flex-direction:column;align-items:stretch}
+ body.ingame #side{display:block;margin-top:12px}body.ingame #side .sd{margin-bottom:12px}
  body.ingame #toasts{bottom:132px}
 }
+@media(prefers-reduced-motion:reduce){body.ingame *{transition:none!important}}
 body.hc.ingame #pane .dim{color:#E0D2B0}
-
-.brand{display:flex;align-items:center;gap:8px;font-family:var(--brush);font-size:1.8rem;color:#F1DFAA;letter-spacing:.08em;text-shadow:0 2px 0 #000;padding-right:18px;border-right:1px solid #5a4024}
-body.ingame .foldh{box-shadow:none;background:transparent;border-radius:0;border-left:0;border-right:0;border-top:0}
-body.ingame .foldh:hover{background:#ffffff0d;box-shadow:none}
-@media(max-width:760px){.brand{display:none}}
-body.ingame #pane h3,body.ingame #pane h2{color:#F1DFAA}
-body.ingame #pane .card h2{color:var(--ink)}
-body.ingame #pane label,body.ingame #pane .small{color:#D9C8A3}
-body.ingame #pane .card label,body.ingame #pane .card .small{color:var(--ink)}
-body.ingame #pane .card .small.dim,body.ingame #pane .card .dim{color:var(--dim)}
-
-.card.memo.shut{cursor:pointer}.card.memo.shut .sum{color:var(--ink)}.card.memo.shut:hover{filter:brightness(1.03)}
-.card.memo .more{float:right;color:#7A2418;font-size:.8rem}
-@media(max-width:760px){body.ingame .tabs .dot{top:0;right:2px;font-size:.6rem;line-height:13px}}
-body.ingame #md{color:var(--ink)}
-body.ingame #md .dim,body.ingame #md .small.dim{color:var(--dim)}
-body.ingame #md .small,body.ingame #md label{color:var(--ink)}
-body.ingame #md h2,body.ingame #md h3{color:var(--ink)}
-body.ingame #md h4{color:var(--ink);border-bottom-color:var(--line)}
-body.ingame #md a{color:#7A2418}
-body.ingame #md .good{color:#2E6B57}body.ingame #md .bad{color:#B3281F}
+/* 賦稅／軍費／用度：窄螢幕改單欄，按鈕可縮 */
+body.ingame .grid3>.card{min-width:0}
+body.ingame .seg{display:flex;max-width:100%}body.ingame .seg button{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
+@media(max-width:1180px){body.ingame .grid3{grid-template-columns:1fr}}
+/* 手機頂欄：功能鈕不遮日期 */
+@media(max-width:760px){body.ingame #top{padding-right:96px}.acts button:nth-child(4){display:none}}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -1696,7 +1762,7 @@ const __mo5=memoOpts;memoOpts=function(m){return m.k==='bj'?bjOpts(m):__mo5(m)};
 /* ---------- 存檔相容：補欄位 ---------- */
 function migrate(g){if(!g||!g.P)return null;const d=(k,v)=>{if(g[k]==null)g[k]=v};
  ['memo','chr','snap','arcs','deeds','chaps','mdone','ach','xl','sit','plots','intel','log','emps'].forEach(k=>d(k,[]));
- d('nid',1000);d('zeit',{});d('mh',[]);d('pro',null);d('omenHid',0);d('reform',0);d('inst',{});d('proj',[]);d('visited',{});
+ d('nid',1000);if(!g.zeit||!g.zeit.k)g.zeit={k:'plain',t:g.t||0};if(!g.life)g.life='diligent';d('mh',[]);d('pro',null);d('omenHid',0);d('reform',0);d('inst',{});d('proj',[]);d('visited',{});
  d('fd',{});['chan','clean','army','kin','eun','wai'].forEach(k=>{if(g.fd[k]==null)g.fd[k]=0});
  for(const r of Object.values(g.reg||{})){if(r.ref==null)r.ref=0;if(r.foe&&r.mil==null){r.mil=18;r.loy=72}}
  for(const f of Object.values(g.foe||{})){if(f.att==null)f.att=0;if(f.str==null)f.str=50}
@@ -1818,6 +1884,42 @@ function artScn(k){
   +'<g fill="#0A0606"><circle cx="130" cy="96" r="8"/><path d="M114 138 L120 108 C124 100 136 100 140 108 L146 138Z"/><path d="M122 88 L130 78 L138 88Z"/><rect x="150" y="62" width="2.6" height="62"/><path d="M146 66 L156 66 L151 56Z"/></g>'
   +'<path d="M0 200 L360 200 L360 184 L0 184Z" fill="#0A0606"/></svg>'}
 
+/* ---------- 場景層：原創繪製的宮殿內景（SVG，僅作背景，不含文字） ---------- */
+function sceneSvg(){
+ const pil=(x,w,b)=>'<g'+(b?' filter="url(#bl'+b+')"':'')+'><rect x="'+x+'" y="-30" width="'+w+'" height="800" fill="url(#pil)"/><rect x="'+x+'" y="60" width="'+w+'" height="9" fill="#d2ae62" opacity=".5"/><rect x="'+x+'" y="96" width="'+w+'" height="3" fill="#d2ae62" opacity=".3"/><rect x="'+(x-w*.14)+'" y="712" width="'+(w*1.28)+'" height="46" rx="4" fill="url(#base)"/></g>';
+ const off=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-30 70 Q-32 14 0 4 Q32 14 30 70Z" fill="#0d1526"/><path d="M-30 70 Q-32 14 0 4 Q32 14 30 70" fill="none" stroke="#e08a44" stroke-opacity=".28" stroke-width="2"/><rect x="-9" y="26" width="18" height="16" rx="2" fill="#b8892f" opacity=".7"/><circle cx="0" cy="-4" r="11" fill="#120e0c"/><path d="M-12 -12 Q0 -26 12 -12Z" fill="#0a0a0a"/><path d="M-30 -14 H-12 M12 -14 H30" stroke="#0a0a0a" stroke-width="5" stroke-linecap="round"/></g>';
+ let o='';
+ const rowsL=[[300,742,1],[205,770,1.08],[380,812,1.22],[140,846,1.3],[470,872,1.38]];
+ const rowsR=rowsL.map(r=>[1600-r[0],r[1],r[2]]);
+ [...rowsL,...rowsR].forEach(r=>{o+=off(r[0],r[1],r[2]*.9)});
+ const win=x=>'<g><rect x="'+x+'" y="150" width="330" height="400" fill="#f0b25a" opacity=".55"/><rect x="'+x+'" y="150" width="330" height="400" fill="url(#lat)"/><rect x="'+x+'" y="150" width="330" height="400" fill="none" stroke="#5a140e" stroke-width="10"/></g>';
+ const lantern=(x,y,k)=>'<g transform="translate('+x+' '+y+') scale('+k+')"><path d="M0 -140V-6" stroke="#d2ae62" stroke-width="3"/><circle r="120" fill="url(#glow)" opacity=".7"/><ellipse cx="0" cy="38" rx="34" ry="46" fill="#b3281f"/><ellipse cx="0" cy="38" rx="34" ry="46" fill="url(#lan)"/><rect x="-18" y="-12" width="36" height="9" rx="2" fill="#d2ae62"/><rect x="-14" y="82" width="28" height="7" rx="2" fill="#d2ae62"/><path d="M0 89v42M-6 89v30M6 89v30" stroke="#e8c26a" stroke-width="2"/></g>';
+ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'
+ +'<linearGradient id="pil" x1="0" x2="1"><stop offset="0" stop-color="#200503"/><stop offset=".3" stop-color="#7d1912"/><stop offset=".52" stop-color="#b33a2a"/><stop offset=".78" stop-color="#5e130d"/><stop offset="1" stop-color="#1c0402"/></linearGradient>'
+ +'<linearGradient id="base" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4a2a14"/><stop offset="1" stop-color="#150a05"/></linearGradient>'
+ +'<linearGradient id="wall" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2a0c08"/><stop offset=".55" stop-color="#4a150d"/><stop offset="1" stop-color="#14090a"/></linearGradient>'
+ +'<linearGradient id="floor" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2b120c"/><stop offset="1" stop-color="#0c0605"/></linearGradient>'
+ +'<linearGradient id="scr" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5a3a14"/><stop offset=".5" stop-color="#b98a3a"/><stop offset="1" stop-color="#3a220c"/></linearGradient>'
+ +'<linearGradient id="car" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a1c14"/><stop offset="1" stop-color="#4a0d09"/></linearGradient>'
+ +'<linearGradient id="beam" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffd890" stop-opacity=".42"/><stop offset="1" stop-color="#ffd890" stop-opacity="0"/></linearGradient>'
+ +'<radialGradient id="glow"><stop offset="0" stop-color="#ffcf6a" stop-opacity=".9"/><stop offset="1" stop-color="#ffcf6a" stop-opacity="0"/></radialGradient>'
+ +'<radialGradient id="lan" cx=".5" cy=".4"><stop offset="0" stop-color="#ffb35a" stop-opacity=".95"/><stop offset="1" stop-color="#b3281f" stop-opacity="0"/></radialGradient>'
+ +'<radialGradient id="vg" cx=".5" cy=".42" r=".75"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".78"/></radialGradient>'
+ +'<pattern id="lat" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M0 0H34M0 0V34" stroke="#4a140c" stroke-width="5" fill="none"/><path d="M17 0L34 17L17 34L0 17Z" stroke="#4a140c" stroke-width="2" fill="none" opacity=".7"/></pattern>'
+ +'<filter id="bl3"><feGaussianBlur stdDeviation="3"/></filter><filter id="bl8"><feGaussianBlur stdDeviation="8"/></filter><filter id="bl1"><feGaussianBlur stdDeviation="1.2"/></filter>'
+ +'</defs>'
+ +'<rect width="1600" height="900" fill="url(#wall)"/><rect y="700" width="1600" height="200" fill="url(#floor)"/>'
+ +'<g filter="url(#bl1)">'+win(160)+win(1110)+'</g>'
+ +'<polygon points="160,150 490,150 700,760 330,760" fill="url(#beam)" opacity=".7"/><polygon points="1110,150 1440,150 1270,760 900,760" fill="url(#beam)" opacity=".7"/>'
+ +'<g filter="url(#bl1)"><ellipse cx="800" cy="360" rx="330" ry="300" fill="url(#glow)" opacity=".7"/><rect x="650" y="150" width="300" height="440" rx="6" fill="url(#scr)"/><rect x="662" y="162" width="276" height="416" rx="4" fill="none" stroke="#f0cf84" stroke-opacity=".55" stroke-width="3"/><circle cx="800" cy="330" r="92" fill="none" stroke="#f0cf84" stroke-opacity=".7" stroke-width="5"/><circle cx="800" cy="330" r="60" fill="none" stroke="#f0cf84" stroke-opacity=".5" stroke-width="3"/><path d="M730 330Q800 250 870 330Q800 410 730 330Z" fill="#f0cf84" fill-opacity=".4"/>'
+ +'<path d="M730 600h140v-60h-20v-30h-100v30h-20z" fill="#2a1408"/><path d="M700 590H900L930 640H670Z" fill="#6a1e14"/><path d="M670 640H930L960 690H640Z" fill="#541710"/><path d="M640 690H960L1000 740H600Z" fill="#3e110c"/></g>'
+ +'<polygon points="700,900 900,900 825,690 775,690" fill="url(#car)"/><polygon points="730,900 748,900 790,690 782,690" fill="#d2ae62" opacity=".35"/><polygon points="852,900 870,900 818,690 810,690" fill="#d2ae62" opacity=".35"/>'
+ +'<g filter="url(#bl1)">'+pil(70,72)+pil(460,66)+pil(1074,66)+pil(1458,72)+'</g>'
+ +lantern(250,40,1)+lantern(1350,40,1)+lantern(800,10,.8)
+ +'<g filter="url(#bl1)">'+o+'</g>'
+ +pil(-60,130,8)+pil(1530,130,8)
+ +'<rect width="1600" height="900" fill="url(#vg)"/></svg>'}
+
 /* ---------- 朝堂改版外框：圖示、導覽、右側動態 ---------- */
 const IC={
  court:'<path d="M3 9l9-5 9 5M5 9v9M9 9v9M15 9v9M19 9v9M3 20h18"/>',
@@ -1843,17 +1945,27 @@ const IC={
 function ico(k,s){return '<svg class="ico" viewBox="0 0 24 24" width="'+(s||20)+'" height="'+(s||20)+'" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(IC[k]||'')+'</svg>'}
 function navHtml(dots){return TABS.map(([k,n])=>'<button class="'+(TAB===k?'on':'')+'" data-act="tab" data-arg="'+k+'">'+ico(k,20)+'<span>'+n+'</span>'+(dots[k]?'<span class="dot"'+(k==='sys'?' data-sys="1"':'')+'>'+dots[k]+'</span>':'')+'</button>').join('')}
 function topActs(){return '<div class="acts">'+[['save','存檔','qsave',''],['load','讀檔','tab','sys'],['gear','設定','tab','sys'],['trophy','典藏','coll',''],['exit','離開','exit','']].map(([i,n,a,g])=>'<button data-act="'+a+'"'+(g?' data-arg="'+g+'"':'')+' title="'+n+'">'+ico(i,22)+'<span>'+n+'</span></button>').join('')+'</div>'}
-function qbHtml(nm_){const dm=G.memo.length;return '<div class="qb-sc"><button data-act="court">'+ico('court',18)+'<span>上朝</span></button><button data-act="tab" data-arg="court">'+ico('gov',18)+'<span>批閱奏摺'+(dm?'（'+dm+'）':'')+'</span></button><button data-act="tab" data-arg="gov">'+ico('people',18)+'<span>朝政</span></button><button data-act="tab" data-arg="map">'+ico('map',18)+'<span>疆域</span></button><button data-act="tab" data-arg="harem">'+ico('harem',18)+'<span>後宮</span></button><button data-act="tab" data-arg="family">'+ico('family',18)+'<span>皇族</span></button></div>'
- +'<div class="qb-adv"><button class="adv" data-act="adv" data-arg="1">推進時間 ▶</button><div class="qb-sub"><button data-act="adv" data-arg="3">三月</button><button data-act="adv" data-arg="12">一年</button></div></div>'}
+function qbHtml(){return '<div class="qb-adv"><div class="qb-sub"><button data-act="adv" data-arg="3">三月</button><button data-act="adv" data-arg="12">一年</button></div><button class="adv" data-act="adv" data-arg="1"><span>推進時間</span><i>▶</i></button></div>'}
 function regState(r){return G.sit.some(s=>s.k==='war'&&s.reg===r.id)?['戰事','r']:G.sit.some(s=>s.k==='revolt'&&s.reg===r.id)||r.rebel?['民變','r']:G.sit.some(s=>s.k==='disaster'&&s.reg===r.id)?['災荒','o']:r.un>65?['民怨','o']:['平穩','g']}
-function sideHtml(){
- const lg=G.log.slice(0,4);
- const news='<div class="sd"><div class="sdh">'+ico('hist',18)+'<b>朝廷動態</b><a data-act="tab" data-arg="hist">更多 ›</a></div>'+(lg.length?lg.map(l=>'<div class="nw '+(l.cls||'')+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join(''):'<div class="nw dim">朝野尚無大事。</div>')+'</div>';
+function sdBox(icon,title,more,body){return '<section class="sd"><header class="sdh">'+ico(icon,18)+'<b>'+title+'</b>'+(more?'<a data-act="tab" data-arg="'+more+'">更多 ›</a>':'')+'</header><div class="sdb">'+body+'</div></section>'}
+function newsBody(n){const lg=G.log.slice(0,n);return lg.length?lg.map(l=>'<div class="nw '+(l.cls||'')+'"><time>'+dateStr(l.t)+'</time>'+esc(l.txt)+'</div>').join(''):'<div class="nw dim">朝野尚無大事。</div>'}
+function dutyBody(){const nS=G.sit.length,nM=G.memo.length,nI=G.intel.length;const it=(d,t)=>'<div class="gi '+(d?'done':'')+'"><i></i>'+t+'</div>';
+ const tip=nS?'先處理急報——它們不會等你。':nM?'奏摺不批會積壓，積壓過多，權臣會趁機代批。':G.ap>0?'還有精力：可以上朝、修養，或召見大臣。':'精力已用盡，可以推進時間了。';
+ return it(!nS,'處理急報（'+nS+'）')+it(!nM,'批閱奏摺（'+nM+'）')+(nI?it(false,'查看密報（'+nI+'）'):'')+it(G.ap===0,'用完精力（尚餘'+G.ap+'旬）')+'<div class="tip"><b>提示</b>'+tip+'</div>'}
+function sideHtml(kind){
+ if(kind==='gov')return sdBox('gov','本月朝政要務','court',dutyBody())+sdBox('hist','朝廷動態','hist',newsBody(6));
  const rg=Object.values(G.reg).map(r=>{const s=regState(r);return '<div class="rg"><i class="'+s[1]+'"></i>'+esc(r.n)+'：<b class="'+s[1]+'">'+s[0]+'</b></div>'}).join('');
- const world='<div class="sd"><div class="sdh">'+ico('map',18)+'<b>天下形勢</b><a data-act="tab" data-arg="map">更多 ›</a></div><div class="wd"><div class="mini" data-act="tab" data-arg="map">'+mapSvg()+'</div><div class="rgs">'+rg+'</div></div></div>';
+ const world='<div class="wd"><div class="mini" data-act="tab" data-arg="map">'+mapSvg()+'</div><div class="rgs">'+rg+'</div></div>';
  const who=[['首輔',holder('chan')],['皇后',consorts().find(c=>c.rank===6)],['太后',alivePs().find(p=>p.role==='dowager')],['太子',G.heir!=null?P(G.heir):null]];
- const ppl='<div class="sd"><div class="sdh">'+ico('web',18)+'<b>人物關係</b><a data-act="tab" data-arg="web">更多 ›</a></div><div class="pps">'+who.map(([l,p])=>p&&p.alive?'<div class="pp" data-act="person" data-arg="'+p.id+'"><div class="pf">'+portrait(p,64)+'</div><span>'+l+'</span></div>':'<div class="pp empty"><div class="pf">'+ico('people',30)+'</div><span>'+l+'（未立）</span></div>').join('')+'</div></div>';
- return news+world+ppl}
+ const ppl='<div class="pps">'+who.map(([l,p])=>p&&p.alive?'<div class="pp" data-act="person" data-arg="'+p.id+'"><div class="pf">'+portrait(p,64)+'</div><span>'+l+'</span></div>':'<div class="pp empty"><div class="pf">'+ico('people',30)+'</div><span>'+l+'（未立）</span></div>').join('')+'</div>';
+ return sdBox('hist','朝廷動態','hist',newsBody(4))+sdBox('map','天下形勢','map',world)+sdBox('web','人物關係','web',ppl)}
+function heroHtml(t,s){return '<div class="hero"><h1>'+t+'</h1><p>'+s+'</p></div>'}
+const PROPS='<svg class="props" viewBox="0 0 520 120" aria-hidden="true"><defs><linearGradient id="jd" x1="0" x2="1"><stop offset="0" stop-color="#3f7a5c"/><stop offset=".5" stop-color="#9fd2b0"/><stop offset="1" stop-color="#2c5a43"/></linearGradient><linearGradient id="pt" x1="0" x2="1"><stop offset="0" stop-color="#1a0e0a"/><stop offset=".5" stop-color="#5a3320"/><stop offset="1" stop-color="#150a07"/></linearGradient></defs>'
+ +'<g transform="translate(18 20)"><rect x="6" y="38" width="46" height="58" rx="6" fill="url(#pt)"/><rect x="6" y="38" width="46" height="8" rx="3" fill="#d2ae62" opacity=".6"/><path d="M16 38L10 2M26 38L24 -6M36 38L40 -2M46 38L54 6" stroke="#2a1a10" stroke-width="3" stroke-linecap="round"/><path d="M10 2l-2-8M24-6l0-8M40-2l3-8M54 6l5-7" stroke="#c9b48a" stroke-width="2.4" stroke-linecap="round"/></g>'
+ +'<g transform="translate(78 62)"><rect x="0" y="22" width="88" height="14" rx="3" fill="#7a2a1c"/><rect x="6" y="8" width="76" height="14" rx="3" fill="#a8863e"/><rect x="10" y="-4" width="68" height="12" rx="3" fill="#2c4a6e"/><rect x="0" y="22" width="88" height="3" fill="#d2ae62" opacity=".5"/></g>'
+ +'<g transform="translate(410 6)"><rect x="0" y="70" width="84" height="26" rx="5" fill="url(#jd)"/><rect x="10" y="48" width="64" height="26" rx="6" fill="url(#jd)"/><path d="M18 50c0-22 14-30 24-30s24 8 24 30z" fill="url(#jd)"/><circle cx="42" cy="24" r="9" fill="#cfe9d6"/><path d="M26 44q16-12 32 0" stroke="#2c5a43" stroke-width="3" fill="none"/></g></svg>'
+function edictScroll(){const chips=['減輕賦稅','開倉賑濟','整頓吏治','整軍練兵','特開恩科','興修水利','犒賞三軍','祭天祈福','節儉宮用','屯田墾荒','大赦天下'];
+ return '<section class="desk">'+PROPS+'<div class="scroll"><i class="rod top"></i><div class="sheet"><div class="sh-h"><span class="sh-t">自擬詔令</span><span class="sh-s">以自己的話下詔，費一旬；群臣依字句理解</span></div><div class="chips">'+chips.map(t=>'<a data-act="edex" data-arg="'+t+'">'+t+'</a>').join('')+'</div><div class="sh-f"><input id="ed" placeholder="朕意欲……" maxlength="30" autocomplete="off"><button class="seal" data-act="edict">頒布詔令</button></div></div><i class="rod bot"></i></div></section>'}
 
 'use strict';
 /* ============ 介面 ============ */
@@ -1982,7 +2094,7 @@ function ambience(){const a=$('#amb');if(!a)return;if(!G){a.innerHTML='';a.class
  a.innerHTML=Array.from({length:se==='wi'?20:14},()=>'<i style="left:'+(Math.random()*100).toFixed(1)+'%;animation-delay:-'+(Math.random()*14).toFixed(1)+'s;animation-duration:'+(10+Math.random()*10).toFixed(1)+'s;--s:'+(.6+Math.random()*.9).toFixed(2)+'"></i>').join('')}
 /* ---------- 頂部與狀態 ---------- */
 function topHtml(){const e=emp();
- return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+({diligent:'勤政',indulge:'享樂',delegate:'放權',tyrant:'專制'}[G.life])+(G.zeit&&G.zeit.k!=='plain'?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
+ return '<div class="brand"><svg viewBox="0 0 60 40" width="54" height="36"><path d="M2 22 Q30 6 58 22 L52 22 Q30 12 8 22Z" fill="#C9A24B"/><path d="M10 24h40v3H10zM14 27h32v10H14z" fill="#8d1f17" stroke="#E8D5A0" stroke-width="1"/><path d="M24 37V30h12v7" fill="#160E0A"/></svg><span>皇帝模擬器</span></div><div class="date"><span class="seas">'+seasonOf()[0]+'</span>'+dateStr()+'<small>'+esc(nm(e))+'（'+age(e)+'歲）· '+(LIFEN[G.life]||'勤政')+(G.zeit&&G.zeit.k&&G.zeit.k!=='plain'&&ZN[G.zeit.k]?' · <span class="warnc">'+ZN[G.zeit.k]+'</span>':'')+(G.regent?' · 攝政中':'')+(G.puppet?' · <span class="bad">傀儡</span>':'')+'</small></div>'
  +'<div class="ap">旬 '+[0,1,2].map(i=>'<span class="pip '+(i<G.ap?'on':'')+'"></span>').join('')+(G.ap===0?' 精力用盡':'')+'</div>'
  +topActs()}
 function statsHtml(){const f=G.fin||{inc:0,exp:0};const net=f.inc-f.exp;
@@ -2239,7 +2351,7 @@ function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).lengt
 function tabSelf(){const e=emp();
  let h='<div class="card"><div class="pm-top"><div class="port">'+portrait(e,150)+'</div><div class="pm-info"><h2>'+esc(nm(e))+' <small class="dim">'+age(e)+'歲 · '+G.era.n+'年號</small></h2><div class="small dim">龍體 '+n0(e.hp)+(e.ill?' <span class="bad">（染病）</span>':'')+'</div>'+bar(e.hp,e.hp<35?'r':'g')
  +'<div class="stg">'+Object.keys(STN).map(k=>'<div>'+STN[k]+' <b class="gold">'+n0(e.st[k])+'</b>'+bar(e.st[k],'')+'</div>').join('')+'</div>'+e.tr.map(t=>'<span class="tag">'+t+'</span>').join('')
- +'<div class="small dim" style="margin-top:6px">時代：<b class="warnc">'+ZN[(G.zeit||{k:'plain'}).k]+'</b>　朝會出席：'+n0(G.att)+'　畏懼度：'+n0(G.fear)+'　權謀影響你看穿人心的能力。</div></div></div></div>';
+ +'<div class="small dim" style="margin-top:6px">時代：<b class="warnc">'+(ZN[(G.zeit||{k:'plain'}).k]||'平世')+'</b>　朝會出席：'+n0(G.att)+'　畏懼度：'+n0(G.fear)+'　權謀影響你看穿人心的能力。</div></div></div></div>';
  h+='<h4>施政風格</h4><div class="grid2">'+Object.keys(LIFEN).map(k=>'<div class="card" style="'+(G.life===k?'border-color:var(--gold)':'')+'"><div class="row sp"><b>'+LIFEN[k]+'</b><button class="sm '+(G.life===k?'gold':'')+'" data-act="life" data-arg="'+k+'">'+(G.life===k?'當前':'採用')+'</button></div><div class="small dim">'+LIFED[k]+'</div></div>').join('')+'</div>';
  h+='<h4>朝務</h4><div class="opts"><button data-act="court">上朝聽政<small>1旬 · 鞏固皇權、增添奏摺</small></button><button data-act="recruit">下詔募兵<small>1旬 · 40萬兩 +6萬兵</small></button><button data-act="review">校場閱兵<small>1旬 · 10萬兩 士氣↑</small></button><button data-act="edit">潤飾實錄<small>1旬 · 影響後世評價</small></button><button data-act="sell">賣官鬻爵<small>1旬 · +80萬兩，吏治受損</small></button></div>';
  h+='<h4>修養（各耗1旬）</h4><div class="opts">'+Object.keys(STN).map(k=>'<button data-act="study" data-arg="'+k+'">'+({lit:'讀書習藝',mil:'練武騎射',pol:'研習政務',sch:'研讀權謀',biz:'鑽研理財',med:'研習醫術'}[k])+'<small>'+STN[k]+' '+n0(e.st[k])+'</small></button>').join('')+'</div>';
@@ -2248,7 +2360,7 @@ function tabSelf(){const e=emp();
 function tabGov(){
  const seg=(key,names,cur,act)=>'<div class="seg">'+names.map((n,i)=>'<button class="'+(cur===i+1?'on':'')+'" data-act="'+act+'" data-arg="'+(i+1)+'">'+n+'</button>').join('')+'</div>';
  const f=G.fin||{inc:0,exp:0,leak:0,army:0,crt:0,sal:0};
- let h=edictHtml()+'<div class="card"><h3>財政</h3><div class="small">月入 <b class="good">'+n0(f.inc)+'</b> ／月出 <b class="bad">'+n0(f.exp)+'</b>（軍費'+n0(f.army||0)+'、宮廷'+n0(f.crt||0)+'、俸祿'+n0(f.sal||0)+'）；官吏貪墨約 <b class="warnc">'+n0(f.leak||0)+'</b>/月。</div></div>';
+ let h=heroHtml('朝　政','綜理百務・治國安邦')+edictScroll()+'<div class="card"><h3>財政</h3><div class="small">月入 <b class="good">'+n0(f.inc)+'</b> ／月出 <b class="bad">'+n0(f.exp)+'</b>（軍費'+n0(f.army||0)+'、宮廷'+n0(f.crt||0)+'、俸祿'+n0(f.sal||0)+'）；官吏貪墨約 <b class="warnc">'+n0(f.leak||0)+'</b>/月。</div></div>';
  h+='<div class="grid3"><div class="card"><b>賦稅</b><div class="small dim">重稅增收但積累民間負擔，傷及長遠</div>'+seg('tax',TAXN,G.tax,'tax')+'</div><div class="card"><b>軍費</b><div class="small dim">影響兵員規模與軍心</div>'+seg('mil',MILN,G.mil,'mil')+'</div><div class="card"><b>宮廷用度</b><div class="small dim">影響後宮情緒與花費</div>'+seg('crt',CRTN,G.crt,'crt')+'</div></div>';
  h+='<h4>派系格局</h4><div class="card">'+['chan','clean','army','wai','eun','kin'].map(k=>{const L=facLeader(k);return '<div class="row" style="margin:3px 0"><span style="width:64px">'+facTag(k)+'</span><div style="flex:1;min-width:120px">'+bar(G.pow[k],G.pow[k]>46?'r':'')+'</div><span style="width:34px;text-align:right">'+n0(G.pow[k])+'</span><span class="small dim" style="width:150px">'+(L?lnk(L):'—')+'</span></div>'}).join('')+'<div class="small dim">任一派系超過46，便可能挾持朝局。</div></div>';
  h+='<h4>機構</h4><div class="opts">'+Object.keys(INST).map(k=>'<button class="'+(G.inst[k]?'gold':'')+'" data-act="inst" data-arg="'+k+'">'+(G.inst[k]?'✔ ':'')+INST[k].n+'<small>'+(G.inst[k]?'點擊裁撤':INST[k].cost+'萬兩 · '+INST[k].d)+'</small></button>').join('')+'</div>';
@@ -2327,8 +2439,8 @@ function render(){if(!G){startScreen();return}
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
  const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
- document.body.classList.add('ingame');
- $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'?'<aside id="side">'+sideHtml()+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
+ document.body.classList.add('ingame');if(!$('#scene')){const sc=document.createElement('div');sc.id='scene';sc.innerHTML=sceneSvg();document.body.prepend(sc)}
+ $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'||TAB==='gov'?'<aside id="side">'+sideHtml(TAB)+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
  window.scrollTo(0,y);
  if(TAB==='web'){const w=$('.webwrap');if(w&&!UI.webScrolled){w.scrollLeft=(w.scrollWidth-w.clientWidth)/2;UI.webScrolled=1}}
  if(UI.empId==null)UI.empId=G.emp;
