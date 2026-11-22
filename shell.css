@@ -613,3 +613,12 @@ body.ingame .tzn.s-act{background:#f1e4c2 !important}
 @keyframes lbin{from{opacity:0}to{opacity:1}}
 @media(max-height:520px) and (orientation:landscape){#lb{flex-direction:row;gap:18px}#lb img{max-height:86vh;max-width:50vw}#lb p{display:none}}
 @media(prefers-reduced-motion:reduce){#lb{animation:none}}
+
+
+/* ===== 事件彈窗人物 ===== */
+.faces{display:flex;gap:14px;justify-content:center;margin:10px 0 6px}
+.faces figure{margin:0;text-align:center;width:92px}
+.faces .fp{display:block;border:2px solid #b8923f;border-radius:4px;overflow:hidden;line-height:0;background:#1a100c;box-shadow:0 4px 12px rgba(0,0,0,.45)}
+.faces .fp img,.faces .fp svg{width:100%;height:auto;display:block}
+.faces figcaption{margin-top:5px;font-size:.92rem;color:#3a2a18;letter-spacing:.08em}.faces figcaption small{display:block;font-size:.76rem;opacity:.75;letter-spacing:0}
+@media(max-height:520px) and (orientation:landscape){.faces figure{width:64px}.faces figcaption{font-size:.8rem}}

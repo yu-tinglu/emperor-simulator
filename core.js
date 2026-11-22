@@ -82,7 +82,7 @@ function grudge(p){let s=0;for(const m of p.mem)if(m.w<0&&G.t-m.t<120)s-=m.w;ret
 function gratitude(p){let s=0;for(const m of p.mem)if(m.w>0&&G.t-m.t<120)s+=m.w;return s}
 function log(txt,cls){G.log.unshift({t:G.t,txt,cls:cls||''});if(G.log.length>260)G.log.pop()}
 const ALERTS=[];
-function chron(txt,imp,ids){G.chr.push({t:G.t,txt,imp:imp||2,ids:ids||[]});log(txt,imp>=3?'big':'');if(imp>=3){ALERTS.push({t:G.t,txt});if(ALERTS.length>30)ALERTS.shift()}}
+function chron(txt,imp,ids){G.chr.push({t:G.t,txt,imp:imp||2,ids:ids||[]});log(txt,imp>=3?'big':'');if(imp>=3){ALERTS.push({t:G.t,txt,ids:(ids||[]).slice(0,3)});if(ALERTS.length>30)ALERTS.shift()}}
 function relOf(a,b){if(a.rel[b.id]==null){let v=(a.fac===b.fac&&a.fac!=='none')?10:-6;v+=ri(-25,25);if(a.clan!=null&&a.clan===b.clan)v+=30;a.rel[b.id]=v}return a.rel[b.id]}
 function bump(a,b,v){a.rel[b.id]=cl(relOf(a,b)+v,-100,100)}
 

@@ -851,6 +851,15 @@ body.ingame .tzn.s-act{background:#f1e4c2 !important}
 @keyframes lbin{from{opacity:0}to{opacity:1}}
 @media(max-height:520px) and (orientation:landscape){#lb{flex-direction:row;gap:18px}#lb img{max-height:86vh;max-width:50vw}#lb p{display:none}}
 @media(prefers-reduced-motion:reduce){#lb{animation:none}}
+
+
+/* ===== 事件彈窗人物 ===== */
+.faces{display:flex;gap:14px;justify-content:center;margin:10px 0 6px}
+.faces figure{margin:0;text-align:center;width:92px}
+.faces .fp{display:block;border:2px solid #b8923f;border-radius:4px;overflow:hidden;line-height:0;background:#1a100c;box-shadow:0 4px 12px rgba(0,0,0,.45)}
+.faces .fp img,.faces .fp svg{width:100%;height:auto;display:block}
+.faces figcaption{margin-top:5px;font-size:.92rem;color:#3a2a18;letter-spacing:.08em}.faces figcaption small{display:block;font-size:.76rem;opacity:.75;letter-spacing:0}
+@media(max-height:520px) and (orientation:landscape){.faces figure{width:64px}.faces figcaption{font-size:.8rem}}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -938,7 +947,7 @@ function grudge(p){let s=0;for(const m of p.mem)if(m.w<0&&G.t-m.t<120)s-=m.w;ret
 function gratitude(p){let s=0;for(const m of p.mem)if(m.w>0&&G.t-m.t<120)s+=m.w;return s}
 function log(txt,cls){G.log.unshift({t:G.t,txt,cls:cls||''});if(G.log.length>260)G.log.pop()}
 const ALERTS=[];
-function chron(txt,imp,ids){G.chr.push({t:G.t,txt,imp:imp||2,ids:ids||[]});log(txt,imp>=3?'big':'');if(imp>=3){ALERTS.push({t:G.t,txt});if(ALERTS.length>30)ALERTS.shift()}}
+function chron(txt,imp,ids){G.chr.push({t:G.t,txt,imp:imp||2,ids:ids||[]});log(txt,imp>=3?'big':'');if(imp>=3){ALERTS.push({t:G.t,txt,ids:(ids||[]).slice(0,3)});if(ALERTS.length>30)ALERTS.shift()}}
 function relOf(a,b){if(a.rel[b.id]==null){let v=(a.fac===b.fac&&a.fac!=='none')?10:-6;v+=ri(-25,25);if(a.clan!=null&&a.clan===b.clan)v+=30;a.rel[b.id]=v}return a.rel[b.id]}
 function bump(a,b,v){a.rel[b.id]=cl(relOf(a,b)+v,-100,100)}
 
@@ -3107,7 +3116,7 @@ function showAlert(){if(!ALERTS.length||G.over)return false;sfx('bell');let note
  const a=ALERTS.shift();if(a.chap){const c=a.chap;modal('<div class="decree edict chapter"><div class="dd">'+esc(c.emp)+'　第'+cn(c.n)+'章</div><div class="dh big">'+esc(c.title)+'</div><div class="dt">'+esc(a.txt)+'</div>'+(c.prev?'<div class="small dim">上一章「'+esc(c.prev)+'」，歷'+c.yrs+'年。</div>':'')+'<div class="opts" style="justify-content:center"><button class="pri" data-act="close">'+(ALERTS.length?'繼續（尚有'+ALERTS.length+'則）':'翻過此頁')+'</button></div></div>');return true}
  if(a.mand){modal('<div class="decree win"><div class="dh">天命已成</div><div class="dd">'+esc(dateStr(a.t))+'</div><div class="dt">'+esc(a.txt)+'</div><div class="small dim">威望＋10、皇權＋5、民心＋3。</div><div class="opts" style="justify-content:center"><button class="pri" data-act="close">'+(ALERTS.length?'知道了（尚有'+ALERTS.length+'則）':'知道了')+'</button><button data-act="mandpick">另立新志</button></div></div>');return true}
  const k=alertKind(a.txt);
- modal('<div class="decree '+k.c+'"><div class="dh">'+k.h+'</div><div class="dd">'+dateStr(a.t)+'</div><div class="dt">'+esc(a.txt)+'</div>'+(note?'<div class="small dim">'+note+'</div>':'')+'<div class="opts" style="justify-content:center"><button class="pri" data-act="close">'+(ALERTS.length?'知道了（尚有'+ALERTS.length+'則）':'知道了')+'</button></div></div>');return true}
+ modal('<div class="decree '+k.c+'"><div class="dh">'+k.h+'</div><div class="dd">'+dateStr(a.t)+'</div>'+alertFaces(a)+'<div class="dt">'+esc(a.txt)+'</div>'+(note?'<div class="small dim">'+note+'</div>':'')+'<div class="opts" style="justify-content:center"><button class="pri" data-act="close">'+(ALERTS.length?'知道了（尚有'+ALERTS.length+'則）':'知道了')+'</button></div></div>');return true}
 function mandHtml(){const m=G.mandate;if(!m||m.done)return '<div class="card mand"><div class="row sp"><h3>天命</h3><button class="sm gold" data-act="mandpick">立志</button></div><div class="small dim">'+(G.mdone&&G.mdone.length?'上一個志向已成。再立一志，給這一朝一個方向。':'為這一朝立下一個志向，達成時會被史官鄭重記上一筆。')+'</div></div>';
  const d=MAND[m.k];const p=mandProg();return '<div class="card mand"><div class="row sp"><h3>天命：'+d.n+'</h3><span class="small dim">'+Math.round(p*100)+'%</span></div><div class="small">'+d.d+'</div><div class="bar" style="margin-top:6px"><i style="width:'+Math.round(p*100)+'%"></i></div></div>'}
 function mandModal(){const ks=UI.mpool=mandPool();modal('<h3>立下天命</h3><div class="small dim" style="margin-bottom:6px">選一個志向。完成時威望、皇權、民心皆有所得，並記入史書。</div>'+ks.map(k=>'<div class="card deb"><b>'+MAND[k].n+'</b><div class="small">'+MAND[k].d+'</div><div class="opts"><button class="sm pri" data-act="mandset" data-arg="'+k+'">立此志</button></div></div>').join('')+'<div class="opts"><button class="sm" data-act="close">暫不立志</button></div>')}
@@ -3316,7 +3325,7 @@ function beginGame(o){o=o||{};const nmv=(($('#nm')||{}).value||'承嗣').trim().
 function dailyKey(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()}
 function dailySeed(k){let h=k*2654435761%2147483647;return h|0}
 function endModal(){const e=emp();const last=G.emps[G.emps.length-1];const v=last&&last.v;
- modal('<h2>'+({fall:'王朝覆滅',usurp:'改朝換代',extinct:'國祚斷絕'}[G.over.type]||'終局')+'</h2><p>'+esc(G.over.txt)+'</p>'+(v?'<p>末代之君 <b>'+esc(nm(e))+'</b>，史稱「'+v.label+'」。</p>':'')
+ modal('<h2>'+({fall:'王朝覆滅',usurp:'改朝換代',extinct:'國祚斷絕'}[G.over.type]||'終局')+'</h2>'+alertFaces({ids:[e.id]})+'<p>'+esc(G.over.txt)+'</p>'+(v?'<p>末代之君 <b>'+esc(nm(e))+'</b>，史稱「'+v.label+'」。</p>':'')
  +'<p class="dim small">本朝歷時'+Math.round((G.t-G.emps[0].t0)/12)+'年，歷'+G.emps.length+'帝。你可以前往「史書」回顧這段歷史，或重新登基。</p><div class="opts"><button class="pri" data-act="recap">本朝回顧</button><button data-act="card">史書書頁</button><button data-act="leg">承前朝而起</button><button data-act="coll">典藏</button><button data-act="restart">重新登基</button><button data-act="close">回顧史書</button></div>')}
 function succModal(){const e=emp();const prev=G.emps[G.emps.length-2];const v=prev&&prev.v;
  modal('<h2>新帝登基</h2><p>'+(prev?'<b>'+esc(nm(P(prev.pid)))+'</b>'+esc(prev.cause||'')+(v?'，廟號「'+v.temple+'」，史稱'+v.label:'')+'。':'')+'</p><p><b>'+esc(nmt(e))+'</b>（'+age(e)+'歲）繼承大統，年號「'+G.era.n+'」。從此，你就是這位皇帝。</p>'
@@ -3434,5 +3443,14 @@ Object.assign(ACT,{czopen(a){czModal(a)},czgo(a){const r=czStart(a);closeModal()
  document.addEventListener('click',function(e){const im=e.target&&e.target.closest&&e.target.closest('img[data-zoom]');if(!im||!im.closest('#md .port,.selfc .port'))return;e.stopPropagation();e.preventDefault();lbOpen(im.getAttribute('data-zoom'))},true);
  document.addEventListener('keydown',function(e){if(e.key==='Escape')lbClose()});
  document.addEventListener('mouseover',function(e){const im=e.target&&e.target.closest&&e.target.closest('img[data-zoom]');if(im&&im.closest('#md .port,.selfc .port'))im.style.cursor='zoom-in'})}
+
+
+/* ---------- 大事件彈窗：帶出相關人物的臉 ---------- */
+function alertFaces(a){if(!a||!G)return '';const seen=new Set(),L=[];
+ for(const id of (a.ids||[])){const p=P(id);if(p&&!seen.has(p.id)){seen.add(p.id);L.push(p)}}
+ if(!L.length&&a.txt){const all=Object.values(G.P||{});const rk=p=>p.id===G.emp?0:p.role==='dowager'?1:p.role==='consort'?2:3;
+  const hit=all.filter(p=>{const n=nm(p);return n&&n.length>=2&&a.txt.indexOf(n)>=0}).sort((x,y)=>rk(x)-rk(y));for(const p of hit){if(L.length>=3)break;if(!seen.has(p.id)){seen.add(p.id);L.push(p)}}}
+ if(!L.length)return '';
+ return '<div class="faces">'+L.slice(0,3).map(p=>{const isEmp=(G.emps||[]).some(x=>x.pid===p.id);const im=isEmp?portImg(PORT_EMP,84,'emp'):portrait(p,84);return '<figure><div class="fp">'+im+'</div><figcaption>'+esc(nm(p))+(p.title?'<small>'+esc(p.title)+'</small>':'')+'</figcaption></figure>'}).join('')+'</div>'}
 
 </script></body></html>
