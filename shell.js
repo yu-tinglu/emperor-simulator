@@ -44,3 +44,8 @@ const PROPS='<svg class="props" viewBox="0 0 520 120" aria-hidden="true"><defs><
  +'<g transform="translate(410 6)"><rect x="0" y="70" width="84" height="26" rx="5" fill="url(#jd)"/><rect x="10" y="48" width="64" height="26" rx="6" fill="url(#jd)"/><path d="M18 50c0-22 14-30 24-30s24 8 24 30z" fill="url(#jd)"/><circle cx="42" cy="24" r="9" fill="#cfe9d6"/><path d="M26 44q16-12 32 0" stroke="#2c5a43" stroke-width="3" fill="none"/></g></svg>'
 function edictScroll(){const chips=['減輕賦稅','開倉賑濟','整頓吏治','整軍練兵','特開恩科','興修水利','犒賞三軍','祭天祈福','節儉宮用','屯田墾荒','大赦天下'];
  return '<section class="desk">'+PROPS+'<div class="scroll"><i class="rod top"></i><div class="sheet"><div class="sh-h"><span class="sh-t">自擬詔令</span><span class="sh-s">以自己的話下詔，費一旬；群臣依字句理解</span></div><div class="chips">'+chips.map(t=>'<a data-act="edex" data-arg="'+t+'">'+t+'</a>').join('')+'</div><div class="sh-f"><input id="ed" placeholder="朕意欲……" maxlength="30" autocomplete="off"><button class="seal" data-act="edict">頒布詔令</button></div></div><i class="rod bot"></i></div></section>'}
+
+(function(){const d=document.createElement('div');d.id='rot';d.innerHTML='<div class="ri"></div><b>請將手機橫放</b><small>皇帝模擬器須橫向遊玩</small>';document.body.appendChild(d);
+ let done=0;function go(){if(done)return;if(!matchMedia('(pointer:coarse)').matches||Math.min(screen.width,screen.height)>=700)return;done=1;
+  try{const el=document.documentElement;const p=el.requestFullscreen?el.requestFullscreen():Promise.resolve();Promise.resolve(p).catch(()=>{}).then(()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(e){}})}catch(e){}}
+ document.addEventListener('click',go,{passive:true});document.addEventListener('touchend',go,{passive:true});})();
