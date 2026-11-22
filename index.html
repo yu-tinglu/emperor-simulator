@@ -803,6 +803,8 @@ body.ingame .tabs button{padding-top:8px;padding-bottom:8px}
  body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr) 290px}
  body.ingame .hero h1{font-size:3.3rem}
 }
+
+.ops.ops4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:760px){.ops.ops4{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -951,7 +953,7 @@ function newGame(o){
  if(S==='b'){G.auth=54;G.tre=950;G.rep=55;G.mind=66}
  if(S==='c'){G.auth=58;G.tre=520;G.gra=340;G.army=50;G.morale=72;G.burden=36;G.mind=56;G.rep=60;G.fd.army=16;G.foe.di.str=70;G.foe.di.att=-30;G.crt=2;
   for(const k of ['he','zhong','guan'])G.reg[k].un+=9}
- G.era={n:pick(ERAS),y0:Math.floor(G.t/12)};
+ G.era={n:pick(ERAS),y0:Math.floor(G.t/12)};G.asp=o.asp||null;
  G.reign={t0:G.t,m0:G.mind,wins:0,losses:0,exec:0,famine:0,revolt:0,authSum:0,mindSum:0,n:0,purges:0,heirsLost:0,founder:S==='c',start:S};
  refreshClans();syncPower();
  G.emps.push({pid:e.id,t0:G.t,era:G.era.n,t1:null});
@@ -1348,7 +1350,7 @@ function yearEnd(){G.weather=rr(.72,1.15);eraTrait();snapRec();chapterCheck();ac
 
 /* ---------- 終局與繼位 ---------- */
 function fall(why){G.over={type:'fall',txt:why};chron('王朝覆滅：'+why+'。',3);const e=emp();e.alive=false;e.dod=G.t;
- const v=judgeReign(e,true);G.emps[G.emps.length-1].v=v;G.emps[G.emps.length-1].t1=G.t;G.emps[G.emps.length-1].cause='亡國'}
+ const v=judgeReign(e,true);G.emps[G.emps.length-1].v=v;G.emps[G.emps.length-1].t1=G.t;G.emps[G.emps.length-1].cause='亡國';if(v.asp){chron('史官論其志：'+v.asp.txt,3);G.asp=null}}
 function checkEnd(){if(G.over)return;
  const revs=G.sit.filter(s=>s.k==='revolt');
  if(revs.some(s=>s.S>=100||(s.S>=62&&s.reg==='jing'))||revs.reduce((a,s)=>a+s.S,0)>=270)return fall('義軍攻破京師，皇帝出奔');
@@ -1360,7 +1362,8 @@ function judgeReign(e,fell){const r=G.reign;const n=Math.max(1,r.n);const am=r.a
  if(fell)key='fall';else if(am<26&&yrs>2)key='puppet';else if((r.exec>=7&&G.fear>55)||r.purges>=5&&mm<50)key='tyrant';else if(mm<40&&G.rep<40)key='fool';
  else if(mm>=66&&G.tre>250&&am>=42)key='sage';else if(r.wins>=3&&r.wins>=r.losses*2)key='warrior';else if(r.m0<48&&mm>=57)key='revive';
  let temple=r.founder&&!fell?'太祖':TEMPLE[key][1];const cnt=G.emps.filter(x=>x.v&&x.v.temple===temple).length;
- return{key,label:TEMPLE[key][0],temple:temple+(cnt?'（'+cn(cnt+1)+'）':''),official:key,edited:false,yrs,mm:rd(mm),am:rd(am),wins:r.wins,losses:r.losses,exec:r.exec,famine:r.famine}}
+ const asp=aspEval(e,fell,key,mm,am,yrs);
+ return{key,asp,label:TEMPLE[key][0],temple:temple+(cnt?'（'+cn(cnt+1)+'）':''),official:key,edited:false,yrs,mm:rd(mm),am:rd(am),wins:r.wins,losses:r.losses,exec:r.exec,famine:r.famine}}
 function succeed(cause){const old=emp();const rec=G.emps[G.emps.length-1];rec.t1=G.t;rec.cause=cause;
  const v=judgeReign(old,false);const ht=holder('hist');
  if(G.editHist>0){const i=KEYORD.indexOf(v.key);v.official=KEYORD[Math.min(KEYORD.length-1,i+2)];v.edited=true;G.editHist=0}
@@ -1368,6 +1371,7 @@ function succeed(cause){const old=emp();const rec=G.emps[G.emps.length-1];rec.t1
  rec.v=v;metaUnlock('v',v.key);old.title=v.temple;old.role='kin';
  for(const x of G.emps){if(x!==rec&&x.v&&x.v.edited&&!x.v.revised&&chance(.35)){x.v.revised=true;x.v.official=x.v.key;chron('史官重修實錄，為'+nm(P(x.pid))+'翻案，史書更正。',2)}}
  chron(nm(old)+cause+'，上廟號「'+v.temple+'」，史稱'+v.label+(v.official!==v.key?'（官修史書則作「'+TEMPLE[v.official][0]+'」）':'')+'。',3,[old.id]);
+ if(v.asp)chron('史官論其志：'+v.asp.txt,3,[old.id]);G.asp=null;
  let nxt=null;
  if(G.force&&P(G.force)&&P(G.force).alive)nxt=P(G.force);
  else if(G.heir&&P(G.heir)&&P(G.heir).alive)nxt=P(G.heir);
@@ -1400,7 +1404,7 @@ function previewFin(){const keep=JSON.stringify({reg:G.reg,tre:G.tre,gra:G.gra,b
  economy();const fin=G.fin;const k=JSON.parse(keep);G.reg=k.reg;G.tre=k.tre;G.gra=k.gra;G.burden=k.burden;G.morale=k.morale;G.mind=k.mind;G.debt=k.debt;G.army=k.army;G.proj=k.proj;for(const id in k.P)G.P[id].wealth=k.P[id];G.fin=fin}
 /* ---------- 月度推進 ---------- */
 function endMonth(){if(G.over)return;
- lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
+ lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
  G.reign.authSum+=G.auth;G.reign.mindSum+=G.mind;G.reign.n++;
  G.t++;G.ap=apMax();G.held=false;G.visited={};G.mw=0;
  if(G.t%12===0)yearEnd();
@@ -1692,7 +1696,7 @@ function memoOpts(m){const O=[];const x=m.x;const f=m.from?P(m.from):null;const 
  else if(k==='dowager'){const d=P(m.from),g=P(x.girl);O.push({l:'遵懿旨納為妃',h:'太后與外戚歡喜，後宮添一人',fn:()=>{if(!g||g.role!=='maiden')return NO('此女已不在。');g.role='consort';g.rank=3;g.sp=G.emp;g.fav=ri(30,50);bio(g,'奉太后懿旨入宮，封嬪。');if(d)good(d,10);G.fd.wai=cl(G.fd.wai+1.5,0,35);chron(nm(g)+'入宮，封嬪。',2);return OKK(nm(g)+'入宮為嬪。')}});O.push({l:'婉拒',h:'太后不悅',fn:()=>{if(d)bad(d,10);G.fd.wai=cl(G.fd.wai-1,0,35);return OKK('你婉言謝絕了太后。')}})}
  return O}
 function runMemo(mid,i){const m=G.memo.find(x=>x.id===mid);if(!m)return NO('奏摺已不存在。');if(G.mw%3===0&&G.ap<1)return NO('精力不足（每批閱三份奏摺耗一旬）。');
- const o=memoOpts(m)[i];if(!o)return NO('選項無效。');const r=o.fn();if(r.ok){G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}return r}
+ const o=memoOpts(m)[i];if(!o)return NO('選項無效。');const s0=decSnap();let r;try{r=o.fn()}catch(e){return NO('此事已有變化，無法照此辦理。')}if(r.ok){decRec(m,o,s0);G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}return r}
 function leaveMemo(mid){G.memo=G.memo.filter(x=>x.id!==mid);return OKK('留中不發。')}
 
 /* ---------- 人物互動選單 ---------- */
@@ -2035,6 +2039,44 @@ function metaName(c,k){return c==='v'?(TEMPLE[k]?TEMPLE[k][0]:k):c==='e'?ENDN[k]
 function metaUnlock(c,k){const M=metaGet();const o=M[c];if(!o)return;if(o[k])o[k].n++;else{o[k]={n:1,t:Date.now()};if(typeof toast==='function')toast('典藏新增：「'+metaName(c,k)+'」')}metaSave()}
 function achCheck(){G.ach=G.ach||[];for(const k in ACH){if(G.ach.includes(k))continue;let ok=false;try{ok=ACH[k].chk()}catch(e){}if(ok){G.ach.push(k);metaUnlock('a',k);chron('〔成就〕'+ACH[k].n+'。',2)}}}
 function metaEnd(){if(G.over&&!G.overMeta){G.overMeta=1;metaUnlock('e',G.over.type);const r=G.emps[G.emps.length-1];if(r&&r.v)metaUnlock('v',r.v.key);if(G.daily){const M=metaGet();M.daily=M.daily||{};const y=Math.round((G.t-G.emps[0].t0)/12);if(!M.daily[G.daily]||M.daily[G.daily].y<y){M.daily[G.daily]={y,v:r&&r.v?r.v.label:'',e:G.over.type};metaSave()}}}}
+
+
+/* ---------- 七：決策回顧（政策決定，數年後由史官對照同期國勢） ---------- */
+function decSnap(){return{mind:G.mind,tre:G.tre,auth:G.auth,rep:G.rep}}
+function decRec(m,o,s0){if(!m||m.k==='echo'||!o)return;G.dec=G.dec||[];let t=String(m.txt||'').replace(/[。！!]+$/,'');if(t.length>34)t=t.slice(0,34)+'…';
+ G.dec.push({t:G.t,k:m.k,txt:t,l:o.l,s:s0||decSnap()});if(G.dec.length>60)G.dec.shift()}
+function decMonth(){const L=G.dec;if(!L||!L.length)return;if(G.decT!=null&&G.t-G.decT<14)return;if(!chance(.05))return;
+ const sc=d=>{const a=G.mind-d.s.mind,b=G.auth-d.s.auth,c=G.rep-d.s.rep,e=(G.tre-d.s.tre)/80;return{a,b,c,e,s:a*1.5+b*.5+c*.5+e}};
+ const c=L.filter(d=>!d.rv&&G.t-d.t>=30&&G.t-d.t<=130);if(!c.length)return;
+ let best=null,bs=0;for(const d of c){const v=sc(d);const m=Math.abs(v.a)*2+Math.abs(v.b)+Math.abs(v.c)+Math.abs(v.e);if(m>bs){bs=m;best=d}}
+ if(!best||bs<8)return;best.rv=1;G.decT=G.t;const v=sc(best);const yrs=Math.max(2,Math.round((G.t-best.t)/12));
+ const ch=[];const R=Math.round;if(Math.abs(v.a)>=3)ch.push('民心'+R(best.s.mind)+'→'+R(G.mind));if(Math.abs(v.b)>=3)ch.push('皇權'+R(best.s.auth)+'→'+R(G.auth));if(Math.abs(v.e*80)>=50)ch.push('國庫'+R(best.s.tre)+'→'+R(G.tre)+'萬兩');if(Math.abs(v.c)>=3)ch.push('威望'+R(best.s.rep)+'→'+R(G.rep));
+ const j=v.s>=6?'同期國運漸升，史家以為此議有功。':v.s<=-6?'同期國勢轉衰，後人論及此事，多有遺憾。':'得失參半，史家未有定論。';
+ chron('史官回顧：'+dateStr(best.t)+'，'+best.txt+'。你當時選擇「'+best.l+'」。其後'+yrs+'年，'+(ch.join('，')||'各項大致持平')+'。'+j+'（同期變化未必全因此事）',3)}
+
+/* ---------- 八：外戚連動（奏摺牽涉太后、皇后家族） ---------- */
+function waiSide(p){if(!p||p.clan==null)return null;const e=emp();const q=e&&e.sp!=null?P(e.sp):null;
+ if(q&&q.alive&&q.role==='consort'&&q.rank>=6&&q.clan===p.clan&&q.id!==p.id)return{side:'皇后',q};
+ const d=alivePs().find(z=>z.role==='dowager'&&String(z.title).indexOf('太后')>=0);if(d&&d.clan===p.clan&&d.id!==p.id)return{side:'太后',q:d};return null}
+function memoWai(m){if(!m||!m.x)return null;let p=null;if(m.k==='impeach')p=P(m.x.tg);else if(m.k==='recommend')p=P(m.x.cand);else return null;if(!p||!p.alive)return null;const w=waiSide(p);return w?{side:w.side,q:w.q,p}:null}
+const __mo8=memoOpts;memoOpts=function(m){const O=__mo8(m);const w=memoWai(m);if(!w)return O;const{side,q,p}=w;const mood=(v)=>{q.op=cl(q.op+v);if(q.role==='consort')q.fav=cl(q.fav+v)};const wai=v=>{G.fd.wai=cl((G.fd.wai||0)+v,0,35)};
+ if(m.k==='impeach'){for(const o of O){if(String(o.l).indexOf('准予徹查')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'涉'+side+'族，'+side+'將不悅';o.fn=()=>{const r=f0();if(r.ok){mood(-8);wai(-1)}return r}}}
+  const f=m.from?P(m.from):null;O.push({l:'看在'+side+'面上，從輕處置',h:side+'歡喜、外戚勢力+2；御史失望，皇權-1',fn:()=>{mood(8);wai(2);p.op=cl(p.op+6);if(f)f.op=cl(f.op-5);G.auth=cl(G.auth-1);return OKK('你顧念'+side+'顏面，命有司從輕發落，御史退下時臉色難看。')}})}
+ else if(m.k==='recommend'){for(const o of O){if(String(o.l).indexOf('准')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'后族出身，外戚勢力+2';o.fn=()=>{const r=f0();if(r.ok){mood(4);wai(2)}return r}}
+  else if(String(o.l).indexOf('駁回')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'恐拂'+side+'之意';o.fn=()=>{const r=f0();if(r.ok)mood(-4);return r}}}}
+ return O};
+
+/* ---------- 九：開局志向與史官評語 ---------- */
+const ASP={restore:{n:'中興',d:'重振國勢：民心與皇權雙高，或名列盛世、中興、武功',ok:'「志在中興，果以中興名世，史臣不虛美也。」',bad:'「志在中興，然國勢未振，終成空言。」',fall:'「志在中興，卒至亡國，志大而才疏。」'},
+ keep:{n:'守成',d:'平穩傳承：在位十二年以上，少民變饑荒，不為暴君庸主',ok:'「守成之君，不求赫赫之功而祖業無損，亦難能也。」',bad:'「志在守成，而變亂屢起，守成之志未能償。」',fall:'「志在守成，而社稷傾覆，守成者反失其所守。」'},
+ joy:{n:'享樂',d:'逍遙一世：在位十年以上，子嗣四人以上，國事未壞',ok:'「帝享太平之福，子孫滿堂，天下亦未見大亂，可謂有福。」',bad:'「帝志在安樂，而國事日非，樂不長久。」',fall:'「帝志在安樂，終致亡國，歡娛之地即傾覆之地。」'}};
+function aspEval(e,fell,key,mm,am,yrs){const k=G.asp;if(!k||!ASP[k])return null;const r=G.reign;let ok=false;
+ if(k==='restore')ok=!fell&&(['sage','revive','warrior'].indexOf(key)>=0||(mm>=62&&am>=45));
+ else if(k==='keep')ok=!fell&&yrs>=12&&r.revolt<=1&&r.famine<=1&&['tyrant','fool','puppet'].indexOf(key)<0;
+ else if(k==='joy')ok=!fell&&yrs>=10&&((e&&e.kids)||[]).length>=4&&mm>=45&&key!=='puppet';
+ return{k,n:ASP[k].n,ok,txt:ASP[k][ok?'ok':fell?'fall':'bad']}}
+function aspHtml(){const k=G.asp;if(k&&ASP[k]){const a=ASP[k];return '<div class="card mand"><div class="row sp"><h3>志向：'+a.n+'</h3><span class="small dim">史官將據此論你</span></div><div class="small">'+a.d+'</div></div>'}
+ return '<div class="card mand"><div class="row sp"><h3>志向</h3></div><div class="small dim">未立。立下之後，史官將以此論這一朝；每朝僅能立一次。</div><div class="opts">'+Object.keys(ASP).map(x=>'<button class="sm" data-act="aspset" data-arg="'+x+'">'+ASP[x].n+'<small>'+ASP[x].d.split('：')[0]+'</small></button>').join('')+'</div></div>'}
 
 /* ---------- 災異與祭祀 / 使節奏報（world.js） ---------- */
 const OMEN={
@@ -2691,6 +2733,7 @@ function startScreen(){document.body.classList.remove('ingame');document.documen
  +'<div class="stp-b">'
  +'<div class="fld"><label class="fl" for="nm">朕名</label><input id="nm" value="'+esc(S.name)+'" maxlength="4" size="6" autocomplete="off" aria-describedby="sthint"><span class="fs">至多四字</span></div>'
  +'<div class="fld"><div class="fl">難度</div><div class="ops ops3">'+Object.keys(DIFF).map(k=>opt((S.diff||'n')===k,'diff',k,DIFF[k].n,DIFF[k].d)).join('')+'</div></div>'
+ +'<div class="fld"><div class="fl">志向<span class="fs">可不立；史官將據此論你</span></div><div class="ops ops4">'+[''].concat(Object.keys(ASP)).map(k=>opt((S.asp||'')===k,'asp',k||'none',k?ASP[k].n:'隨緣',k?ASP[k].d.split('：')[0]:'不預設')).join('')+'</div></div>'
  +'<div class="fld"><div class="fl">天賦所長<span class="fs">開局該項能力較高</span></div><div class="ops ops3">'+Object.keys(STN).map(k=>opt(S.focus===k,'focus',k,STN[k],FOCUSD[k])).join('')+'</div></div>'
  +'<details class="cust"><summary>自訂劇本（進階）</summary><div class="cust-b">'+Object.keys(CUST).map(k=>'<div class="fld"><div class="fl">'+({tre:'起始國庫',foe:'外邦強弱',fac:'朝堂派系'}[k])+'</div><div class="ops ops3 sm">'+CUST[k].map((n,i)=>opt(CS[k]===i,'cust',k+'|'+i,n)).join('')+'</div></div>').join('')+'</div></details>'
  +'</div></section>'
@@ -2897,7 +2940,7 @@ function recapHtml(){const E=G.emps;const first=E[0];const yrs=Math.round(((G.ov
   +'<h4>勢力消長</h4><div class="stream">'+(streamSvg(-1)||'<div class="small dim" style="padding:12px">歷時太短，尚無曲線。</div>')+'</div>'
   +'<h4>國勢起伏</h4><div class="stream">'+(lineSvg()||'<div class="small dim" style="padding:12px">歷時太短，尚無曲線。</div>')+'</div>'
   +'<h4>歷代帝王</h4><div class="grid2">'+E.map(x=>{const p=P(x.pid);const v=x.v;const y=Math.round(((x.t1==null?G.t:x.t1)-x.t0)/12);const off=v&&v.official&&v.official!==v.key&&TEMPLE[v.official]?'<div class="small warnc">官修史書稱其「'+TEMPLE[v.official][0]+'」，與實情不同。</div>':'';
-   return '<div class="card" style="display:flex;gap:10px"><div class="port" style="width:64px;margin:0;flex:none">'+portrait(p,54)+'</div><div><b>'+esc(nm(p))+'</b> <span class="small dim">'+esc(x.era)+'・在位'+y+'年</span><div>'+(v?'「'+esc(v.label)+'」・'+esc(v.temple):(G.over?'末代之君':'尚在位'))+'</div>'+off+'<div class="small dim">'+esc(x.cause||'')+'</div></div></div>'}).join('')+'</div>'
+   return '<div class="card" style="display:flex;gap:10px"><div class="port" style="width:64px;margin:0;flex:none">'+portrait(p,54)+'</div><div><b>'+esc(nm(p))+'</b> <span class="small dim">'+esc(x.era)+'・在位'+y+'年</span><div>'+(v?'「'+esc(v.label)+'」・'+esc(v.temple):(G.over?'末代之君':'尚在位'))+'</div>'+off+(v&&v.asp?'<div class="small '+(v.asp.ok?'':'warnc')+'">志向「'+esc(v.asp.n)+'」：'+(v.asp.ok?'已達成':'未達成')+'</div>':'')+'<div class="small dim">'+esc(x.cause||'')+'</div></div></div>'}).join('')+'</div>'
   +'<h4>章回</h4><div class="card">'+E.map(x=>{const cs=(G.chaps||[]).filter(c=>c.emp===x.pid);return cs.length?'<div class="row" style="align-items:baseline"><b>'+esc(nm(P(x.pid)))+'</b><span class="small">'+cs.map(c=>'第'+cn(c.n)+'章 '+esc(c.title)).join(' → ')+'</span></div>':''}).join('')+'</div>'
   +'<h4>大事記</h4><div class="feed" style="max-height:none">'+pick_.map(c=>'<div class="big"><time>'+esc(dateStr(c.t))+'</time>'+esc(c.txt)+'</div>').join('')+'</div>'
   +'<div class="opts" style="margin-top:12px;justify-content:center"><button class="pri" data-act="close">合上史冊</button>'+(G.over?'<button data-act="restart">重新登基</button>':'')+'</div></div>'}
@@ -2974,7 +3017,7 @@ function tabSelf(){const e=emp();
  let h=heroHtml('起　居','朕躬安否・修身養性')+'<div class="card selfc"><div class="pm-top"><div class="port">'+portrait(e,150)+'</div><div class="pm-info"><h2>'+esc(nm(e))+' <small class="dim">'+age(e)+'歲 · '+G.era.n+'年號</small></h2><div class="small dim">龍體 '+n0(e.hp)+(e.ill?' <span class="bad">（染病）</span>':'')+'</div>'+bar(e.hp,e.hp<35?'r':'g')
  +'<div class="stg">'+Object.keys(STN).map(k=>'<div>'+STN[k]+' <b class="gold">'+n0(e.st[k])+'</b>'+bar(e.st[k],'')+'</div>').join('')+'</div>'+e.tr.map(t=>'<span class="tag">'+t+'</span>').join('')
  +'<div class="small dim" style="margin-top:6px">時代：<b class="warnc">'+(ZN[(G.zeit||{k:'plain'}).k]||'平世')+'</b>　朝會出席：'+n0(G.att)+'　畏懼度：'+n0(G.fear)+'　權謀影響你看穿人心的能力。</div></div></div></div>';
- h+='<h4>施政風格</h4><div class="grid2">'+Object.keys(LIFEN).map(k=>'<div class="card" style="'+(G.life===k?'border-color:var(--gold)':'')+'"><div class="row sp"><b>'+LIFEN[k]+'</b><button class="sm '+(G.life===k?'gold':'')+'" data-act="life" data-arg="'+k+'">'+(G.life===k?'當前':'採用')+'</button></div><div class="small dim">'+LIFED[k]+'</div></div>').join('')+'</div>';
+ h+=aspHtml();h+='<h4>施政風格</h4><div class="grid2">'+Object.keys(LIFEN).map(k=>'<div class="card" style="'+(G.life===k?'border-color:var(--gold)':'')+'"><div class="row sp"><b>'+LIFEN[k]+'</b><button class="sm '+(G.life===k?'gold':'')+'" data-act="life" data-arg="'+k+'">'+(G.life===k?'當前':'採用')+'</button></div><div class="small dim">'+LIFED[k]+'</div></div>').join('')+'</div>';
  h+='<h4>朝務</h4><div class="opts"><button data-act="court">上朝聽政<small>1旬 · 鞏固皇權、增添奏摺</small></button><button data-act="recruit">下詔募兵<small>1旬 · 40萬兩 +6萬兵</small></button><button data-act="review">校場閱兵<small>1旬 · 10萬兩 士氣↑</small></button><button data-act="edit">潤飾實錄<small>1旬 · 影響後世評價</small></button><button data-act="sell">賣官鬻爵<small>1旬 · +80萬兩，吏治受損</small></button></div>';
  h+='<h4>修養（各耗1旬）</h4><div class="opts">'+Object.keys(STN).map(k=>'<button data-act="study" data-arg="'+k+'">'+({lit:'讀書習藝',mil:'練武騎射',pol:'研習政務',sch:'研讀權謀',biz:'鑽研理財',med:'研習醫術'}[k])+'<small>'+STN[k]+' '+n0(e.st[k])+'</small></button>').join('')+'</div>';
  h+='<h4>起居</h4><div class="opts"><button data-act="rest">靜養休息<small>1旬 · 龍體+8</small></button><button data-act="hunt">秋狩出獵<small>1旬 · 15萬兩</small></button><button data-act="banq" data-arg="0">設小宴<small>1旬 · 10萬兩</small></button><button data-act="banq" data-arg="1">大宴群臣<small>1旬 · 40萬兩</small></button><button data-act="tour">微服私訪<small>2旬 · 體察民情、尋訪人才</small></button></div>';
@@ -3126,7 +3169,7 @@ function bjModal(i){modal('<div class="recap"><h2 class="rh">'+esc(G.emps[i].era
 function legModal(){const L=G.over?G.over.type:'fall';modal('<h2>承前朝而起</h2><p>前朝「'+esc(G.era.n)+'」已成歷史。你可以選擇下一局的身份：</p><div class="opts"><button class="pri" data-act="legpick" data-arg="a">旁支入繼<small>承其遺澤，聲望+8；天下仍在</small></button><button data-act="legpick" data-arg="c">起於草莽<small>開國之君；有前朝遺老輔佐</small></button></div><div class="opts" style="margin-top:8px"><button data-act="close">返回</button></div>')}
 function legacyBegin(sc){const type=G.over?G.over.type:'fall';const L={era:G.era.n,type:sc==='a'?'extinct':type==='extinct'?'fall':type};beginGame({scn:sc,legacy:L})}
 function beginGame(o){o=o||{};const nmv=(($('#nm')||{}).value||'承嗣').trim().slice(0,4)||'承嗣';{const M=metaGet();M.games++;metaSave()}
- const a={scn:o.scn||UI.start.scn,name:nmv,focus:UI.start.focus||'pol',diff:o.daily?'n':(UI.start.diff||'n')};if(o.daily){const k=dailyKey();a.seed=dailySeed(k);a.scn='a'}if(o.legacy)a.legacy=o.legacy;if(!o.daily&&UI.start.cust)a.cust=UI.start.cust;
+ const a={scn:o.scn||UI.start.scn,name:nmv,focus:UI.start.focus||'pol',diff:o.daily?'n':(UI.start.diff||'n'),asp:(!o.daily&&UI.start.asp)||null};if(o.daily){const k=dailyKey();a.seed=dailySeed(k);a.scn='a'}if(o.legacy)a.legacy=o.legacy;if(!o.daily&&UI.start.cust)a.cust=UI.start.cust;
  newGame(a);if(o.daily){G.daily=dailyKey()}UI.last=null;UI.overShown=false;UI.empId=G.emp;TAB='court';ALERTS.length=0;saveG('auto');render();showPro()}
 function dailyKey(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()}
 function dailySeed(k){let h=k*2654435761%2147483647;return h|0}
@@ -3151,7 +3194,7 @@ const ACT={
  edex(a){const i=$('#ed');if(i){i.value=a;i.focus()}},edict(){const i=$('#ed');res(actEdict(i?i.value:''))},
  tosave(){closeModal();TAB='sys';render();window.scrollTo(0,0)},close(){closeModal();render()},
  scn(a){UI.start.scn=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},
- cust(a){const[k,i]=a.split('|');UI.start.cust=Object.assign({tre:1,foe:1,fac:1},UI.start.cust||{});UI.start.cust[k]=+i;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen();const d=document.querySelector('details.cust');if(d)d.open=true},diff(a){UI.start.diff=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},focus(a){UI.start.focus=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},enter(){UI.splashDone=true;startScreen()},
+ cust(a){const[k,i]=a.split('|');UI.start.cust=Object.assign({tre:1,foe:1,fac:1},UI.start.cust||{});UI.start.cust[k]=+i;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen();const d=document.querySelector('details.cust');if(d)d.open=true},asp(a){UI.start.asp=a==='none'?'':a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},aspset(a){if(G.asp||!ASP[a])return;G.asp=a;bio(emp(),'立下志向：「'+ASP[a].n+'」。');autosave();render();toast('已立志向：「'+ASP[a].n+'」')},diff(a){UI.start.diff=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},focus(a){UI.start.focus=a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},enter(){UI.splashDone=true;startScreen()},
  begin(){const n=$('#nm');if(n&&!n.value.trim()){const h=$('#sthint');if(h){h.textContent='請先為朕定下名號（一至四字），再行登基。';h.classList.add('warn')}n.classList.add('bad');n.focus();return}beginGame()},
  pron(){UI.proPg++;proModal()},pros(){closeModal();render()},
  proc(a){const t=proApply(+a);closeModal();saveG('auto');render();toast(t);setTimeout(mandModal,350)},
@@ -3202,5 +3245,7 @@ applySettings();
 
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('sc')){e.preventDefault();e.target.click()}});/*kbscn*/
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='nm'){e.target.classList.remove('bad');const h=document.getElementById('sthint');if(h&&h.classList.contains('warn')){h.classList.remove('warn');const S=UI.start;h.textContent=SCN[S.scn].n+'　·　'+DIFF[S.diff||'n'].n+'　·　'+STN[S.focus||'pol']}}});
+
+;{const __mc=memoCard;memoCard=function(m,ix){const h=__mc(m,ix);const w=memoWai(m);return w?h.replace('<div class="small dim">','<div class="small dim"><b class="badge">'+w.side+'族</b> '):h}}
 
 </script></body></html>

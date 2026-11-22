@@ -119,3 +119,41 @@ function metaName(c,k){return c==='v'?(TEMPLE[k]?TEMPLE[k][0]:k):c==='e'?ENDN[k]
 function metaUnlock(c,k){const M=metaGet();const o=M[c];if(!o)return;if(o[k])o[k].n++;else{o[k]={n:1,t:Date.now()};if(typeof toast==='function')toast('典藏新增：「'+metaName(c,k)+'」')}metaSave()}
 function achCheck(){G.ach=G.ach||[];for(const k in ACH){if(G.ach.includes(k))continue;let ok=false;try{ok=ACH[k].chk()}catch(e){}if(ok){G.ach.push(k);metaUnlock('a',k);chron('〔成就〕'+ACH[k].n+'。',2)}}}
 function metaEnd(){if(G.over&&!G.overMeta){G.overMeta=1;metaUnlock('e',G.over.type);const r=G.emps[G.emps.length-1];if(r&&r.v)metaUnlock('v',r.v.key);if(G.daily){const M=metaGet();M.daily=M.daily||{};const y=Math.round((G.t-G.emps[0].t0)/12);if(!M.daily[G.daily]||M.daily[G.daily].y<y){M.daily[G.daily]={y,v:r&&r.v?r.v.label:'',e:G.over.type};metaSave()}}}}
+
+
+/* ---------- 七：決策回顧（政策決定，數年後由史官對照同期國勢） ---------- */
+function decSnap(){return{mind:G.mind,tre:G.tre,auth:G.auth,rep:G.rep}}
+function decRec(m,o,s0){if(!m||m.k==='echo'||!o)return;G.dec=G.dec||[];let t=String(m.txt||'').replace(/[。！!]+$/,'');if(t.length>34)t=t.slice(0,34)+'…';
+ G.dec.push({t:G.t,k:m.k,txt:t,l:o.l,s:s0||decSnap()});if(G.dec.length>60)G.dec.shift()}
+function decMonth(){const L=G.dec;if(!L||!L.length)return;if(G.decT!=null&&G.t-G.decT<14)return;if(!chance(.05))return;
+ const sc=d=>{const a=G.mind-d.s.mind,b=G.auth-d.s.auth,c=G.rep-d.s.rep,e=(G.tre-d.s.tre)/80;return{a,b,c,e,s:a*1.5+b*.5+c*.5+e}};
+ const c=L.filter(d=>!d.rv&&G.t-d.t>=30&&G.t-d.t<=130);if(!c.length)return;
+ let best=null,bs=0;for(const d of c){const v=sc(d);const m=Math.abs(v.a)*2+Math.abs(v.b)+Math.abs(v.c)+Math.abs(v.e);if(m>bs){bs=m;best=d}}
+ if(!best||bs<8)return;best.rv=1;G.decT=G.t;const v=sc(best);const yrs=Math.max(2,Math.round((G.t-best.t)/12));
+ const ch=[];const R=Math.round;if(Math.abs(v.a)>=3)ch.push('民心'+R(best.s.mind)+'→'+R(G.mind));if(Math.abs(v.b)>=3)ch.push('皇權'+R(best.s.auth)+'→'+R(G.auth));if(Math.abs(v.e*80)>=50)ch.push('國庫'+R(best.s.tre)+'→'+R(G.tre)+'萬兩');if(Math.abs(v.c)>=3)ch.push('威望'+R(best.s.rep)+'→'+R(G.rep));
+ const j=v.s>=6?'同期國運漸升，史家以為此議有功。':v.s<=-6?'同期國勢轉衰，後人論及此事，多有遺憾。':'得失參半，史家未有定論。';
+ chron('史官回顧：'+dateStr(best.t)+'，'+best.txt+'。你當時選擇「'+best.l+'」。其後'+yrs+'年，'+(ch.join('，')||'各項大致持平')+'。'+j+'（同期變化未必全因此事）',3)}
+
+/* ---------- 八：外戚連動（奏摺牽涉太后、皇后家族） ---------- */
+function waiSide(p){if(!p||p.clan==null)return null;const e=emp();const q=e&&e.sp!=null?P(e.sp):null;
+ if(q&&q.alive&&q.role==='consort'&&q.rank>=6&&q.clan===p.clan&&q.id!==p.id)return{side:'皇后',q};
+ const d=alivePs().find(z=>z.role==='dowager'&&String(z.title).indexOf('太后')>=0);if(d&&d.clan===p.clan&&d.id!==p.id)return{side:'太后',q:d};return null}
+function memoWai(m){if(!m||!m.x)return null;let p=null;if(m.k==='impeach')p=P(m.x.tg);else if(m.k==='recommend')p=P(m.x.cand);else return null;if(!p||!p.alive)return null;const w=waiSide(p);return w?{side:w.side,q:w.q,p}:null}
+const __mo8=memoOpts;memoOpts=function(m){const O=__mo8(m);const w=memoWai(m);if(!w)return O;const{side,q,p}=w;const mood=(v)=>{q.op=cl(q.op+v);if(q.role==='consort')q.fav=cl(q.fav+v)};const wai=v=>{G.fd.wai=cl((G.fd.wai||0)+v,0,35)};
+ if(m.k==='impeach'){for(const o of O){if(String(o.l).indexOf('准予徹查')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'涉'+side+'族，'+side+'將不悅';o.fn=()=>{const r=f0();if(r.ok){mood(-8);wai(-1)}return r}}}
+  const f=m.from?P(m.from):null;O.push({l:'看在'+side+'面上，從輕處置',h:side+'歡喜、外戚勢力+2；御史失望，皇權-1',fn:()=>{mood(8);wai(2);p.op=cl(p.op+6);if(f)f.op=cl(f.op-5);G.auth=cl(G.auth-1);return OKK('你顧念'+side+'顏面，命有司從輕發落，御史退下時臉色難看。')}})}
+ else if(m.k==='recommend'){for(const o of O){if(String(o.l).indexOf('准')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'后族出身，外戚勢力+2';o.fn=()=>{const r=f0();if(r.ok){mood(4);wai(2)}return r}}
+  else if(String(o.l).indexOf('駁回')===0){const f0=o.fn;o.h=(o.h?o.h+'；':'')+'恐拂'+side+'之意';o.fn=()=>{const r=f0();if(r.ok)mood(-4);return r}}}}
+ return O};
+
+/* ---------- 九：開局志向與史官評語 ---------- */
+const ASP={restore:{n:'中興',d:'重振國勢：民心與皇權雙高，或名列盛世、中興、武功',ok:'「志在中興，果以中興名世，史臣不虛美也。」',bad:'「志在中興，然國勢未振，終成空言。」',fall:'「志在中興，卒至亡國，志大而才疏。」'},
+ keep:{n:'守成',d:'平穩傳承：在位十二年以上，少民變饑荒，不為暴君庸主',ok:'「守成之君，不求赫赫之功而祖業無損，亦難能也。」',bad:'「志在守成，而變亂屢起，守成之志未能償。」',fall:'「志在守成，而社稷傾覆，守成者反失其所守。」'},
+ joy:{n:'享樂',d:'逍遙一世：在位十年以上，子嗣四人以上，國事未壞',ok:'「帝享太平之福，子孫滿堂，天下亦未見大亂，可謂有福。」',bad:'「帝志在安樂，而國事日非，樂不長久。」',fall:'「帝志在安樂，終致亡國，歡娛之地即傾覆之地。」'}};
+function aspEval(e,fell,key,mm,am,yrs){const k=G.asp;if(!k||!ASP[k])return null;const r=G.reign;let ok=false;
+ if(k==='restore')ok=!fell&&(['sage','revive','warrior'].indexOf(key)>=0||(mm>=62&&am>=45));
+ else if(k==='keep')ok=!fell&&yrs>=12&&r.revolt<=1&&r.famine<=1&&['tyrant','fool','puppet'].indexOf(key)<0;
+ else if(k==='joy')ok=!fell&&yrs>=10&&((e&&e.kids)||[]).length>=4&&mm>=45&&key!=='puppet';
+ return{k,n:ASP[k].n,ok,txt:ASP[k][ok?'ok':fell?'fall':'bad']}}
+function aspHtml(){const k=G.asp;if(k&&ASP[k]){const a=ASP[k];return '<div class="card mand"><div class="row sp"><h3>志向：'+a.n+'</h3><span class="small dim">史官將據此論你</span></div><div class="small">'+a.d+'</div></div>'}
+ return '<div class="card mand"><div class="row sp"><h3>志向</h3></div><div class="small dim">未立。立下之後，史官將以此論這一朝；每朝僅能立一次。</div><div class="opts">'+Object.keys(ASP).map(x=>'<button class="sm" data-act="aspset" data-arg="'+x+'">'+ASP[x].n+'<small>'+ASP[x].d.split('：')[0]+'</small></button>').join('')+'</div></div>'}

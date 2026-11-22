@@ -143,7 +143,7 @@ function newGame(o){
  if(S==='b'){G.auth=54;G.tre=950;G.rep=55;G.mind=66}
  if(S==='c'){G.auth=58;G.tre=520;G.gra=340;G.army=50;G.morale=72;G.burden=36;G.mind=56;G.rep=60;G.fd.army=16;G.foe.di.str=70;G.foe.di.att=-30;G.crt=2;
   for(const k of ['he','zhong','guan'])G.reg[k].un+=9}
- G.era={n:pick(ERAS),y0:Math.floor(G.t/12)};
+ G.era={n:pick(ERAS),y0:Math.floor(G.t/12)};G.asp=o.asp||null;
  G.reign={t0:G.t,m0:G.mind,wins:0,losses:0,exec:0,famine:0,revolt:0,authSum:0,mindSum:0,n:0,purges:0,heirsLost:0,founder:S==='c',start:S};
  refreshClans();syncPower();
  G.emps.push({pid:e.id,t0:G.t,era:G.era.n,t1:null});

@@ -272,7 +272,7 @@ function memoOpts(m){const O=[];const x=m.x;const f=m.from?P(m.from):null;const 
  else if(k==='dowager'){const d=P(m.from),g=P(x.girl);O.push({l:'遵懿旨納為妃',h:'太后與外戚歡喜，後宮添一人',fn:()=>{if(!g||g.role!=='maiden')return NO('此女已不在。');g.role='consort';g.rank=3;g.sp=G.emp;g.fav=ri(30,50);bio(g,'奉太后懿旨入宮，封嬪。');if(d)good(d,10);G.fd.wai=cl(G.fd.wai+1.5,0,35);chron(nm(g)+'入宮，封嬪。',2);return OKK(nm(g)+'入宮為嬪。')}});O.push({l:'婉拒',h:'太后不悅',fn:()=>{if(d)bad(d,10);G.fd.wai=cl(G.fd.wai-1,0,35);return OKK('你婉言謝絕了太后。')}})}
  return O}
 function runMemo(mid,i){const m=G.memo.find(x=>x.id===mid);if(!m)return NO('奏摺已不存在。');if(G.mw%3===0&&G.ap<1)return NO('精力不足（每批閱三份奏摺耗一旬）。');
- const o=memoOpts(m)[i];if(!o)return NO('選項無效。');const r=o.fn();if(r.ok){G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}return r}
+ const o=memoOpts(m)[i];if(!o)return NO('選項無效。');const s0=decSnap();let r;try{r=o.fn()}catch(e){return NO('此事已有變化，無法照此辦理。')}if(r.ok){decRec(m,o,s0);G.memo=G.memo.filter(z=>z!==m);if(G.mw%3===0)G.ap--;G.mw++}return r}
 function leaveMemo(mid){G.memo=G.memo.filter(x=>x.id!==mid);return OKK('留中不發。')}
 
 /* ---------- 人物互動選單 ---------- */

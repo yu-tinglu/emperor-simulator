@@ -565,3 +565,5 @@ body.ingame .tabs button{padding-top:8px;padding-bottom:8px}
  body.ingame #shell:has(#side){grid-template-columns:150px minmax(0,1fr) 290px}
  body.ingame .hero h1{font-size:3.3rem}
 }
+
+.ops.ops4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:760px){.ops.ops4{grid-template-columns:1fr 1fr}}

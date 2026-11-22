@@ -385,7 +385,7 @@ function yearEnd(){G.weather=rr(.72,1.15);eraTrait();snapRec();chapterCheck();ac
 
 /* ---------- 終局與繼位 ---------- */
 function fall(why){G.over={type:'fall',txt:why};chron('王朝覆滅：'+why+'。',3);const e=emp();e.alive=false;e.dod=G.t;
- const v=judgeReign(e,true);G.emps[G.emps.length-1].v=v;G.emps[G.emps.length-1].t1=G.t;G.emps[G.emps.length-1].cause='亡國'}
+ const v=judgeReign(e,true);G.emps[G.emps.length-1].v=v;G.emps[G.emps.length-1].t1=G.t;G.emps[G.emps.length-1].cause='亡國';if(v.asp){chron('史官論其志：'+v.asp.txt,3);G.asp=null}}
 function checkEnd(){if(G.over)return;
  const revs=G.sit.filter(s=>s.k==='revolt');
  if(revs.some(s=>s.S>=100||(s.S>=62&&s.reg==='jing'))||revs.reduce((a,s)=>a+s.S,0)>=270)return fall('義軍攻破京師，皇帝出奔');
@@ -397,7 +397,8 @@ function judgeReign(e,fell){const r=G.reign;const n=Math.max(1,r.n);const am=r.a
  if(fell)key='fall';else if(am<26&&yrs>2)key='puppet';else if((r.exec>=7&&G.fear>55)||r.purges>=5&&mm<50)key='tyrant';else if(mm<40&&G.rep<40)key='fool';
  else if(mm>=66&&G.tre>250&&am>=42)key='sage';else if(r.wins>=3&&r.wins>=r.losses*2)key='warrior';else if(r.m0<48&&mm>=57)key='revive';
  let temple=r.founder&&!fell?'太祖':TEMPLE[key][1];const cnt=G.emps.filter(x=>x.v&&x.v.temple===temple).length;
- return{key,label:TEMPLE[key][0],temple:temple+(cnt?'（'+cn(cnt+1)+'）':''),official:key,edited:false,yrs,mm:rd(mm),am:rd(am),wins:r.wins,losses:r.losses,exec:r.exec,famine:r.famine}}
+ const asp=aspEval(e,fell,key,mm,am,yrs);
+ return{key,asp,label:TEMPLE[key][0],temple:temple+(cnt?'（'+cn(cnt+1)+'）':''),official:key,edited:false,yrs,mm:rd(mm),am:rd(am),wins:r.wins,losses:r.losses,exec:r.exec,famine:r.famine}}
 function succeed(cause){const old=emp();const rec=G.emps[G.emps.length-1];rec.t1=G.t;rec.cause=cause;
  const v=judgeReign(old,false);const ht=holder('hist');
  if(G.editHist>0){const i=KEYORD.indexOf(v.key);v.official=KEYORD[Math.min(KEYORD.length-1,i+2)];v.edited=true;G.editHist=0}
@@ -405,6 +406,7 @@ function succeed(cause){const old=emp();const rec=G.emps[G.emps.length-1];rec.t1
  rec.v=v;metaUnlock('v',v.key);old.title=v.temple;old.role='kin';
  for(const x of G.emps){if(x!==rec&&x.v&&x.v.edited&&!x.v.revised&&chance(.35)){x.v.revised=true;x.v.official=x.v.key;chron('史官重修實錄，為'+nm(P(x.pid))+'翻案，史書更正。',2)}}
  chron(nm(old)+cause+'，上廟號「'+v.temple+'」，史稱'+v.label+(v.official!==v.key?'（官修史書則作「'+TEMPLE[v.official][0]+'」）':'')+'。',3,[old.id]);
+ if(v.asp)chron('史官論其志：'+v.asp.txt,3,[old.id]);G.asp=null;
  let nxt=null;
  if(G.force&&P(G.force)&&P(G.force).alive)nxt=P(G.force);
  else if(G.heir&&P(G.heir)&&P(G.heir).alive)nxt=P(G.heir);
@@ -437,7 +439,7 @@ function previewFin(){const keep=JSON.stringify({reg:G.reg,tre:G.tre,gra:G.gra,b
  economy();const fin=G.fin;const k=JSON.parse(keep);G.reg=k.reg;G.tre=k.tre;G.gra=k.gra;G.burden=k.burden;G.morale=k.morale;G.mind=k.mind;G.debt=k.debt;G.army=k.army;G.proj=k.proj;for(const id in k.P)G.P[id].wealth=k.P[id];G.fin=fin}
 /* ---------- 月度推進 ---------- */
 function endMonth(){if(G.over)return;
- lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
+ lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
  G.reign.authSum+=G.auth;G.reign.mindSum+=G.mind;G.reign.n++;
  G.t++;G.ap=apMax();G.held=false;G.visited={};G.mw=0;
  if(G.t%12===0)yearEnd();
