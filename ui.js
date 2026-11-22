@@ -18,7 +18,7 @@ function corLabel(p){const v=shown(p,p.cor+10);return v>=60?'疑有貪墨':v>=40
 
 /* ---------- 立繪 ---------- */
 function portHash(id){let h=7;const t=String(id);for(let i=0;i<t.length;i++)h=(Math.imul(h^t.charCodeAt(i),2654435761)+0x9e3779b9)>>>0;h=Math.imul(h^(h>>>15),2246822519)>>>0;return (h^(h>>>13))>>>0}
-function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" draggable="false">'}
+function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" decoding="async" draggable="false">'}
 const PORT_ROLES={consort:1,maiden:1,wife:1,princess:1},PORT_SLOT={consort:1};
 let _pm=null,_pmKey='';
 function portPool(){if(!portPool.a){const a=[];for(let i=0;i<PORT_F.length;i++)if(PORT_SAD.indexOf(i)<0)a.push(PORT_F[i]);portPool.a=a.concat(PORT_F2,PORT_X)}return portPool.a}
@@ -738,3 +738,14 @@ function czModal(id){const o=CZ[id];if(!o)return;const c=czCan(id);const a=czAct
  h+='<div class="opts" style="margin-top:12px">'+(c.done?'<button disabled>已推行</button>':a?'<button class="warn" data-act="czx" data-arg="'+id+'">中止此策</button>':'<button class="gold" data-act="czgo" data-arg="'+id+'"'+(c.ok?'':' disabled')+'>開辦</button>'+(c.ok?'':'<span class="small bad">'+esc(c.why[0])+'</span>'))+'</div>';
  modal(h);$('#md').classList.add('wide')}
 Object.assign(ACT,{czopen(a){czModal(a)},czgo(a){const r=czStart(a);closeModal();res(r)},czx(a){const r=czCancel(a);closeModal();res(r)}});
+
+/* ---------- 照片放大檢視 ---------- */
+;{const __pt=portrait;portrait=function(p,w){const h=__pt(p,w);return h.slice(0,4)==='<img'?h.replace('<img ','<img data-zoom="'+p.id+'" '):h};
+ function lbClose(){const e=document.getElementById('lb');if(e)e.remove()}
+ function lbOpen(id){const p=P(+id);if(!p)return;const im=document.querySelector('#md .port img[data-zoom="'+id+'"],.selfc .port img[data-zoom="'+id+'"]');if(!im)return;lbClose();
+  const d=document.createElement('div');d.id='lb';d.setAttribute('role','dialog');d.setAttribute('aria-label','放大檢視');
+  d.innerHTML='<button class="lbx" aria-label="關閉">✕</button><figure><img src="'+im.src+'" alt=""><figcaption><b>'+esc(nm(p))+'</b>'+(p.title?'・'+esc(p.title):'')+' <small>'+age(p)+'歲</small></figcaption></figure><p>點任意處關閉</p>';
+  d.addEventListener('click',lbClose);document.body.appendChild(d)}
+ document.addEventListener('click',function(e){const im=e.target&&e.target.closest&&e.target.closest('img[data-zoom]');if(!im||!im.closest('#md .port,.selfc .port'))return;e.stopPropagation();e.preventDefault();lbOpen(im.getAttribute('data-zoom'))},true);
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')lbClose()});
+ document.addEventListener('mouseover',function(e){const im=e.target&&e.target.closest&&e.target.closest('img[data-zoom]');if(im&&im.closest('#md .port,.selfc .port'))im.style.cursor='zoom-in'})}

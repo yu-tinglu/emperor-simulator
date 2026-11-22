@@ -602,3 +602,14 @@ body.ingame .tzn small{color:#6a5a44 !important}
 body.ingame .tzn.s-done{background:var(--c) !important;color:#fff !important}
 body.ingame .tzn.s-done small{color:rgba(255,255,255,.9) !important}
 body.ingame .tzn.s-act{background:#f1e4c2 !important}
+
+/* ===== 照片放大檢視 ===== */
+#lb{position:fixed;inset:0;z-index:9000;background:rgba(6,3,2,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;cursor:zoom-out;animation:lbin .18s ease-out}
+#lb figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%}
+#lb img{max-width:min(92vw,620px);max-height:min(80vh,780px);width:auto;height:auto;object-fit:contain;border:3px solid #d2ae62;border-radius:6px;box-shadow:0 12px 50px rgba(0,0,0,.7);background:#1a100c}
+#lb figcaption{color:#f1dba0;font-size:1.15rem;letter-spacing:.15em}#lb figcaption small{opacity:.7;font-size:.85rem;letter-spacing:.05em}
+#lb p{margin:0;color:#c9b88a;opacity:.7;font-size:.85rem}
+#lb .lbx{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:44px;height:44px;border-radius:50%;border:1px solid #d2ae62;background:rgba(0,0,0,.5);color:#f1dba0;font-size:1.2rem;cursor:pointer}
+@keyframes lbin{from{opacity:0}to{opacity:1}}
+@media(max-height:520px) and (orientation:landscape){#lb{flex-direction:row;gap:18px}#lb img{max-height:86vh;max-width:50vw}#lb p{display:none}}
+@media(prefers-reduced-motion:reduce){#lb{animation:none}}
