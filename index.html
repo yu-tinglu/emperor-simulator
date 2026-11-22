@@ -805,6 +805,41 @@ body.ingame .tabs button{padding-top:8px;padding-bottom:8px}
 }
 
 .ops.ops4{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:760px){.ops.ops4{grid-template-columns:1fr 1fr}}
+
+
+/* ===== 國策分頁 ===== */
+.tzst{margin-bottom:12px}.tzact{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0}
+.tzai{cursor:pointer;padding:8px 10px;background:rgba(0,0,0,.05);border-left:3px solid var(--gold,#c9a45a)}.tzai b{display:block}
+.tzsum{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.tzfx{display:inline-block;padding:1px 8px;margin:2px 4px 2px 0;font-size:.88rem;border:1px solid currentColor;border-radius:3px}
+.tzfx.good{color:#2f6b3a}.tzfx.bad{color:#a23a2c}
+.tzl{margin:0 0 12px;border:1px solid rgba(120,90,50,.45);background:linear-gradient(180deg,rgba(255,250,235,.96),rgba(240,228,200,.96));border-left:5px solid var(--c)}
+.tzh{display:flex;align-items:baseline;gap:10px;padding:6px 12px;border-bottom:1px solid rgba(120,90,50,.3)}.tzh b{font-family:var(--brush,serif);font-size:1.35rem;color:var(--c);letter-spacing:.15em;font-weight:400}
+.tzh small{color:#5b4a36}.tzh em{font-style:normal;font-size:.8rem;background:var(--c);color:#fff;padding:0 8px;border-radius:2px;margin-left:auto}
+.tzr{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:0;overflow-x:auto}
+.tzc{padding:8px 10px;border-right:1px dashed rgba(120,90,50,.3);display:flex;flex-direction:column;gap:6px;min-height:92px}.tzc:last-child{border-right:0}
+.tzt{font-size:.8rem;color:#7a6a52;letter-spacing:.2em}
+.tzn{position:relative;overflow:hidden;text-align:left;padding:8px 10px;border:1px solid rgba(120,90,50,.5);background:#fffaf0;color:#2b2218;cursor:pointer;display:block;width:100%}
+.tzn b{display:block;font-size:1rem}.tzn small{display:block;color:#6a5a44;font-size:.82rem}
+.tzn.s-done{background:var(--c);color:#fff;border-color:var(--c)}.tzn.s-done small{color:rgba(255,255,255,.85)}
+.tzn.s-can{border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
+.tzn.s-act{border-color:var(--c);background:#f4ead0}.tzn.s-act .tzp{position:absolute;left:0;bottom:0;height:4px;background:var(--c)}
+.tzn.s-lock{opacity:.55}.tzn.s-ex{opacity:.4;text-decoration:line-through}
+.tzmx{margin:10px 0;padding:8px 10px;background:rgba(0,0,0,.04);border-left:3px solid var(--gold,#c9a45a)}.tzmx>b{display:block;margin-bottom:4px}
+.tzsy{opacity:.7}.tzsy.on{opacity:1;border-color:var(--gold,#c9a45a)}
+@media(max-width:760px){.tzr{grid-template-columns:repeat(4,160px)}}
+body.ingame .tzn{background:#fffaf0;color:#2b2218;text-shadow:none;box-shadow:none;min-height:0;padding:7px 10px;border-radius:2px}
+body.ingame .tzn.s-done{background:var(--c);color:#fff;border-color:var(--c)}
+body.ingame .tzn.s-done small{color:rgba(255,255,255,.88)}
+body.ingame .tzn.s-can{box-shadow:inset 0 0 0 1px var(--c);border-color:var(--c)}
+body.ingame .tzn.s-act{background:#f1e4c2}
+body.ingame .tzn:hover{filter:brightness(.96)}
+@media(max-height:520px) and (orientation:landscape){body.ingame .tzn{padding:4px 8px}.tzc{min-height:0;padding:5px 6px}.tzr{grid-template-columns:repeat(4,minmax(130px,1fr))}.tzh{padding:3px 10px}}
+body.ingame .tzn{background:#fffaf0 !important;background-image:none !important;color:#2b2218 !important}
+body.ingame .tzn small{color:#6a5a44 !important}
+body.ingame .tzn.s-done{background:var(--c) !important;color:#fff !important}
+body.ingame .tzn.s-done small{color:rgba(255,255,255,.9) !important}
+body.ingame .tzn.s-act{background:#f1e4c2 !important}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -994,36 +1029,36 @@ function economy(){
  const ps=alivePs();const ncon=ps.filter(p=>p.role==='consort').length,nkid=ps.filter(p=>(p.role==='prince'||p.role==='princess')&&age(p)<18).length;
  for(const id in G.reg){const r=G.reg[id];const gov=holder('g_'+id);
   const gq=gov?(gov.st.pol*.6+gov.st.biz*.4-gov.cor*.25):28;
-  let fd=-3;if(m===9||m===10)fd+=20*(.6+r.pr/100)*(1-r.un/220)*G.weather;r.food=cl(r.food+fd);
-  r.pop=Math.max(20,r.pop+r.pop*((r.food-38)/100*.0007+(r.pr-50)/100*.0003)-(r.rebel?r.pop*.0004:0));
+  let fd=-3;if(m===9||m===10)fd+=20*(.6+r.pr/100)*(1-r.un/220)*G.weather*(1+czm('harv'));r.food=cl(r.food+fd);
+  const pg=(r.food-38)/100*.0007+(r.pr-50)/100*.0003;r.pop=Math.max(20,r.pop+r.pop*(pg>0?pg*(1+czm('popg')):pg)-(r.rebel?r.pop*.0004:0));
   const prT=58+(gq-50)*.5-(G.burden-30)*.4-(r.un-20)*.2+(G.inst.shi&&r.ter==='coast'?5:0)+(r.proj||0);
   r.pr=cl(r.pr+(prT-r.pr)*.02,10,96);
-  const unT=(G.zeit&&G.zeit.k==='decline'?4:0)-(G.zeit&&G.zeit.k==='revival'?3:0)+12+(G.burden-30)*.6+Math.max(0,45-r.food)*.9+(gov?gov.cor*.15:8)-(G.mind-50)*.3-r.garr+(gov&&gov.op<30?4:0)+(r.sec?20:0);
+  const unT=czm('unrest')+(G.zeit&&G.zeit.k==='decline'?4:0)-(G.zeit&&G.zeit.k==='revival'?3:0)+12+(G.burden-30)*.6+Math.max(0,45-r.food)*.9+(gov?gov.cor*.15:8)-(G.mind-50)*.3-r.garr+(gov&&gov.op<30?4:0)+(r.sec?20:0);
   r.un=cl(r.un+(unT-r.un)*.06);
   const auT=10+(50-G.auth)*.5+(gov?(gov.amb-50)*.25:0)+r.garr+(gov&&gov.op<35?8:0)+(r.vas?20:0);
   r.au=cl(r.au+(auT-r.au)*.04);
   if(r.exempt>0&&r.exempt<500)r.exempt--;
   if(r.sec)continue;
-  const base=r.pop*r.pr/100*.044*tm*hb*(r.exempt>0?0:1)*(G.inst.shi&&r.ter==='coast'?1.08:1)*(r.vas?.3:1);
-  const lk=gov?cl(gov.cor/100*.32,0,.4):.15;inc+=base*(1-lk);leak+=base*lk;pops+=r.pop;unS+=r.un*r.pop;
+  const base=(1+czm('inc'))*r.pop*r.pr/100*.044*tm*hb*(r.exempt>0?0:1)*(G.inst.shi&&r.ter==='coast'?1.08:1)*(r.vas?.3:1);
+  const lk=(gov?cl(gov.cor/100*.32,0,.4):.15)*Math.max(.2,1-czm('leak'));inc+=base*(1-lk);leak+=base*lk;pops+=r.pop;unS+=r.un*r.pop;
   if(gov)gov.wealth=(gov.wealth||0)+base*lk;
-  if(m===10)grain+=r.pop*r.pr/100*.08*tm;
+  if(m===10)grain+=r.pop*r.pr/100*.08*tm*(1+czm('grain'));
   if(r.proj)r.proj=Math.max(0,r.proj-.02)}
- const army=(G.zeit&&G.zeit.k==='martial'?.95:1)*G.army*1.45*[.7,.85,1,1.15,1.3][G.mil-1]*(1-(offq('bing','mil')-50)*.002);
+ const army=(G.zeit&&G.zeit.k==='martial'?.95:1)*G.army*1.45*[.7,.85,1,1.15,1.3][G.mil-1]*(1-(offq('bing','mil')-50)*.002)*Math.max(.4,1+czm('armycost'));
  const Z=G.zeit?G.zeit.k:'plain';const crt=(10+G.crt*4+ncon*.5+nkid*.25+(G.life==='indulge'?5:0))*(Z==='gilded'?1.15:1);
- const offN=Object.values(G.off).filter(Boolean).length;const sal=9+offN*.9;
+ const offN=Object.values(G.off).filter(Boolean).length;const sal=(9+offN*.9)*Math.max(.5,1+czm('salc'));
  const inst=(G.inst.spy?4:0)+(G.inst.shi?2:0)+(G.inst.cab?3:0)+(G.inst.acad?3:0);
  const wars=G.sit.filter(s=>s.k==='war'||s.k==='revolt').length;const warC=wars*3*[.7,.85,1,1.15,1.3][G.mil-1];
  let pc=0;for(const pr of G.proj){pc+=pr.cost/pr.dur}
- let exp=(army+crt+sal+inst+warC+pc)*diffExp();inc*=diffInc();
+ let exp=(army+crt+sal+inst+warC+pc+czUp())*diffExp();inc*=diffInc();inc+=czm('trade');
  for(const f in G.foe){if(G.foe[f].vas)inc+=3;if(G.foe[f].trade)inc+=4}
  G.fin={inc,exp,leak,army,crt,sal};G.tre+=inc-exp;G.gra=Math.max(0,G.gra*.998+grain);
  if(G.tre<0)G.debt++;else G.debt=0;
- G.burden=cl(G.burden+[-1.2,-.5,0,.9,2][G.tax-1]);
+ G.burden=cl(G.burden+[-1.2,-.5,0,.9,2][G.tax-1]+czm('burden'));
  if(G.tre>0&&G.army<[30,36,40,48,56][G.mil-1])G.army+=.12;else if(G.army>[30,36,40,48,56][G.mil-1]+4)G.army-=.1;
- const mT=50+(G.mil-3)*14-(G.debt>0?25:0);G.morale=cl(G.morale+(mT-G.morale)*.05);
+ const mT=czm('morale')+50+(G.mil-3)*14-(G.debt>0?25:0);G.morale=cl(G.morale+(mT-G.morale)*.05);
  const avgUn=pops?unS/pops:30;G.avgUn=avgUn;
- const mdT=56-(G.burden-30)*.4-(avgUn-20)*.3+(G.rep-50)*.1+(G.life==='tyrant'?-6:0);G.mind=cl(G.mind+(mdT-G.mind)*.05);
+ const mdT=czm('mind')+56-(G.burden-30)*.4-(avgUn-20)*.3+(G.rep-50)*.1+(G.life==='tyrant'?-6:0);G.mind=cl(G.mind+(mdT-G.mind)*.05);
  // 工程
  for(const pr of G.proj.slice()){pr.left--;if(pr.left<=0){G.proj=G.proj.filter(x=>x!==pr);const r=G.reg[pr.reg];
   if(pr.k==='canal'){r.proj=(r.proj||0)+9;r.food=cl(r.food+10);chron(r.n+'水利工程竣工，沃野可期。',2)}
@@ -1041,7 +1076,7 @@ function powerMonth(){const e=emp();
  for(const f in G.fd)G.fd[f]=cl(G.fd[f]*.992,0,35);
  syncPower();
  const top=Math.max(G.pow.chan,G.pow.eun,G.pow.wai,G.pow.army,G.pow.clean);const gu=holder('guard');
- const tgt=44+(G.rep-50)*.25+(e.st.sch+e.st.pol-90)*.12+(G.att>60?8:G.att<20?-12:0)-.55*Math.max(0,top-28)+(G.inst.spy?5:0)+(G.inst.cab?3:0)+(gu?(gu.op-50)*.15:0)+(G.life==='tyrant'?10:0)+(G.life==='delegate'?-10:0)-(G.regent?22:0);
+ const tgt=czm('auth')+44+(G.rep-50)*.25+(e.st.sch+e.st.pol-90)*.12+(G.att>60?8:G.att<20?-12:0)-.55*Math.max(0,top-28)+(G.inst.spy?5:0)+(G.inst.cab?3:0)+(gu?(gu.op-50)*.15:0)+(G.life==='tyrant'?10:0)+(G.life==='delegate'?-10:0)-(G.regent?22:0);
  G.auth=cl(G.auth+(tgt-G.auth)*.12);G.puppet=G.auth<18;
  if(G.regent){const rp=P(G.regent);if(!rp||!rp.alive||age(e)>=16){if(G.regent){chron(nm(e)+'年滿十六，親政。',3);G.regent=null}}}
 }
@@ -1157,7 +1192,7 @@ function npcAct(p){const a=age(p);const R_=p.role;if(['official','general','eunu
 
 function peopleMonth(){
  for(const p of alivePs()){if(!p.alive)continue;const a=age(p);
-  if(p.lock>0)p.lock--;if(p.watch>0)p.watch--;
+  if(p.lock>0)p.lock--;if(p.off&&typeof p.cor==='number'&&p.cor>0&&G.cz)p.cor=Math.max(0,p.cor-czm('cor'));if(p.watch>0)p.watch--;
   if(p.ill>0){p.ill++;const rec=.22+(offq('med','med')-40)*.002;
    if(chance(rec)){p.ill=0;p.hp=cl(p.hp-5);if(p.id===G.emp)log('龍體漸癒。','good')}
    else if(chance(.035+(a>55?.03:0)-(p.hp>60?.015:0))){die(p,'病逝');continue}}
@@ -1231,13 +1266,13 @@ function foreignMonth(){
   else if(f.str<75&&chance(.0025)){f.str=cl(f.str+12);f.att=cl(f.att-12);chron(f.n+'出現雄主，統一諸部，聲勢復振。',3)}
   const rg=Object.values(G.reg).find(r=>r.foe===k);if(!f.war&&rg){
    const garr=rg.garr+G.army*.15;const risk=((f.str-garr*3)*.0012+(-f.att)*.0006)*.6+(G.auth<30?.006:0)+(G.army<25?.008:0);
-   if(!f.vas&&chance(Math.max(0,risk)))startWar(f)}}}
+   if(!f.vas&&chance(Math.max(0,risk)*Math.max(.3,1-czm('raid'))))startWar(f)}}}
 function defaultGen(){return holder('gen')||alivePs().filter(p=>p.role==='general'&&age(p)>=22).sort((a,b)=>b.st.mil-a.st.mil)[0]||null}
 function fightMonth(s,r){const gen=s.gen&&P(s.gen)&&P(s.gen).alive?P(s.gen):(s.k==='revolt'?holder('g_'+r.id):defaultGen());const gm=gen?gen.st.mil:36;
  let F=s.force||(r.garr+G.army*.2);F=Math.min(F,Math.max(2,G.army));if(s.emp)F*=1.2;
  const far=['he','long','ling'].includes(r.id)&&s.k==='war';let sup=(G.tre>-50&&r.food>20&&G.debt<3)?1:.75;
  if(far&&s.age>5&&(r.proj||0)<4){sup*=.88;if(!s.supLog){s.supLog=1;log('糧道漫長，前線補給吃緊。（修築驛道可緩解）','warn')}}
- const our=F*(G.morale/60)*(.6+gm/90)*sup*({plain:1,coast:1,mount:1.2,steppe:.92}[r.ter]||1)*(s.emp?1.25:1);
+ const our=F*(1+czm('war'))*(G.morale/60)*(.6+gm/90)*sup*({plain:1,coast:1,mount:1.2,steppe:.92}[r.ter]||1)*(s.emp?1.25:1);
  const E=s.k==='war'?s.E:s.S*.12;const en=E*(s.k==='revolt'?.85:1);const diff=(our-en)/(our+en+.1);
  s.front=cl(s.front+diff*28+rr(-7,7),-100,100);const lr=en/(our+en+.1);
  if(chance(.3)){const nn=s.k==='war'?G.foe[s.foe].n:s.name;if(diff>.25)log('官軍在'+r.n+'連戰告捷，'+(gen?nm(gen)+'指揮得當，':'')+'斬獲頗眾。');else if(diff<-.25)log(r.n+'戰局不利，'+nn+'攻勢兇猛，官軍後撤整補。','warn')}
@@ -1328,7 +1363,7 @@ function vacancyMonth(){G.vac=G.vac||{};
 function mem_gain(c){c.op=cl(c.op+3)}
 
 /* ---------- 年度 ---------- */
-function exam(pol){pol=pol||'poor';const n=3+(G.inst.acad?3:0)+(G.inst.cab?1:0);let best=null;const PB={gate:{pol:6,lit:6},poor:{pol:10,lit:12},real:{pol:16,lit:2}}[pol];
+function exam(pol){pol=pol||'poor';const n=3+(G.inst.acad?3:0)+(G.inst.cab?1:0)+Math.round(czm('exam'));let best=null;const PB={gate:{pol:6,lit:6},poor:{pol:10,lit:12},real:{pol:16,lit:2}}[pol];
  for(let i=0;i<n;i++){const c=newClan(pick(SURN),pol==='gate'?'chan':'clean',pol!=='gate');const p=newMan(c.id,21,32,'official',{bias:{pol:PB.pol+(G.inst.acad?10:0),lit:PB.lit},op:ri(58,78)});if(pol==='gate'){p.cor=cl((p.cor||40)+14);p.amb=cl((p.amb||50)+8)}else if(pol==='poor'){p.cor=cl((p.cor||40)-10)}else{p.st.sch=cl(p.st.sch+6)}p.disc=emp().id;c.m.push(p.id);
   memo_(p,'exam',8,'蒙皇恩取士，感念知遇。');bio(p,'登進士第，授候補。');if(!best||p.st.lit+p.st.pol>best.st.lit+best.st.pol)best=p}
  chron('開科取士（'+({gate:'重門第',poor:'取寒門',real:'重實學'}[pol])+'），錄進士'+n+'人，狀元'+nm(best)+'。',2,[best.id]);G.xl=G.xl||[];G.xl.push({t:G.t,pol,n});if(pol==='gate'){G.fd.chan=cl(G.fd.chan+3,0,35);G.mind=cl(G.mind-1);for(const p of alivePs())if(p.off&&facOf(p)==='clean')p.op=cl(p.op-2)}else if(pol==='poor'){G.fd.clean=cl(G.fd.clean+3,0,35);G.mind=cl(G.mind+1);for(const p of alivePs())if(p.off&&facOf(p)==='chan')p.op=cl(p.op-3)}else{G.reform=(G.reform||0)+1;G.tre+=30*G.reform>150?150:30*G.reform;for(const p of alivePs())if(p.off&&p.role==='official'&&p.st.lit>70)p.op=cl(p.op-1)}}
@@ -1344,7 +1379,7 @@ function chapterTitle(){const e=emp();const war=G.sit.some(s=>s.k==='war'),rev=G
 function chapterStart(alert){const e=emp();G.chaps=G.chaps||[];G.chap={t:G.t,title:'初登大寶',n:1};G.chaps.push({t:G.t,emp:e.id,n:1,title:'初登大寶'});if(alert)ALERTS.push({t:G.t,txt:CHAPT['初登大寶'],chap:{n:1,title:'初登大寶',emp:nm(e)}})}
 function chapterCheck(){if(!G.chap)return;if((G.t-G.chap.t)/12<3)return;const t=chapterTitle();if(t===G.chap.title)return;const e=emp();const prev=G.chap;const n=prev.n+1;
  G.chap={t:G.t,title:t,n};G.chaps.push({t:G.t,emp:e.id,n,title:t});chron('〔第'+cn(n)+'章〕'+t+'。',2);ALERTS.push({t:G.t,txt:CHAPT[t]||'',chap:{n,title:t,emp:nm(e),prev:prev.title,yrs:Math.round((G.t-prev.t)/12)}})}
-function yearEnd(){G.weather=rr(.72,1.15);eraTrait();snapRec();chapterCheck();achCheck();marryYear();growthYear();if((G.t/12)%3===0)examYear();refreshClans();
+function yearEnd(){G.weather=rr(.72,1.15);if(G.weather<1)G.weather=1-(1-G.weather)*(1-Math.min(.6,czm('relief')));eraTrait();snapRec();chapterCheck();achCheck();marryYear();growthYear();if((G.t/12)%3===0)examYear();refreshClans();
  for(const p of alivePs()){if(p.id===G.emp)continue;p.op=cl(p.op+(50-p.op)*.04);for(const k of Object.keys(p.rel)){const o=P(k);if(!o||!o.alive)delete p.rel[k]}}
  G.lastYear={tre:G.tre,mind:G.mind,pop:Object.values(G.reg).reduce((a,r)=>a+r.pop,0)}}
 
@@ -1404,7 +1439,7 @@ function previewFin(){const keep=JSON.stringify({reg:G.reg,tre:G.tre,gra:G.gra,b
  economy();const fin=G.fin;const k=JSON.parse(keep);G.reg=k.reg;G.tre=k.tre;G.gra=k.gra;G.burden=k.burden;G.morale=k.morale;G.mind=k.mind;G.debt=k.debt;G.army=k.army;G.proj=k.proj;for(const id in k.P)G.P[id].wealth=k.P[id];G.fin=fin}
 /* ---------- 月度推進 ---------- */
 function endMonth(){if(G.over)return;
- lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
+ lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();czMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
  G.reign.authSum+=G.auth;G.reign.mindSum+=G.mind;G.reign.n++;
  G.t++;G.ap=apMax();G.held=false;G.visited={};G.mw=0;
  if(G.t%12===0)yearEnd();
@@ -2244,6 +2279,101 @@ function echoMonth2(){
 function echoOpts(m){const p=P(m.x.id);return[{l:'為其平反',h:'聲望+3，民心+1；皇權-1',fn:()=>{G.rep=cl(G.rep+3);G.mind=cl(G.mind+1);G.auth=cl(G.auth-1);if(p)p.op=cl(p.op+25);chron('追雪'+nm(p)+'前冤，官復原品。',2,[p.id]);return OKK('平反詔書到時，他已鬚髮皆白，伏地久久不能起身。')}},{l:'駁回',h:'聲望-1',fn:()=>{G.rep=cl(G.rep-1);if(p)p.op=cl(p.op-8);return OKK('你說，既往之事，不必再議。')}}]}
 const __mo7=memoOpts;memoOpts=function(m){return m.k==='echo'?echoOpts(m):__mo7(m)};
 
+/* ======================================================================
+   國策樹：六條線、三十五項。推行需耗時耗銀；有前置、排他、派系反彈與協同。
+   G.cz = { d:{id:完成月}, a:[{id,left,dur,mult,pause}] }（舊存檔缺此欄位，惰性建立）
+   ====================================================================== */
+const CZL={ag:{n:'農政',c:'#5E8B4A'},ml:{n:'兵制',c:'#A0402F'},fn:{n:'財政',c:'#B8892E'},ad:{n:'吏治',c:'#3E6A8F'},cu:{n:'文教',c:'#7B5A8F'},dp:{n:'外務',c:'#2F8283'}};
+const CZF={chan:'權臣',clean:'清流',army:'將門',wai:'外戚',eun:'宦官',kin:'宗室'};
+const CZR={chan:'侵奪世家田產，動搖朝廷根本',clean:'與民爭利，有違聖人之教',army:'削奪將門權責，恐寒邊將之心',wai:'奪外戚職任，有失親親之誼',eun:'奪內廷之權，不合祖制',kin:'侵宗室之利，傷骨肉之恩'};
+const CZ={
+ ag1:{l:'ag',t:1,n:'興修水利',d:'疏浚河渠、修築陂塘，旱澇之年也能保住收成。',cost:60,dur:8,mods:{harv:.04,relief:.12},ev:{food:5}},
+ ag2:{l:'ag',t:1,n:'輪作良種',d:'推廣輪作與選種之法，同一塊地多收幾成。',cost:90,dur:10,pre:['ag1'],mods:{harv:.05,popg:.12}},
+ ag3a:{l:'ag',t:2,n:'均田限田',d:'限制兼併，使無地之民有田可耕。得民心，但世家大族切齒。',cost:150,dur:20,pre:['ag2'],ex:['ag3b'],need:4,mods:{unrest:-3,mind:1,harv:.03,inc:-.02},rx:{fac:'chan',op:-10},ev:{fd:{chan:-4}}},
+ ag3b:{l:'ag',t:2,n:'招商墾荒',d:'招徠流民與商人開墾荒地，增產快，但流民聚散難免生事。',cost:120,dur:14,pre:['ag2'],ex:['ag3a'],need:4,mods:{harv:.04,inc:.03,popg:.18,unrest:1.5},ev:{fd:{chan:2}}},
+ ag4:{l:'ag',t:3,n:'常平倉制',d:'豐年平價收糧、荒年減價出糶，以倉廩平抑糧價。',cost:150,dur:16,anyp:['ag3a','ag3b'],need:8,mods:{relief:.3,grain:.25,mind:1},ev:{gra:150}},
+ ag5:{l:'ag',t:4,n:'海外糧種',d:'經海商引入耐旱高產的新作物，可養活更多人口。',cost:220,dur:24,pre:['ag4','dp2'],need:14,mods:{harv:.09,popg:.25}},
+ ml1:{l:'ml',t:1,n:'整飭軍紀',d:'清查軍籍、嚴明賞罰，剔除空額與老弱。',cost:50,dur:6,mods:{morale:3,armycost:-.03},ev:{fd:{army:-1}}},
+ ml2:{l:'ml',t:1,n:'屯田養兵',d:'令軍士且耕且戍，邊軍糧餉可自給一部分。',cost:100,dur:12,pre:['ml1'],mods:{armycost:-.08,grain:.08}},
+ ml3a:{l:'ml',t:2,n:'府兵制',d:'兵農合一，平時務農、戰時徵調，省餉而得兵，但將門權勢漸大。',cost:150,dur:18,pre:['ml2'],ex:['ml3b'],need:5,mods:{armycost:-.12,morale:2,unrest:-1},rx:{fac:'army',op:-5},ev:{fd:{army:3}}},
+ ml3b:{l:'ml',t:2,n:'募兵制',d:'以餉養兵，兵為職業，戰力強而費用高，民間徭役反減。',cost:170,dur:14,pre:['ml2'],ex:['ml3a'],need:5,mods:{war:.10,morale:4,armycost:.10,burden:-.05}},
+ ml4:{l:'ml',t:3,n:'將門考成',d:'設武學、行考課，使將領升遷不再全憑門第與私恩。',cost:130,dur:14,anyp:['ml3a','ml3b'],need:9,mods:{war:.06,morale:2,auth:2},rx:{fac:'army',op:-8},ev:{fd:{army:-4}}},
+ ml5:{l:'ml',t:4,n:'火器營',d:'設專營鑄造並操練火器，野戰攻城皆添新利。',cost:260,dur:24,pre:['ml4','cu3'],need:15,mods:{war:.16,armycost:.07,auth:1}},
+ fn1:{l:'fn',t:1,n:'度支清查',d:'清點各州倉庫與稅卡，堵住最明顯的漏洞。',cost:50,dur:6,mods:{leak:.12},rx:{fac:'chan',op:-3}},
+ fn2:{l:'fn',t:1,n:'驛傳與度量衡',d:'統一斗斛尺度、整頓驛傳，商貨流通，稅收也好算。',cost:80,dur:10,pre:['fn1'],mods:{inc:.02,trade:.6}},
+ fn3a:{l:'fn',t:2,n:'清丈田畝',d:'重新丈量天下田土，查出隱匿之產。得利最大，也得罪最深。',cost:160,dur:18,pre:['fn2'],ex:['fn3b'],need:5,mods:{leak:.15,inc:.03,unrest:1},rx:{fac:'chan',op:-12},ev:{fd:{chan:-5}}},
+ fn3b:{l:'fn',t:2,n:'鹽鐵官營',d:'鹽、鐵、茶收歸官營，歲入穩增，但與商民爭利，士林有怨。',cost:150,dur:14,pre:['fn2'],ex:['fn3a'],need:5,mods:{inc:.05,mind:-1,leak:-.04},rx:{fac:'clean',op:-8}},
+ fn4:{l:'fn',t:3,n:'一條鞭法',d:'田賦徭役併為一條，折銀徵收，簡便而難以作弊。',cost:200,dur:24,anyp:['fn3a','fn3b'],need:9,mods:{inc:.04,burden:-.05,leak:.08},rx:{fac:'chan',op:-6}},
+ fn5:{l:'fn',t:4,n:'錢法票號',d:'整齊錢法，許民間票號匯兌，銀錢往來暢通。',t:4,cost:240,dur:24,pre:['fn4','dp2'],need:16,mods:{trade:1.5,inc:.02}},
+ ad1:{l:'ad',t:1,n:'考課之法',d:'定期考核官員政績，劣者降黜，貪者留案。',cost:40,dur:6,mods:{cor:.08},rx:{fac:'chan',op:-2}},
+ ad2:{l:'ad',t:1,n:'御史巡按',d:'派御史分巡各道，風聞可奏，使地方官有所忌憚。',cost:80,dur:10,pre:['ad1'],mods:{leak:.08,cor:.05,auth:1},ev:{fd:{clean:2}}},
+ ad3a:{l:'ad',t:2,n:'高薪養廉',d:'加俸以養其廉，使官員無須靠陋規過日子。花錢多，但根子治得深。',cost:130,dur:14,pre:['ad2'],ex:['ad3b'],need:5,mods:{cor:.14,salc:.14,mind:.5}},
+ ad3b:{l:'ad',t:2,n:'嚴刑峻法',d:'重典懲貪，一人犯法株連數人。皇權立見其威，朝野人人自危。',cost:90,dur:10,pre:['ad2'],ex:['ad3a'],need:5,mods:{cor:.12,auth:3,mind:-1.5},rx:{fac:'clean',op:-7}},
+ ad4:{l:'ad',t:3,n:'科舉擴額',d:'增設科目與名額，寒門子弟多一條出路。',cost:110,dur:12,pre:['ad2','cu1'],need:9,mods:{exam:2,auth:1},ev:{fd:{clean:2,chan:-2}}},
+ ad5:{l:'ad',t:4,n:'軍機處',d:'設機要班子直承聖意，政令繞過三省，皇權牢牢握在手中。',cost:200,dur:20,pre:['ad4'],anyp:['ad3a','ad3b'],need:15,mods:{auth:5,leak:.05},rx:{fac:'wai',op:-6},ev:{fd:{wai:-3}}},
+ cu1:{l:'cu',t:1,n:'興辦官學',d:'州縣設學，教化鄉里，也為朝廷儲才。',cost:60,dur:8,mods:{exam:1,mind:.5}},
+ cu2:{l:'cu',t:2,n:'修史禮制',d:'修前朝史、定本朝禮，使正統有據、威望日隆。',cost:70,dur:10,pre:['cu1'],mods:{rep:.08,mind:.5}},
+ cu3:{l:'cu',t:2,n:'印刷藏書',d:'設官刻書坊與藏書樓，典籍流布，士人易得書。',cost:110,dur:12,pre:['cu1'],need:4,mods:{exam:1,mind:1}},
+ cu4:{l:'cu',t:3,n:'醫藥防疫',d:'設惠民藥局、行防疫之法，疫病不再動輒殺人過萬。',cost:130,dur:14,anyp:['cu2','cu3'],need:8,mods:{popg:.10,relief:.10}},
+ cu5:{l:'cu',t:4,n:'格物工藝',d:'官府招攬工匠、鼓勵發明，農具、兵器、紡織俱有改進。',cost:250,dur:24,pre:['cu3','fn2'],need:14,mods:{inc:.04,war:.05,harv:.03}},
+ dp1:{l:'dp',t:1,n:'四夷通譯',d:'設通事館培養譯人，邊事不再憑傳聞猜測。',cost:50,dur:6,ev:{att:5}},
+ dp2:{l:'dp',t:1,n:'互市貿易',d:'於邊境開設互市，以茶絹易馬，邊民得利而少寇掠。',cost:90,dur:10,pre:['dp1'],mods:{trade:1.2},ev:{att:4}},
+ dp3a:{l:'dp',t:2,n:'和親羈縻',d:'以聯姻與賞賜安撫諸部，花錢買平安，也折些顏面。',cost:100,dur:12,pre:['dp2'],ex:['dp3b'],need:5,mods:{raid:.3,mind:.5},rx:{fac:'army',op:-4},ev:{att:12}},
+ dp3b:{l:'dp',t:2,n:'揚威邊防',d:'沿邊築堡增戍，屢以兵威示人，異族不敢輕犯，但彼此關係轉冷。',cost:140,dur:14,pre:['dp2'],ex:['dp3a'],need:5,mods:{war:.08,raid:.15,armycost:.04},ev:{att:-6}},
+ dp4:{l:'dp',t:3,n:'海運通商',d:'開海路、通番舶，沿海商貿大興，歲入添一大宗。',cost:220,dur:24,pre:['dp2'],need:9,req:{f:()=>G.inst&&G.inst.shi,t:'須先設市舶司'},mods:{trade:2,inc:.02}},
+ dp5:{l:'dp',t:4,n:'宗藩朝貢',d:'遠近諸邦奉正朔、遣使納貢，天朝體系大成。',cost:260,dur:24,pre:['dp4'],anyp:['dp3a','dp3b'],need:16,mods:{trade:1,raid:.2,war:.04},ev:{rep:4,att:8}}};
+for(const k in CZ){if(!CZ[k].t)CZ[k].t=1}
+const CZSYN=[
+ {a:['ag2','fn2'],n:'農商相濟',d:'田有餘糧、市有流通，稅基自然厚實。',mods:{inc:.02,popg:.05}},
+ {a:['ml2','ag4'],n:'兵農相資',d:'屯田與常平倉互為犄角，軍糧不必全靠國庫。',mods:{armycost:-.04,grain:.10}},
+ {a:['fn4','ad4'],n:'法清政平',d:'稅制簡明、官員清正，徵收之間少了許多暗耗。',mods:{leak:.08,mind:1}},
+ {a:['ml4','ad5'],n:'文武相制',d:'軍權有考成、政務有樞要，二者互相牽制又彼此配合。',mods:{auth:3,war:.04}},
+ {a:['cu3','cu5'],n:'學以致用',d:'書刊流布與工藝精進相互促進。',mods:{exam:1,inc:.02}},
+ {a:['dp4','fn5'],n:'通貨四海',d:'海舶往來與票號匯兌相接，貿易之利倍增。',mods:{trade:1.2}},
+ {a:['ag4','cu4'],n:'倉廩實而知禮',d:'有糧、有醫、有學，百姓安居樂業。',mods:{mind:1.5,popg:.08}}];
+const CZMOD={harv:['秋收',1,'p'],grain:['田賦糧',1,'p'],inc:['稅收',1,'p'],leak:['貪墨流失減少',1,'p'],popg:['人口增長',1,'p'],unrest:['民怨',-1,'n'],burden:['每月負擔',-1,'n'],mind:['民心',1,'n'],morale:['軍心',1,'n'],armycost:['軍費',-1,'p'],salc:['官俸支出',-1,'p'],trade:['貿易歲入（每月）',1,'w'],war:['戰力',1,'p'],cor:['官員貪腐（每月下降）',1,'n'],auth:['皇權',1,'n'],exam:['科舉取士',1,'r'],relief:['抗災減損',1,'p'],rep:['威望（每月）',1,'n'],raid:['邊患風險降低',1,'p']};
+function czInit(){if(!G.cz||!G.cz.d)G.cz={d:{},a:[]};if(!G.cz.a)G.cz.a=[];return G.cz}
+function czDone(id){return !!(G&&G.cz&&G.cz.d&&G.cz.d[id]!=null)}
+function czAct(id){return G&&G.cz&&G.cz.a?G.cz.a.find(x=>x.id===id):null}
+function czSynOn(s){return s.a.every(czDone)}
+function czm(k){const c=G&&G.cz;if(!c||!c.d)return 0;let v=0;for(const id in c.d){const o=CZ[id];if(o&&o.mods&&o.mods[k])v+=o.mods[k]}for(const s of CZSYN){if(s.mods[k]&&czSynOn(s))v+=s.mods[k]}return v}
+function czCount(){return G&&G.cz&&G.cz.d?Object.keys(G.cz.d).length:0}
+function czSlots(){return 2+(G.inst&&G.inst.cab?1:0)}
+function czUp(){const c=G&&G.cz;if(!c||!c.a)return 0;let s=0;for(const a of c.a){if(a.pause>0)continue;const o=CZ[a.id];if(o)s+=o.cost*(a.mult||1)/o.dur}for(const id in (c.d||{})){const o=CZ[id];if(o)s+=o.cost*.005}return s}
+function czCan(id){const o=CZ[id];const why=[];if(!o)return{ok:false,why:['無此國策']};czInit();
+ if(czDone(id))return{ok:false,why:['已推行'],done:1};if(czAct(id))return{ok:false,why:['推行中'],act:1};
+ for(const p of o.pre||[])if(!czDone(p))why.push('須先推行「'+CZ[p].n+'」');
+ if(o.anyp&&!o.anyp.some(czDone))why.push('須先推行「'+o.anyp.map(x=>CZ[x].n).join('」或「')+'」');
+ for(const x of o.ex||[])if(czDone(x)||czAct(x))why.push('與「'+CZ[x].n+'」不可並行');
+ if(o.need&&czCount()<o.need)why.push('須已推行國策'+o.need+'項（現'+czCount()+'項）');
+ if(o.req&&!o.req.f())why.push(o.req.t);
+ const ex=why.some(w=>w.indexOf('不可並行')>=0);
+ return{ok:!why.length,why,ex}}
+function czApply(ev){if(!ev)return;if(ev.fd)for(const f in ev.fd)G.fd[f]=cl((G.fd[f]||0)+ev.fd[f],0,35);
+ if(ev.food)for(const r of Object.values(G.reg))r.food=cl(r.food+ev.food);if(ev.gra)G.gra+=ev.gra;if(ev.rep)G.rep=cl(G.rep+ev.rep);if(ev.mind)G.mind=cl(G.mind+ev.mind);
+ if(ev.att)for(const f of Object.values(G.foe))f.att=cl(f.att+ev.att,-100,100)}
+function czMood(fac,v){for(const p of alivePs()){if(p.id===G.emp)continue;if(facOf(p)===fac)p.op=cl(p.op+v)}}
+function czStart(id){const o=CZ[id];const c=czCan(id);if(!c.ok)return NO(c.why[0]);czInit();
+ if(G.cz.a.length>=czSlots())return NO('同時只能推行'+czSlots()+'項國策。');
+ const first=o.cost/o.dur;if(G.tre<Math.max(first*2,o.cost*.2))return NO('國庫不足（至少需'+Math.ceil(Math.max(first*2,o.cost*.2))+'萬兩方可開辦）。');
+ G.cz.a.push({id,left:o.dur,dur:o.dur,mult:1,pause:0,t0:G.t});
+ if(o.rx){czMood(o.rx.fac,o.rx.op)}
+ chron('詔行國策「'+o.n+'」，預計'+o.dur+'月告成。',2);
+ return OKK('已開辦「'+o.n+'」，每月耗銀約'+Math.round(first*10)/10+'萬兩。')}
+function czCancel(id){czInit();const a=czAct(id);if(!a)return NO('此策並未推行。');G.cz.a=G.cz.a.filter(x=>x!==a);G.memo=G.memo.filter(m=>!(m.k==='cz'&&m.x&&m.x.id===id));chron('國策「'+CZ[id].n+'」中途罷止，已耗之銀付諸流水。',2);return OKK('已中止「'+CZ[id].n+'」。（已耗國庫不退）')}
+function czMonth(){const c=G&&G.cz;if(c&&c.a&&c.a.length){const mc=czm('rep');
+ for(const a of c.a.slice()){if(a.pause>0){a.pause--;continue}if(G.debt>0)continue;a.left--;const o=CZ[a.id];
+  if(a.left<=0){c.a=c.a.filter(x=>x!==a);c.d[a.id]=G.t;czApply(o.ev);G.memo=G.memo.filter(m=>!(m.k==='cz'&&m.x&&m.x.id===a.id));
+   chron('國策「'+o.n+'」告成。'+(o.t>=3?'史臣記曰：此乃經國大計。':''),o.t>=3?3:2);
+   for(const s of CZSYN){if(s.a.includes(a.id)&&czSynOn(s))chron('國策相濟：「'+s.n+'」——'+s.d,3)}}
+  else if(o.rx&&G.t-a.t0>=2&&chance(.045)&&!G.memo.some(m=>m.k==='cz')){const L=facLeader(o.rx.fac);const who=L?nmt(L):CZF[o.rx.fac];
+   G.memo.push({id:G.nid++,k:'cz',t:G.t,from:L?L.id:null,txt:who+'聯名上書，反對推行「'+o.n+'」，稱此舉'+CZR[o.rx.fac]+'，請陛下三思。',x:{id:a.id,fac:o.rx.fac}})}}}
+ if(czm('rep'))G.rep=cl(G.rep+czm('rep'))}
+const __mo9=memoOpts;memoOpts=function(m){if(m.k!=='cz')return __mo9(m);const a=czAct(m.x.id),o=CZ[m.x.id],fac=m.x.fac,fn=CZF[fac];if(!a||!o)return[{l:'知道了',h:'此策已不在推行中',fn:()=>OKK('此事已了。')}];
+ return[{l:'堅持推行',h:'皇權-2，'+fn+'態度-6，工期不變',fn:()=>{G.auth=cl(G.auth-2);czMood(fac,-6);return OKK('你不為所動，下旨照辦。'+fn+'退下時面色難看。')}},
+  {l:'折中讓步',h:'工期+4個月、加撥一成經費，'+fn+'態度-2',fn:()=>{if(G.tre<o.cost*.1)return NO('國庫不足以加撥。');G.tre-=Math.round(o.cost*.1);a.left+=4;a.dur+=4;czMood(fac,-2);return OKK('你酌情修改條款，'+fn+'的怨氣稍平。')}},
+  {l:'暫緩一年',h:'國策停擺12個月，'+fn+'態度+4',fn:()=>{a.pause=12;czMood(fac,4);return OKK('你下旨暫緩推行，'+fn+'如釋重負。')}}]};
+
 /* ---------- 插畫（原創剪影，純 SVG） ---------- */
 function roof(cx,y,w,h,col){ // 重簷歇山剪影：中心x、屋脊y、寬、高
  const l=cx-w/2,r=cx+w/2,e=w*.09;
@@ -2493,6 +2623,7 @@ const PORT_X=[
 const IC={
  court:'<path d="M3 9l9-5 9 5M5 9v9M9 9v9M15 9v9M19 9v9M3 20h18"/>',
  self:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+ tree:'<path d="M12 21v-9M12 12l-5-4M12 12l5-4M7 8V4M17 8V4M8 21h8"/>',
  gov:'<path d="M6 3h11a2 2 0 012 2v14H8a2 2 0 01-2-2zM6 17a2 2 0 012-2h11M10 8h6M10 11h6"/>',
  map:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
  harem:'<path d="M12 20c-5-1-8-4-8-8 3 0 6 1 8 4 2-3 5-4 8-4 0 4-3 7-8 8zM12 16c-1-4-1-7 0-10 1 3 1 6 0 10z"/>',
@@ -3097,12 +3228,12 @@ function tabSys(){return heroHtml('存　檔','設定・存檔・備份')+settin
  +(hasSave('prev')?'<div class="card"><h3>還原上月</h3><div class="small">每個月會自動留一份上個月的存檔。若此局出了狀況，可退回一個月。</div><div class="opts"><button class="warn" data-act="loadprev">退回上一個月</button></div></div>':'')+'<div class="card"><h3>備份到瀏覽器之外</h3><div class="small">狀態：<span id="bkst">'+bkText()+'</span>。存檔只存在這個瀏覽器；清除瀏覽資料或換裝置就會消失。建議每隔幾年備份一次。</div><div class="opts"><button class="pri" data-act="copycode">複製存檔碼<small>貼到備忘錄或傳給自己</small></button><button data-act="dlsave">下載存檔檔案<small>.txt 檔</small></button>'+(navigator.share?'<button data-act="sharesave">傳給自己<small>用系統分享</small></button>':'')+'</div></div><div class="card"><h3>還原存檔</h3><textarea id="exp" placeholder="把存檔碼貼在這裡（EMP1: 開頭）"></textarea><div class="opts"><button data-act="import">匯入貼上的存檔碼</button><label class="filebtn">從檔案匯入<input type="file" id="imf" accept=".txt,.json,text/plain,application/json" hidden></label></div></div>'
  +'<div class="card"><h3>重新開始</h3><button class="warn" data-act="restart">放棄此局，重新登基</button></div>'}
 
-const TABS=[['court','朝堂'],['self','起居'],['gov','朝政'],['map','疆域'],['harem','後宮'],['family','皇族'],['people','人物'],['web','關係'],['hist','史書'],['sys','存檔']];
+const TABS=[['court','朝堂'],['self','起居'],['gov','朝政'],['tree','國策'],['map','疆域'],['harem','後宮'],['family','皇族'],['people','人物'],['web','關係'],['hist','史書'],['sys','存檔']];
 function render(){if(!G){startScreen();return}
  document.body.dataset.scn='';ambience();
  $('#top').style.display='';$('#top').innerHTML=topHtml();
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
- const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
+ const fn={court:tabCourt,self:tabSelf,gov:tabGov,tree:tabTree,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
  document.body.classList.add('ingame');if(!$('#scene')){const sc=document.createElement('div');sc.id='scene';sc.innerHTML=sceneSvg();document.body.prepend(sc)}
  $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'||TAB==='gov'?'<aside id="side">'+sideHtml(TAB)+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
@@ -3246,6 +3377,40 @@ applySettings();
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('sc')){e.preventDefault();e.target.click()}});/*kbscn*/
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='nm'){e.target.classList.remove('bad');const h=document.getElementById('sthint');if(h&&h.classList.contains('warn')){h.classList.remove('warn');const S=UI.start;h.textContent=SCN[S.scn].n+'　·　'+DIFF[S.diff||'n'].n+'　·　'+STN[S.focus||'pol']}}});
 
-;{const __mc=memoCard;memoCard=function(m,ix){const h=__mc(m,ix);const w=memoWai(m);return w?h.replace('<div class="small dim">','<div class="small dim"><b class="badge">'+w.side+'族</b> '):h}}
+;{const __mc=memoCard;memoCard=function(m,ix){const h=__mc(m,ix);if(m.k==='cz')return h.replace('<div class="small dim">','<div class="small dim"><b class="badge">國策</b> ');const w=memoWai(m);return w?h.replace('<div class="small dim">','<div class="small dim"><b class="badge">'+w.side+'族</b> '):h}}
+
+
+/* ---------- 國策分頁 ---------- */
+const CZTN=['初階','進階','深化','大成'];const ASPL={restore:['ml','fn','ad'],keep:['ag','cu','dp'],joy:['fn','dp','cu']};
+function czFmt(k,v){const m=CZMOD[k];if(!m)return null;const good=(v*m[1])>0;let t;const sg=v>0?'+':'−';const a=Math.abs(v);
+ if(m[2]==='p')t=sg+Math.round(a*100)+'%';else if(m[2]==='w')t=sg+(Math.round(a*10)/10)+'萬兩';else if(m[2]==='r')t=sg+a+'人';else t=sg+(Math.round(a*100)/100);
+ return'<span class="tzfx '+(good?'good':'bad')+'">'+m[0]+' '+t+'</span>'}
+function czEvTxt(ev){if(!ev)return'';const L=[];if(ev.fd)for(const f in ev.fd)L.push(CZF[f]+'勢力'+(ev.fd[f]>0?'+':'−')+Math.abs(ev.fd[f]));if(ev.food)L.push('各地存糧+'+ev.food);if(ev.gra)L.push('糧倉+'+ev.gra);if(ev.rep)L.push('威望+'+ev.rep);if(ev.att)L.push('諸邦好感'+(ev.att>0?'+':'−')+Math.abs(ev.att));return L.join('、')}
+function czModsHtml(mods){return Object.keys(mods||{}).map(k=>czFmt(k,mods[k])).filter(Boolean).join('')}
+function czNode(id){const o=CZ[id];const c=czCan(id);const a=czAct(id);const st=c.done?'done':c.act?'act':c.ok?'can':c.ex?'ex':'lock';
+ const sub=st==='done'?'已推行':st==='act'?(a.pause>0?'暫緩 '+a.pause+'月':'尚餘 '+a.left+'月'):st==='ex'?'已擇他路':o.cost+'萬兩・'+o.dur+'月';
+ return '<button class="tzn s-'+st+'" data-act="czopen" data-arg="'+id+'"><b>'+esc(o.n)+'</b><small>'+sub+'</small>'+(st==='act'?'<i class="tzp" style="width:'+Math.round((1-a.left/a.dur)*100)+'%"></i>':'')+'</button>'}
+function tabTree(){czInit();const n=czCount(),tot=Object.keys(CZ).length;const act=G.cz.a;
+ let h=heroHtml('國　策','經世濟民・百年大計');
+ h+='<div class="card tzst"><div class="row sp"><h3>推行中 <small class="dim">'+act.length+' / '+czSlots()+'</small></h3><span class="small dim">已推行 '+n+' / '+tot+' 項・每月經費 '+n0(czUp())+' 萬兩'+(G.inst.cab?'':'・設「內閣」可多推行一項')+'</span></div>';
+ h+=act.length?'<div class="tzact">'+act.map(a=>{const o=CZ[a.id];const pc=Math.round((1-a.left/a.dur)*100);return '<div class="tzai" data-act="czopen" data-arg="'+a.id+'"><b style="color:'+CZL[o.l].c+'">'+esc(o.n)+'</b><span class="small dim">'+(a.pause>0?'暫緩中，'+a.pause+'月後續行':G.debt>0?'國庫虧空，工程停擺':'尚餘'+a.left+'月')+'</span><div class="bar"><i style="width:'+pc+'%"></i></div></div>'}).join('')+'</div>':'<div class="small dim">尚無推行中的國策。點選下方任一項可查看詳情並開辦。</div>';
+ const tm={};for(const k in CZMOD){const v=czm(k);if(v)tm[k]=v}
+ h+=(Object.keys(tm).length?'<div class="tzsum"><span class="small dim">目前累計：</span>'+czModsHtml(tm)+'</div>':'')+'</div>';
+ for(const L in CZL){const ids=Object.keys(CZ).filter(k=>CZ[k].l===L);const dn=ids.filter(czDone).length;const fit=G.asp&&ASPL[G.asp]&&ASPL[G.asp].includes(L);
+  h+='<div class="tzl" style="--c:'+CZL[L].c+'"><div class="tzh"><b>'+CZL[L].n+'</b><small>'+dn+' / '+ids.length+'</small>'+(fit?'<em>合志向</em>':'')+'</div><div class="tzr">';
+  for(let t=1;t<=4;t++){const col=ids.filter(k=>CZ[k].t===t);h+='<div class="tzc"><div class="tzt">'+CZTN[t-1]+'</div>'+col.map(czNode).join('')+'</div>'}
+  h+='</div></div>'}
+ h+='<h4>協同效果</h4><div class="grid2">'+CZSYN.map(s=>{const on=czSynOn(s);return '<div class="card tzsy'+(on?' on':'')+'"><b>'+(on?'◆ ':'◇ ')+esc(s.n)+'</b> <span class="small dim">'+s.a.map(x=>CZ[x].n).join(' + ')+'</span><div class="small">'+esc(s.d)+'</div><div>'+czModsHtml(s.mods)+'</div></div>'}).join('')+'</div>';
+ return h}
+function czModal(id){const o=CZ[id];if(!o)return;const c=czCan(id);const a=czAct(id);const per=Math.round(o.cost/o.dur*10)/10;
+ let h='<h3 style="color:'+CZL[o.l].c+'">'+esc(o.n)+' <small class="dim">'+CZL[o.l].n+'・'+CZTN[o.t-1]+'</small></h3><p>'+esc(o.d)+'</p>';
+ h+='<div class="tzmx"><b>推行成效</b><div>'+(czModsHtml(o.mods)||'<span class="small dim">無常駐加成（見完成時效果）</span>')+'</div>'+(o.ev?'<div class="small">完成時：'+czEvTxt(o.ev)+'</div>':'')+'</div>';
+ h+='<div class="tzmx"><b>代價</b><div class="small">共耗銀 '+o.cost+' 萬兩，分 '+o.dur+' 個月（每月約 '+per+' 萬兩）；完成後每月維持費約 '+(Math.round(o.cost*.005*10)/10)+' 萬兩。</div>'+(o.rx?'<div class="small warnc">推行期間'+CZF[o.rx.fac]+'態度'+o.rx.op+'，且可能聯名上書反對。</div>':'')+'</div>';
+ const pre=(o.pre||[]).map(x=>'<span class="'+(czDone(x)?'good':'bad')+'">'+(czDone(x)?'✓ ':'✗ ')+esc(CZ[x].n)+'</span>');if(o.anyp)pre.push('<span class="'+(o.anyp.some(czDone)?'good':'bad')+'">'+(o.anyp.some(czDone)?'✓ ':'✗ ')+o.anyp.map(x=>esc(CZ[x].n)).join(' 或 ')+'</span>');if(o.need)pre.push('<span class="'+(czCount()>=o.need?'good':'bad')+'">'+(czCount()>=o.need?'✓ ':'✗ ')+'已推行國策 '+o.need+' 項</span>');if(o.req)pre.push('<span class="'+(o.req.f()?'good':'bad')+'">'+(o.req.f()?'✓ ':'✗ ')+o.req.t+'</span>');
+ h+='<div class="tzmx"><b>前置</b><div class="small">'+(pre.join('　')||'無')+'</div>'+(o.ex?'<div class="small warnc">與「'+o.ex.map(x=>esc(CZ[x].n)).join('」「')+'」二選一。</div>':'')+'</div>';
+ const syn=CZSYN.filter(s=>s.a.includes(id));if(syn.length)h+='<div class="tzmx"><b>協同</b>'+syn.map(s=>'<div class="small">'+esc(s.n)+'：與「'+s.a.filter(x=>x!==id).map(x=>esc(CZ[x].n)).join('」「')+'」同行 '+czModsHtml(s.mods)+'</div>').join('')+'</div>';
+ h+='<div class="opts" style="margin-top:12px">'+(c.done?'<button disabled>已推行</button>':a?'<button class="warn" data-act="czx" data-arg="'+id+'">中止此策</button>':'<button class="gold" data-act="czgo" data-arg="'+id+'"'+(c.ok?'':' disabled')+'>開辦</button>'+(c.ok?'':'<span class="small bad">'+esc(c.why[0])+'</span>'))+'</div>';
+ modal(h);$('#md').classList.add('wide')}
+Object.assign(ACT,{czopen(a){czModal(a)},czgo(a){const r=czStart(a);closeModal();res(r)},czx(a){const r=czCancel(a);closeModal();res(r)}});
 
 </script></body></html>

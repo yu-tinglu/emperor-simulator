@@ -29,36 +29,36 @@ function economy(){
  const ps=alivePs();const ncon=ps.filter(p=>p.role==='consort').length,nkid=ps.filter(p=>(p.role==='prince'||p.role==='princess')&&age(p)<18).length;
  for(const id in G.reg){const r=G.reg[id];const gov=holder('g_'+id);
   const gq=gov?(gov.st.pol*.6+gov.st.biz*.4-gov.cor*.25):28;
-  let fd=-3;if(m===9||m===10)fd+=20*(.6+r.pr/100)*(1-r.un/220)*G.weather;r.food=cl(r.food+fd);
-  r.pop=Math.max(20,r.pop+r.pop*((r.food-38)/100*.0007+(r.pr-50)/100*.0003)-(r.rebel?r.pop*.0004:0));
+  let fd=-3;if(m===9||m===10)fd+=20*(.6+r.pr/100)*(1-r.un/220)*G.weather*(1+czm('harv'));r.food=cl(r.food+fd);
+  const pg=(r.food-38)/100*.0007+(r.pr-50)/100*.0003;r.pop=Math.max(20,r.pop+r.pop*(pg>0?pg*(1+czm('popg')):pg)-(r.rebel?r.pop*.0004:0));
   const prT=58+(gq-50)*.5-(G.burden-30)*.4-(r.un-20)*.2+(G.inst.shi&&r.ter==='coast'?5:0)+(r.proj||0);
   r.pr=cl(r.pr+(prT-r.pr)*.02,10,96);
-  const unT=(G.zeit&&G.zeit.k==='decline'?4:0)-(G.zeit&&G.zeit.k==='revival'?3:0)+12+(G.burden-30)*.6+Math.max(0,45-r.food)*.9+(gov?gov.cor*.15:8)-(G.mind-50)*.3-r.garr+(gov&&gov.op<30?4:0)+(r.sec?20:0);
+  const unT=czm('unrest')+(G.zeit&&G.zeit.k==='decline'?4:0)-(G.zeit&&G.zeit.k==='revival'?3:0)+12+(G.burden-30)*.6+Math.max(0,45-r.food)*.9+(gov?gov.cor*.15:8)-(G.mind-50)*.3-r.garr+(gov&&gov.op<30?4:0)+(r.sec?20:0);
   r.un=cl(r.un+(unT-r.un)*.06);
   const auT=10+(50-G.auth)*.5+(gov?(gov.amb-50)*.25:0)+r.garr+(gov&&gov.op<35?8:0)+(r.vas?20:0);
   r.au=cl(r.au+(auT-r.au)*.04);
   if(r.exempt>0&&r.exempt<500)r.exempt--;
   if(r.sec)continue;
-  const base=r.pop*r.pr/100*.044*tm*hb*(r.exempt>0?0:1)*(G.inst.shi&&r.ter==='coast'?1.08:1)*(r.vas?.3:1);
-  const lk=gov?cl(gov.cor/100*.32,0,.4):.15;inc+=base*(1-lk);leak+=base*lk;pops+=r.pop;unS+=r.un*r.pop;
+  const base=(1+czm('inc'))*r.pop*r.pr/100*.044*tm*hb*(r.exempt>0?0:1)*(G.inst.shi&&r.ter==='coast'?1.08:1)*(r.vas?.3:1);
+  const lk=(gov?cl(gov.cor/100*.32,0,.4):.15)*Math.max(.2,1-czm('leak'));inc+=base*(1-lk);leak+=base*lk;pops+=r.pop;unS+=r.un*r.pop;
   if(gov)gov.wealth=(gov.wealth||0)+base*lk;
-  if(m===10)grain+=r.pop*r.pr/100*.08*tm;
+  if(m===10)grain+=r.pop*r.pr/100*.08*tm*(1+czm('grain'));
   if(r.proj)r.proj=Math.max(0,r.proj-.02)}
- const army=(G.zeit&&G.zeit.k==='martial'?.95:1)*G.army*1.45*[.7,.85,1,1.15,1.3][G.mil-1]*(1-(offq('bing','mil')-50)*.002);
+ const army=(G.zeit&&G.zeit.k==='martial'?.95:1)*G.army*1.45*[.7,.85,1,1.15,1.3][G.mil-1]*(1-(offq('bing','mil')-50)*.002)*Math.max(.4,1+czm('armycost'));
  const Z=G.zeit?G.zeit.k:'plain';const crt=(10+G.crt*4+ncon*.5+nkid*.25+(G.life==='indulge'?5:0))*(Z==='gilded'?1.15:1);
- const offN=Object.values(G.off).filter(Boolean).length;const sal=9+offN*.9;
+ const offN=Object.values(G.off).filter(Boolean).length;const sal=(9+offN*.9)*Math.max(.5,1+czm('salc'));
  const inst=(G.inst.spy?4:0)+(G.inst.shi?2:0)+(G.inst.cab?3:0)+(G.inst.acad?3:0);
  const wars=G.sit.filter(s=>s.k==='war'||s.k==='revolt').length;const warC=wars*3*[.7,.85,1,1.15,1.3][G.mil-1];
  let pc=0;for(const pr of G.proj){pc+=pr.cost/pr.dur}
- let exp=(army+crt+sal+inst+warC+pc)*diffExp();inc*=diffInc();
+ let exp=(army+crt+sal+inst+warC+pc+czUp())*diffExp();inc*=diffInc();inc+=czm('trade');
  for(const f in G.foe){if(G.foe[f].vas)inc+=3;if(G.foe[f].trade)inc+=4}
  G.fin={inc,exp,leak,army,crt,sal};G.tre+=inc-exp;G.gra=Math.max(0,G.gra*.998+grain);
  if(G.tre<0)G.debt++;else G.debt=0;
- G.burden=cl(G.burden+[-1.2,-.5,0,.9,2][G.tax-1]);
+ G.burden=cl(G.burden+[-1.2,-.5,0,.9,2][G.tax-1]+czm('burden'));
  if(G.tre>0&&G.army<[30,36,40,48,56][G.mil-1])G.army+=.12;else if(G.army>[30,36,40,48,56][G.mil-1]+4)G.army-=.1;
- const mT=50+(G.mil-3)*14-(G.debt>0?25:0);G.morale=cl(G.morale+(mT-G.morale)*.05);
+ const mT=czm('morale')+50+(G.mil-3)*14-(G.debt>0?25:0);G.morale=cl(G.morale+(mT-G.morale)*.05);
  const avgUn=pops?unS/pops:30;G.avgUn=avgUn;
- const mdT=56-(G.burden-30)*.4-(avgUn-20)*.3+(G.rep-50)*.1+(G.life==='tyrant'?-6:0);G.mind=cl(G.mind+(mdT-G.mind)*.05);
+ const mdT=czm('mind')+56-(G.burden-30)*.4-(avgUn-20)*.3+(G.rep-50)*.1+(G.life==='tyrant'?-6:0);G.mind=cl(G.mind+(mdT-G.mind)*.05);
  // 工程
  for(const pr of G.proj.slice()){pr.left--;if(pr.left<=0){G.proj=G.proj.filter(x=>x!==pr);const r=G.reg[pr.reg];
   if(pr.k==='canal'){r.proj=(r.proj||0)+9;r.food=cl(r.food+10);chron(r.n+'水利工程竣工，沃野可期。',2)}
@@ -76,7 +76,7 @@ function powerMonth(){const e=emp();
  for(const f in G.fd)G.fd[f]=cl(G.fd[f]*.992,0,35);
  syncPower();
  const top=Math.max(G.pow.chan,G.pow.eun,G.pow.wai,G.pow.army,G.pow.clean);const gu=holder('guard');
- const tgt=44+(G.rep-50)*.25+(e.st.sch+e.st.pol-90)*.12+(G.att>60?8:G.att<20?-12:0)-.55*Math.max(0,top-28)+(G.inst.spy?5:0)+(G.inst.cab?3:0)+(gu?(gu.op-50)*.15:0)+(G.life==='tyrant'?10:0)+(G.life==='delegate'?-10:0)-(G.regent?22:0);
+ const tgt=czm('auth')+44+(G.rep-50)*.25+(e.st.sch+e.st.pol-90)*.12+(G.att>60?8:G.att<20?-12:0)-.55*Math.max(0,top-28)+(G.inst.spy?5:0)+(G.inst.cab?3:0)+(gu?(gu.op-50)*.15:0)+(G.life==='tyrant'?10:0)+(G.life==='delegate'?-10:0)-(G.regent?22:0);
  G.auth=cl(G.auth+(tgt-G.auth)*.12);G.puppet=G.auth<18;
  if(G.regent){const rp=P(G.regent);if(!rp||!rp.alive||age(e)>=16){if(G.regent){chron(nm(e)+'年滿十六，親政。',3);G.regent=null}}}
 }
@@ -192,7 +192,7 @@ function npcAct(p){const a=age(p);const R_=p.role;if(['official','general','eunu
 
 function peopleMonth(){
  for(const p of alivePs()){if(!p.alive)continue;const a=age(p);
-  if(p.lock>0)p.lock--;if(p.watch>0)p.watch--;
+  if(p.lock>0)p.lock--;if(p.off&&typeof p.cor==='number'&&p.cor>0&&G.cz)p.cor=Math.max(0,p.cor-czm('cor'));if(p.watch>0)p.watch--;
   if(p.ill>0){p.ill++;const rec=.22+(offq('med','med')-40)*.002;
    if(chance(rec)){p.ill=0;p.hp=cl(p.hp-5);if(p.id===G.emp)log('龍體漸癒。','good')}
    else if(chance(.035+(a>55?.03:0)-(p.hp>60?.015:0))){die(p,'病逝');continue}}
@@ -266,13 +266,13 @@ function foreignMonth(){
   else if(f.str<75&&chance(.0025)){f.str=cl(f.str+12);f.att=cl(f.att-12);chron(f.n+'出現雄主，統一諸部，聲勢復振。',3)}
   const rg=Object.values(G.reg).find(r=>r.foe===k);if(!f.war&&rg){
    const garr=rg.garr+G.army*.15;const risk=((f.str-garr*3)*.0012+(-f.att)*.0006)*.6+(G.auth<30?.006:0)+(G.army<25?.008:0);
-   if(!f.vas&&chance(Math.max(0,risk)))startWar(f)}}}
+   if(!f.vas&&chance(Math.max(0,risk)*Math.max(.3,1-czm('raid'))))startWar(f)}}}
 function defaultGen(){return holder('gen')||alivePs().filter(p=>p.role==='general'&&age(p)>=22).sort((a,b)=>b.st.mil-a.st.mil)[0]||null}
 function fightMonth(s,r){const gen=s.gen&&P(s.gen)&&P(s.gen).alive?P(s.gen):(s.k==='revolt'?holder('g_'+r.id):defaultGen());const gm=gen?gen.st.mil:36;
  let F=s.force||(r.garr+G.army*.2);F=Math.min(F,Math.max(2,G.army));if(s.emp)F*=1.2;
  const far=['he','long','ling'].includes(r.id)&&s.k==='war';let sup=(G.tre>-50&&r.food>20&&G.debt<3)?1:.75;
  if(far&&s.age>5&&(r.proj||0)<4){sup*=.88;if(!s.supLog){s.supLog=1;log('糧道漫長，前線補給吃緊。（修築驛道可緩解）','warn')}}
- const our=F*(G.morale/60)*(.6+gm/90)*sup*({plain:1,coast:1,mount:1.2,steppe:.92}[r.ter]||1)*(s.emp?1.25:1);
+ const our=F*(1+czm('war'))*(G.morale/60)*(.6+gm/90)*sup*({plain:1,coast:1,mount:1.2,steppe:.92}[r.ter]||1)*(s.emp?1.25:1);
  const E=s.k==='war'?s.E:s.S*.12;const en=E*(s.k==='revolt'?.85:1);const diff=(our-en)/(our+en+.1);
  s.front=cl(s.front+diff*28+rr(-7,7),-100,100);const lr=en/(our+en+.1);
  if(chance(.3)){const nn=s.k==='war'?G.foe[s.foe].n:s.name;if(diff>.25)log('官軍在'+r.n+'連戰告捷，'+(gen?nm(gen)+'指揮得當，':'')+'斬獲頗眾。');else if(diff<-.25)log(r.n+'戰局不利，'+nn+'攻勢兇猛，官軍後撤整補。','warn')}
@@ -363,7 +363,7 @@ function vacancyMonth(){G.vac=G.vac||{};
 function mem_gain(c){c.op=cl(c.op+3)}
 
 /* ---------- 年度 ---------- */
-function exam(pol){pol=pol||'poor';const n=3+(G.inst.acad?3:0)+(G.inst.cab?1:0);let best=null;const PB={gate:{pol:6,lit:6},poor:{pol:10,lit:12},real:{pol:16,lit:2}}[pol];
+function exam(pol){pol=pol||'poor';const n=3+(G.inst.acad?3:0)+(G.inst.cab?1:0)+Math.round(czm('exam'));let best=null;const PB={gate:{pol:6,lit:6},poor:{pol:10,lit:12},real:{pol:16,lit:2}}[pol];
  for(let i=0;i<n;i++){const c=newClan(pick(SURN),pol==='gate'?'chan':'clean',pol!=='gate');const p=newMan(c.id,21,32,'official',{bias:{pol:PB.pol+(G.inst.acad?10:0),lit:PB.lit},op:ri(58,78)});if(pol==='gate'){p.cor=cl((p.cor||40)+14);p.amb=cl((p.amb||50)+8)}else if(pol==='poor'){p.cor=cl((p.cor||40)-10)}else{p.st.sch=cl(p.st.sch+6)}p.disc=emp().id;c.m.push(p.id);
   memo_(p,'exam',8,'蒙皇恩取士，感念知遇。');bio(p,'登進士第，授候補。');if(!best||p.st.lit+p.st.pol>best.st.lit+best.st.pol)best=p}
  chron('開科取士（'+({gate:'重門第',poor:'取寒門',real:'重實學'}[pol])+'），錄進士'+n+'人，狀元'+nm(best)+'。',2,[best.id]);G.xl=G.xl||[];G.xl.push({t:G.t,pol,n});if(pol==='gate'){G.fd.chan=cl(G.fd.chan+3,0,35);G.mind=cl(G.mind-1);for(const p of alivePs())if(p.off&&facOf(p)==='clean')p.op=cl(p.op-2)}else if(pol==='poor'){G.fd.clean=cl(G.fd.clean+3,0,35);G.mind=cl(G.mind+1);for(const p of alivePs())if(p.off&&facOf(p)==='chan')p.op=cl(p.op-3)}else{G.reform=(G.reform||0)+1;G.tre+=30*G.reform>150?150:30*G.reform;for(const p of alivePs())if(p.off&&p.role==='official'&&p.st.lit>70)p.op=cl(p.op-1)}}
@@ -379,7 +379,7 @@ function chapterTitle(){const e=emp();const war=G.sit.some(s=>s.k==='war'),rev=G
 function chapterStart(alert){const e=emp();G.chaps=G.chaps||[];G.chap={t:G.t,title:'初登大寶',n:1};G.chaps.push({t:G.t,emp:e.id,n:1,title:'初登大寶'});if(alert)ALERTS.push({t:G.t,txt:CHAPT['初登大寶'],chap:{n:1,title:'初登大寶',emp:nm(e)}})}
 function chapterCheck(){if(!G.chap)return;if((G.t-G.chap.t)/12<3)return;const t=chapterTitle();if(t===G.chap.title)return;const e=emp();const prev=G.chap;const n=prev.n+1;
  G.chap={t:G.t,title:t,n};G.chaps.push({t:G.t,emp:e.id,n,title:t});chron('〔第'+cn(n)+'章〕'+t+'。',2);ALERTS.push({t:G.t,txt:CHAPT[t]||'',chap:{n,title:t,emp:nm(e),prev:prev.title,yrs:Math.round((G.t-prev.t)/12)}})}
-function yearEnd(){G.weather=rr(.72,1.15);eraTrait();snapRec();chapterCheck();achCheck();marryYear();growthYear();if((G.t/12)%3===0)examYear();refreshClans();
+function yearEnd(){G.weather=rr(.72,1.15);if(G.weather<1)G.weather=1-(1-G.weather)*(1-Math.min(.6,czm('relief')));eraTrait();snapRec();chapterCheck();achCheck();marryYear();growthYear();if((G.t/12)%3===0)examYear();refreshClans();
  for(const p of alivePs()){if(p.id===G.emp)continue;p.op=cl(p.op+(50-p.op)*.04);for(const k of Object.keys(p.rel)){const o=P(k);if(!o||!o.alive)delete p.rel[k]}}
  G.lastYear={tre:G.tre,mind:G.mind,pop:Object.values(G.reg).reduce((a,r)=>a+r.pop,0)}}
 
@@ -439,7 +439,7 @@ function previewFin(){const keep=JSON.stringify({reg:G.reg,tre:G.tre,gra:G.gra,b
  economy();const fin=G.fin;const k=JSON.parse(keep);G.reg=k.reg;G.tre=k.tre;G.gra=k.gra;G.burden=k.burden;G.morale=k.morale;G.mind=k.mind;G.debt=k.debt;G.army=k.army;G.proj=k.proj;for(const id in k.P)G.P[id].wealth=k.P[id];G.fin=fin}
 /* ---------- 月度推進 ---------- */
 function endMonth(){if(G.over)return;
- lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
+ lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();czMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
  G.reign.authSum+=G.auth;G.reign.mindSum+=G.mind;G.reign.n++;
  G.t++;G.ap=apMax();G.held=false;G.visited={};G.mw=0;
  if(G.t%12===0)yearEnd();

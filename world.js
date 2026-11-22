@@ -163,3 +163,98 @@ function echoMonth2(){
   G.memo.push({id:G.nid++,k:'echo',t:G.t,from:p.id,txt:'數年前因天象被罷黜的'+nm(p)+'，其門生聯名上書，為他鳴冤，言辭懇切，並稱「天象與臣無涉」。',x:{id:p.id}});G.scape=null}}
 function echoOpts(m){const p=P(m.x.id);return[{l:'為其平反',h:'聲望+3，民心+1；皇權-1',fn:()=>{G.rep=cl(G.rep+3);G.mind=cl(G.mind+1);G.auth=cl(G.auth-1);if(p)p.op=cl(p.op+25);chron('追雪'+nm(p)+'前冤，官復原品。',2,[p.id]);return OKK('平反詔書到時，他已鬚髮皆白，伏地久久不能起身。')}},{l:'駁回',h:'聲望-1',fn:()=>{G.rep=cl(G.rep-1);if(p)p.op=cl(p.op-8);return OKK('你說，既往之事，不必再議。')}}]}
 const __mo7=memoOpts;memoOpts=function(m){return m.k==='echo'?echoOpts(m):__mo7(m)};
+
+/* ======================================================================
+   國策樹：六條線、三十五項。推行需耗時耗銀；有前置、排他、派系反彈與協同。
+   G.cz = { d:{id:完成月}, a:[{id,left,dur,mult,pause}] }（舊存檔缺此欄位，惰性建立）
+   ====================================================================== */
+const CZL={ag:{n:'農政',c:'#5E8B4A'},ml:{n:'兵制',c:'#A0402F'},fn:{n:'財政',c:'#B8892E'},ad:{n:'吏治',c:'#3E6A8F'},cu:{n:'文教',c:'#7B5A8F'},dp:{n:'外務',c:'#2F8283'}};
+const CZF={chan:'權臣',clean:'清流',army:'將門',wai:'外戚',eun:'宦官',kin:'宗室'};
+const CZR={chan:'侵奪世家田產，動搖朝廷根本',clean:'與民爭利，有違聖人之教',army:'削奪將門權責，恐寒邊將之心',wai:'奪外戚職任，有失親親之誼',eun:'奪內廷之權，不合祖制',kin:'侵宗室之利，傷骨肉之恩'};
+const CZ={
+ ag1:{l:'ag',t:1,n:'興修水利',d:'疏浚河渠、修築陂塘，旱澇之年也能保住收成。',cost:60,dur:8,mods:{harv:.04,relief:.12},ev:{food:5}},
+ ag2:{l:'ag',t:1,n:'輪作良種',d:'推廣輪作與選種之法，同一塊地多收幾成。',cost:90,dur:10,pre:['ag1'],mods:{harv:.05,popg:.12}},
+ ag3a:{l:'ag',t:2,n:'均田限田',d:'限制兼併，使無地之民有田可耕。得民心，但世家大族切齒。',cost:150,dur:20,pre:['ag2'],ex:['ag3b'],need:4,mods:{unrest:-3,mind:1,harv:.03,inc:-.02},rx:{fac:'chan',op:-10},ev:{fd:{chan:-4}}},
+ ag3b:{l:'ag',t:2,n:'招商墾荒',d:'招徠流民與商人開墾荒地，增產快，但流民聚散難免生事。',cost:120,dur:14,pre:['ag2'],ex:['ag3a'],need:4,mods:{harv:.04,inc:.03,popg:.18,unrest:1.5},ev:{fd:{chan:2}}},
+ ag4:{l:'ag',t:3,n:'常平倉制',d:'豐年平價收糧、荒年減價出糶，以倉廩平抑糧價。',cost:150,dur:16,anyp:['ag3a','ag3b'],need:8,mods:{relief:.3,grain:.25,mind:1},ev:{gra:150}},
+ ag5:{l:'ag',t:4,n:'海外糧種',d:'經海商引入耐旱高產的新作物，可養活更多人口。',cost:220,dur:24,pre:['ag4','dp2'],need:14,mods:{harv:.09,popg:.25}},
+ ml1:{l:'ml',t:1,n:'整飭軍紀',d:'清查軍籍、嚴明賞罰，剔除空額與老弱。',cost:50,dur:6,mods:{morale:3,armycost:-.03},ev:{fd:{army:-1}}},
+ ml2:{l:'ml',t:1,n:'屯田養兵',d:'令軍士且耕且戍，邊軍糧餉可自給一部分。',cost:100,dur:12,pre:['ml1'],mods:{armycost:-.08,grain:.08}},
+ ml3a:{l:'ml',t:2,n:'府兵制',d:'兵農合一，平時務農、戰時徵調，省餉而得兵，但將門權勢漸大。',cost:150,dur:18,pre:['ml2'],ex:['ml3b'],need:5,mods:{armycost:-.12,morale:2,unrest:-1},rx:{fac:'army',op:-5},ev:{fd:{army:3}}},
+ ml3b:{l:'ml',t:2,n:'募兵制',d:'以餉養兵，兵為職業，戰力強而費用高，民間徭役反減。',cost:170,dur:14,pre:['ml2'],ex:['ml3a'],need:5,mods:{war:.10,morale:4,armycost:.10,burden:-.05}},
+ ml4:{l:'ml',t:3,n:'將門考成',d:'設武學、行考課，使將領升遷不再全憑門第與私恩。',cost:130,dur:14,anyp:['ml3a','ml3b'],need:9,mods:{war:.06,morale:2,auth:2},rx:{fac:'army',op:-8},ev:{fd:{army:-4}}},
+ ml5:{l:'ml',t:4,n:'火器營',d:'設專營鑄造並操練火器，野戰攻城皆添新利。',cost:260,dur:24,pre:['ml4','cu3'],need:15,mods:{war:.16,armycost:.07,auth:1}},
+ fn1:{l:'fn',t:1,n:'度支清查',d:'清點各州倉庫與稅卡，堵住最明顯的漏洞。',cost:50,dur:6,mods:{leak:.12},rx:{fac:'chan',op:-3}},
+ fn2:{l:'fn',t:1,n:'驛傳與度量衡',d:'統一斗斛尺度、整頓驛傳，商貨流通，稅收也好算。',cost:80,dur:10,pre:['fn1'],mods:{inc:.02,trade:.6}},
+ fn3a:{l:'fn',t:2,n:'清丈田畝',d:'重新丈量天下田土，查出隱匿之產。得利最大，也得罪最深。',cost:160,dur:18,pre:['fn2'],ex:['fn3b'],need:5,mods:{leak:.15,inc:.03,unrest:1},rx:{fac:'chan',op:-12},ev:{fd:{chan:-5}}},
+ fn3b:{l:'fn',t:2,n:'鹽鐵官營',d:'鹽、鐵、茶收歸官營，歲入穩增，但與商民爭利，士林有怨。',cost:150,dur:14,pre:['fn2'],ex:['fn3a'],need:5,mods:{inc:.05,mind:-1,leak:-.04},rx:{fac:'clean',op:-8}},
+ fn4:{l:'fn',t:3,n:'一條鞭法',d:'田賦徭役併為一條，折銀徵收，簡便而難以作弊。',cost:200,dur:24,anyp:['fn3a','fn3b'],need:9,mods:{inc:.04,burden:-.05,leak:.08},rx:{fac:'chan',op:-6}},
+ fn5:{l:'fn',t:4,n:'錢法票號',d:'整齊錢法，許民間票號匯兌，銀錢往來暢通。',t:4,cost:240,dur:24,pre:['fn4','dp2'],need:16,mods:{trade:1.5,inc:.02}},
+ ad1:{l:'ad',t:1,n:'考課之法',d:'定期考核官員政績，劣者降黜，貪者留案。',cost:40,dur:6,mods:{cor:.08},rx:{fac:'chan',op:-2}},
+ ad2:{l:'ad',t:1,n:'御史巡按',d:'派御史分巡各道，風聞可奏，使地方官有所忌憚。',cost:80,dur:10,pre:['ad1'],mods:{leak:.08,cor:.05,auth:1},ev:{fd:{clean:2}}},
+ ad3a:{l:'ad',t:2,n:'高薪養廉',d:'加俸以養其廉，使官員無須靠陋規過日子。花錢多，但根子治得深。',cost:130,dur:14,pre:['ad2'],ex:['ad3b'],need:5,mods:{cor:.14,salc:.14,mind:.5}},
+ ad3b:{l:'ad',t:2,n:'嚴刑峻法',d:'重典懲貪，一人犯法株連數人。皇權立見其威，朝野人人自危。',cost:90,dur:10,pre:['ad2'],ex:['ad3a'],need:5,mods:{cor:.12,auth:3,mind:-1.5},rx:{fac:'clean',op:-7}},
+ ad4:{l:'ad',t:3,n:'科舉擴額',d:'增設科目與名額，寒門子弟多一條出路。',cost:110,dur:12,pre:['ad2','cu1'],need:9,mods:{exam:2,auth:1},ev:{fd:{clean:2,chan:-2}}},
+ ad5:{l:'ad',t:4,n:'軍機處',d:'設機要班子直承聖意，政令繞過三省，皇權牢牢握在手中。',cost:200,dur:20,pre:['ad4'],anyp:['ad3a','ad3b'],need:15,mods:{auth:5,leak:.05},rx:{fac:'wai',op:-6},ev:{fd:{wai:-3}}},
+ cu1:{l:'cu',t:1,n:'興辦官學',d:'州縣設學，教化鄉里，也為朝廷儲才。',cost:60,dur:8,mods:{exam:1,mind:.5}},
+ cu2:{l:'cu',t:2,n:'修史禮制',d:'修前朝史、定本朝禮，使正統有據、威望日隆。',cost:70,dur:10,pre:['cu1'],mods:{rep:.08,mind:.5}},
+ cu3:{l:'cu',t:2,n:'印刷藏書',d:'設官刻書坊與藏書樓，典籍流布，士人易得書。',cost:110,dur:12,pre:['cu1'],need:4,mods:{exam:1,mind:1}},
+ cu4:{l:'cu',t:3,n:'醫藥防疫',d:'設惠民藥局、行防疫之法，疫病不再動輒殺人過萬。',cost:130,dur:14,anyp:['cu2','cu3'],need:8,mods:{popg:.10,relief:.10}},
+ cu5:{l:'cu',t:4,n:'格物工藝',d:'官府招攬工匠、鼓勵發明，農具、兵器、紡織俱有改進。',cost:250,dur:24,pre:['cu3','fn2'],need:14,mods:{inc:.04,war:.05,harv:.03}},
+ dp1:{l:'dp',t:1,n:'四夷通譯',d:'設通事館培養譯人，邊事不再憑傳聞猜測。',cost:50,dur:6,ev:{att:5}},
+ dp2:{l:'dp',t:1,n:'互市貿易',d:'於邊境開設互市，以茶絹易馬，邊民得利而少寇掠。',cost:90,dur:10,pre:['dp1'],mods:{trade:1.2},ev:{att:4}},
+ dp3a:{l:'dp',t:2,n:'和親羈縻',d:'以聯姻與賞賜安撫諸部，花錢買平安，也折些顏面。',cost:100,dur:12,pre:['dp2'],ex:['dp3b'],need:5,mods:{raid:.3,mind:.5},rx:{fac:'army',op:-4},ev:{att:12}},
+ dp3b:{l:'dp',t:2,n:'揚威邊防',d:'沿邊築堡增戍，屢以兵威示人，異族不敢輕犯，但彼此關係轉冷。',cost:140,dur:14,pre:['dp2'],ex:['dp3a'],need:5,mods:{war:.08,raid:.15,armycost:.04},ev:{att:-6}},
+ dp4:{l:'dp',t:3,n:'海運通商',d:'開海路、通番舶，沿海商貿大興，歲入添一大宗。',cost:220,dur:24,pre:['dp2'],need:9,req:{f:()=>G.inst&&G.inst.shi,t:'須先設市舶司'},mods:{trade:2,inc:.02}},
+ dp5:{l:'dp',t:4,n:'宗藩朝貢',d:'遠近諸邦奉正朔、遣使納貢，天朝體系大成。',cost:260,dur:24,pre:['dp4'],anyp:['dp3a','dp3b'],need:16,mods:{trade:1,raid:.2,war:.04},ev:{rep:4,att:8}}};
+for(const k in CZ){if(!CZ[k].t)CZ[k].t=1}
+const CZSYN=[
+ {a:['ag2','fn2'],n:'農商相濟',d:'田有餘糧、市有流通，稅基自然厚實。',mods:{inc:.02,popg:.05}},
+ {a:['ml2','ag4'],n:'兵農相資',d:'屯田與常平倉互為犄角，軍糧不必全靠國庫。',mods:{armycost:-.04,grain:.10}},
+ {a:['fn4','ad4'],n:'法清政平',d:'稅制簡明、官員清正，徵收之間少了許多暗耗。',mods:{leak:.08,mind:1}},
+ {a:['ml4','ad5'],n:'文武相制',d:'軍權有考成、政務有樞要，二者互相牽制又彼此配合。',mods:{auth:3,war:.04}},
+ {a:['cu3','cu5'],n:'學以致用',d:'書刊流布與工藝精進相互促進。',mods:{exam:1,inc:.02}},
+ {a:['dp4','fn5'],n:'通貨四海',d:'海舶往來與票號匯兌相接，貿易之利倍增。',mods:{trade:1.2}},
+ {a:['ag4','cu4'],n:'倉廩實而知禮',d:'有糧、有醫、有學，百姓安居樂業。',mods:{mind:1.5,popg:.08}}];
+const CZMOD={harv:['秋收',1,'p'],grain:['田賦糧',1,'p'],inc:['稅收',1,'p'],leak:['貪墨流失減少',1,'p'],popg:['人口增長',1,'p'],unrest:['民怨',-1,'n'],burden:['每月負擔',-1,'n'],mind:['民心',1,'n'],morale:['軍心',1,'n'],armycost:['軍費',-1,'p'],salc:['官俸支出',-1,'p'],trade:['貿易歲入（每月）',1,'w'],war:['戰力',1,'p'],cor:['官員貪腐（每月下降）',1,'n'],auth:['皇權',1,'n'],exam:['科舉取士',1,'r'],relief:['抗災減損',1,'p'],rep:['威望（每月）',1,'n'],raid:['邊患風險降低',1,'p']};
+function czInit(){if(!G.cz||!G.cz.d)G.cz={d:{},a:[]};if(!G.cz.a)G.cz.a=[];return G.cz}
+function czDone(id){return !!(G&&G.cz&&G.cz.d&&G.cz.d[id]!=null)}
+function czAct(id){return G&&G.cz&&G.cz.a?G.cz.a.find(x=>x.id===id):null}
+function czSynOn(s){return s.a.every(czDone)}
+function czm(k){const c=G&&G.cz;if(!c||!c.d)return 0;let v=0;for(const id in c.d){const o=CZ[id];if(o&&o.mods&&o.mods[k])v+=o.mods[k]}for(const s of CZSYN){if(s.mods[k]&&czSynOn(s))v+=s.mods[k]}return v}
+function czCount(){return G&&G.cz&&G.cz.d?Object.keys(G.cz.d).length:0}
+function czSlots(){return 2+(G.inst&&G.inst.cab?1:0)}
+function czUp(){const c=G&&G.cz;if(!c||!c.a)return 0;let s=0;for(const a of c.a){if(a.pause>0)continue;const o=CZ[a.id];if(o)s+=o.cost*(a.mult||1)/o.dur}for(const id in (c.d||{})){const o=CZ[id];if(o)s+=o.cost*.005}return s}
+function czCan(id){const o=CZ[id];const why=[];if(!o)return{ok:false,why:['無此國策']};czInit();
+ if(czDone(id))return{ok:false,why:['已推行'],done:1};if(czAct(id))return{ok:false,why:['推行中'],act:1};
+ for(const p of o.pre||[])if(!czDone(p))why.push('須先推行「'+CZ[p].n+'」');
+ if(o.anyp&&!o.anyp.some(czDone))why.push('須先推行「'+o.anyp.map(x=>CZ[x].n).join('」或「')+'」');
+ for(const x of o.ex||[])if(czDone(x)||czAct(x))why.push('與「'+CZ[x].n+'」不可並行');
+ if(o.need&&czCount()<o.need)why.push('須已推行國策'+o.need+'項（現'+czCount()+'項）');
+ if(o.req&&!o.req.f())why.push(o.req.t);
+ const ex=why.some(w=>w.indexOf('不可並行')>=0);
+ return{ok:!why.length,why,ex}}
+function czApply(ev){if(!ev)return;if(ev.fd)for(const f in ev.fd)G.fd[f]=cl((G.fd[f]||0)+ev.fd[f],0,35);
+ if(ev.food)for(const r of Object.values(G.reg))r.food=cl(r.food+ev.food);if(ev.gra)G.gra+=ev.gra;if(ev.rep)G.rep=cl(G.rep+ev.rep);if(ev.mind)G.mind=cl(G.mind+ev.mind);
+ if(ev.att)for(const f of Object.values(G.foe))f.att=cl(f.att+ev.att,-100,100)}
+function czMood(fac,v){for(const p of alivePs()){if(p.id===G.emp)continue;if(facOf(p)===fac)p.op=cl(p.op+v)}}
+function czStart(id){const o=CZ[id];const c=czCan(id);if(!c.ok)return NO(c.why[0]);czInit();
+ if(G.cz.a.length>=czSlots())return NO('同時只能推行'+czSlots()+'項國策。');
+ const first=o.cost/o.dur;if(G.tre<Math.max(first*2,o.cost*.2))return NO('國庫不足（至少需'+Math.ceil(Math.max(first*2,o.cost*.2))+'萬兩方可開辦）。');
+ G.cz.a.push({id,left:o.dur,dur:o.dur,mult:1,pause:0,t0:G.t});
+ if(o.rx){czMood(o.rx.fac,o.rx.op)}
+ chron('詔行國策「'+o.n+'」，預計'+o.dur+'月告成。',2);
+ return OKK('已開辦「'+o.n+'」，每月耗銀約'+Math.round(first*10)/10+'萬兩。')}
+function czCancel(id){czInit();const a=czAct(id);if(!a)return NO('此策並未推行。');G.cz.a=G.cz.a.filter(x=>x!==a);G.memo=G.memo.filter(m=>!(m.k==='cz'&&m.x&&m.x.id===id));chron('國策「'+CZ[id].n+'」中途罷止，已耗之銀付諸流水。',2);return OKK('已中止「'+CZ[id].n+'」。（已耗國庫不退）')}
+function czMonth(){const c=G&&G.cz;if(c&&c.a&&c.a.length){const mc=czm('rep');
+ for(const a of c.a.slice()){if(a.pause>0){a.pause--;continue}if(G.debt>0)continue;a.left--;const o=CZ[a.id];
+  if(a.left<=0){c.a=c.a.filter(x=>x!==a);c.d[a.id]=G.t;czApply(o.ev);G.memo=G.memo.filter(m=>!(m.k==='cz'&&m.x&&m.x.id===a.id));
+   chron('國策「'+o.n+'」告成。'+(o.t>=3?'史臣記曰：此乃經國大計。':''),o.t>=3?3:2);
+   for(const s of CZSYN){if(s.a.includes(a.id)&&czSynOn(s))chron('國策相濟：「'+s.n+'」——'+s.d,3)}}
+  else if(o.rx&&G.t-a.t0>=2&&chance(.045)&&!G.memo.some(m=>m.k==='cz')){const L=facLeader(o.rx.fac);const who=L?nmt(L):CZF[o.rx.fac];
+   G.memo.push({id:G.nid++,k:'cz',t:G.t,from:L?L.id:null,txt:who+'聯名上書，反對推行「'+o.n+'」，稱此舉'+CZR[o.rx.fac]+'，請陛下三思。',x:{id:a.id,fac:o.rx.fac}})}}}
+ if(czm('rep'))G.rep=cl(G.rep+czm('rep'))}
+const __mo9=memoOpts;memoOpts=function(m){if(m.k!=='cz')return __mo9(m);const a=czAct(m.x.id),o=CZ[m.x.id],fac=m.x.fac,fn=CZF[fac];if(!a||!o)return[{l:'知道了',h:'此策已不在推行中',fn:()=>OKK('此事已了。')}];
+ return[{l:'堅持推行',h:'皇權-2，'+fn+'態度-6，工期不變',fn:()=>{G.auth=cl(G.auth-2);czMood(fac,-6);return OKK('你不為所動，下旨照辦。'+fn+'退下時面色難看。')}},
+  {l:'折中讓步',h:'工期+4個月、加撥一成經費，'+fn+'態度-2',fn:()=>{if(G.tre<o.cost*.1)return NO('國庫不足以加撥。');G.tre-=Math.round(o.cost*.1);a.left+=4;a.dur+=4;czMood(fac,-2);return OKK('你酌情修改條款，'+fn+'的怨氣稍平。')}},
+  {l:'暫緩一年',h:'國策停擺12個月，'+fn+'態度+4',fn:()=>{a.pause=12;czMood(fac,4);return OKK('你下旨暫緩推行，'+fn+'如釋重負。')}}]};

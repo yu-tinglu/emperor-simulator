@@ -554,12 +554,12 @@ function tabSys(){return heroHtml('存　檔','設定・存檔・備份')+settin
  +(hasSave('prev')?'<div class="card"><h3>還原上月</h3><div class="small">每個月會自動留一份上個月的存檔。若此局出了狀況，可退回一個月。</div><div class="opts"><button class="warn" data-act="loadprev">退回上一個月</button></div></div>':'')+'<div class="card"><h3>備份到瀏覽器之外</h3><div class="small">狀態：<span id="bkst">'+bkText()+'</span>。存檔只存在這個瀏覽器；清除瀏覽資料或換裝置就會消失。建議每隔幾年備份一次。</div><div class="opts"><button class="pri" data-act="copycode">複製存檔碼<small>貼到備忘錄或傳給自己</small></button><button data-act="dlsave">下載存檔檔案<small>.txt 檔</small></button>'+(navigator.share?'<button data-act="sharesave">傳給自己<small>用系統分享</small></button>':'')+'</div></div><div class="card"><h3>還原存檔</h3><textarea id="exp" placeholder="把存檔碼貼在這裡（EMP1: 開頭）"></textarea><div class="opts"><button data-act="import">匯入貼上的存檔碼</button><label class="filebtn">從檔案匯入<input type="file" id="imf" accept=".txt,.json,text/plain,application/json" hidden></label></div></div>'
  +'<div class="card"><h3>重新開始</h3><button class="warn" data-act="restart">放棄此局，重新登基</button></div>'}
 
-const TABS=[['court','朝堂'],['self','起居'],['gov','朝政'],['map','疆域'],['harem','後宮'],['family','皇族'],['people','人物'],['web','關係'],['hist','史書'],['sys','存檔']];
+const TABS=[['court','朝堂'],['self','起居'],['gov','朝政'],['tree','國策'],['map','疆域'],['harem','後宮'],['family','皇族'],['people','人物'],['web','關係'],['hist','史書'],['sys','存檔']];
 function render(){if(!G){startScreen();return}
  document.body.dataset.scn='';ambience();
  $('#top').style.display='';$('#top').innerHTML=topHtml();
  const dots={court:G.memo.length+G.sit.length+G.intel.length,sys:backupDue()?'!':0};
- const fn={court:tabCourt,self:tabSelf,gov:tabGov,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
+ const fn={court:tabCourt,self:tabSelf,gov:tabGov,tree:tabTree,map:tabMap,harem:tabHarem,family:tabFamily,people:tabPeople,web:tabWeb,hist:tabHist,sys:tabSys}[TAB];
  const y=window.scrollY;
  document.body.classList.add('ingame');if(!$('#scene')){const sc=document.createElement('div');sc.id='scene';sc.innerHTML=sceneSvg();document.body.prepend(sc)}
  $('#app').innerHTML='<div id="stats">'+statsHtml()+'</div><div id="shell"><div class="tabs">'+navHtml(dots)+'</div><div id="pane">'+fn()+'</div>'+(TAB==='court'||TAB==='gov'?'<aside id="side">'+sideHtml(TAB)+'</aside>':'')+'</div><div id="qb">'+qbHtml()+'</div>';
@@ -703,4 +703,38 @@ applySettings();
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('sc')){e.preventDefault();e.target.click()}});/*kbscn*/
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='nm'){e.target.classList.remove('bad');const h=document.getElementById('sthint');if(h&&h.classList.contains('warn')){h.classList.remove('warn');const S=UI.start;h.textContent=SCN[S.scn].n+'　·　'+DIFF[S.diff||'n'].n+'　·　'+STN[S.focus||'pol']}}});
 
-;{const __mc=memoCard;memoCard=function(m,ix){const h=__mc(m,ix);const w=memoWai(m);return w?h.replace('<div class="small dim">','<div class="small dim"><b class="badge">'+w.side+'族</b> '):h}}
+;{const __mc=memoCard;memoCard=function(m,ix){const h=__mc(m,ix);if(m.k==='cz')return h.replace('<div class="small dim">','<div class="small dim"><b class="badge">國策</b> ');const w=memoWai(m);return w?h.replace('<div class="small dim">','<div class="small dim"><b class="badge">'+w.side+'族</b> '):h}}
+
+
+/* ---------- 國策分頁 ---------- */
+const CZTN=['初階','進階','深化','大成'];const ASPL={restore:['ml','fn','ad'],keep:['ag','cu','dp'],joy:['fn','dp','cu']};
+function czFmt(k,v){const m=CZMOD[k];if(!m)return null;const good=(v*m[1])>0;let t;const sg=v>0?'+':'−';const a=Math.abs(v);
+ if(m[2]==='p')t=sg+Math.round(a*100)+'%';else if(m[2]==='w')t=sg+(Math.round(a*10)/10)+'萬兩';else if(m[2]==='r')t=sg+a+'人';else t=sg+(Math.round(a*100)/100);
+ return'<span class="tzfx '+(good?'good':'bad')+'">'+m[0]+' '+t+'</span>'}
+function czEvTxt(ev){if(!ev)return'';const L=[];if(ev.fd)for(const f in ev.fd)L.push(CZF[f]+'勢力'+(ev.fd[f]>0?'+':'−')+Math.abs(ev.fd[f]));if(ev.food)L.push('各地存糧+'+ev.food);if(ev.gra)L.push('糧倉+'+ev.gra);if(ev.rep)L.push('威望+'+ev.rep);if(ev.att)L.push('諸邦好感'+(ev.att>0?'+':'−')+Math.abs(ev.att));return L.join('、')}
+function czModsHtml(mods){return Object.keys(mods||{}).map(k=>czFmt(k,mods[k])).filter(Boolean).join('')}
+function czNode(id){const o=CZ[id];const c=czCan(id);const a=czAct(id);const st=c.done?'done':c.act?'act':c.ok?'can':c.ex?'ex':'lock';
+ const sub=st==='done'?'已推行':st==='act'?(a.pause>0?'暫緩 '+a.pause+'月':'尚餘 '+a.left+'月'):st==='ex'?'已擇他路':o.cost+'萬兩・'+o.dur+'月';
+ return '<button class="tzn s-'+st+'" data-act="czopen" data-arg="'+id+'"><b>'+esc(o.n)+'</b><small>'+sub+'</small>'+(st==='act'?'<i class="tzp" style="width:'+Math.round((1-a.left/a.dur)*100)+'%"></i>':'')+'</button>'}
+function tabTree(){czInit();const n=czCount(),tot=Object.keys(CZ).length;const act=G.cz.a;
+ let h=heroHtml('國　策','經世濟民・百年大計');
+ h+='<div class="card tzst"><div class="row sp"><h3>推行中 <small class="dim">'+act.length+' / '+czSlots()+'</small></h3><span class="small dim">已推行 '+n+' / '+tot+' 項・每月經費 '+n0(czUp())+' 萬兩'+(G.inst.cab?'':'・設「內閣」可多推行一項')+'</span></div>';
+ h+=act.length?'<div class="tzact">'+act.map(a=>{const o=CZ[a.id];const pc=Math.round((1-a.left/a.dur)*100);return '<div class="tzai" data-act="czopen" data-arg="'+a.id+'"><b style="color:'+CZL[o.l].c+'">'+esc(o.n)+'</b><span class="small dim">'+(a.pause>0?'暫緩中，'+a.pause+'月後續行':G.debt>0?'國庫虧空，工程停擺':'尚餘'+a.left+'月')+'</span><div class="bar"><i style="width:'+pc+'%"></i></div></div>'}).join('')+'</div>':'<div class="small dim">尚無推行中的國策。點選下方任一項可查看詳情並開辦。</div>';
+ const tm={};for(const k in CZMOD){const v=czm(k);if(v)tm[k]=v}
+ h+=(Object.keys(tm).length?'<div class="tzsum"><span class="small dim">目前累計：</span>'+czModsHtml(tm)+'</div>':'')+'</div>';
+ for(const L in CZL){const ids=Object.keys(CZ).filter(k=>CZ[k].l===L);const dn=ids.filter(czDone).length;const fit=G.asp&&ASPL[G.asp]&&ASPL[G.asp].includes(L);
+  h+='<div class="tzl" style="--c:'+CZL[L].c+'"><div class="tzh"><b>'+CZL[L].n+'</b><small>'+dn+' / '+ids.length+'</small>'+(fit?'<em>合志向</em>':'')+'</div><div class="tzr">';
+  for(let t=1;t<=4;t++){const col=ids.filter(k=>CZ[k].t===t);h+='<div class="tzc"><div class="tzt">'+CZTN[t-1]+'</div>'+col.map(czNode).join('')+'</div>'}
+  h+='</div></div>'}
+ h+='<h4>協同效果</h4><div class="grid2">'+CZSYN.map(s=>{const on=czSynOn(s);return '<div class="card tzsy'+(on?' on':'')+'"><b>'+(on?'◆ ':'◇ ')+esc(s.n)+'</b> <span class="small dim">'+s.a.map(x=>CZ[x].n).join(' + ')+'</span><div class="small">'+esc(s.d)+'</div><div>'+czModsHtml(s.mods)+'</div></div>'}).join('')+'</div>';
+ return h}
+function czModal(id){const o=CZ[id];if(!o)return;const c=czCan(id);const a=czAct(id);const per=Math.round(o.cost/o.dur*10)/10;
+ let h='<h3 style="color:'+CZL[o.l].c+'">'+esc(o.n)+' <small class="dim">'+CZL[o.l].n+'・'+CZTN[o.t-1]+'</small></h3><p>'+esc(o.d)+'</p>';
+ h+='<div class="tzmx"><b>推行成效</b><div>'+(czModsHtml(o.mods)||'<span class="small dim">無常駐加成（見完成時效果）</span>')+'</div>'+(o.ev?'<div class="small">完成時：'+czEvTxt(o.ev)+'</div>':'')+'</div>';
+ h+='<div class="tzmx"><b>代價</b><div class="small">共耗銀 '+o.cost+' 萬兩，分 '+o.dur+' 個月（每月約 '+per+' 萬兩）；完成後每月維持費約 '+(Math.round(o.cost*.005*10)/10)+' 萬兩。</div>'+(o.rx?'<div class="small warnc">推行期間'+CZF[o.rx.fac]+'態度'+o.rx.op+'，且可能聯名上書反對。</div>':'')+'</div>';
+ const pre=(o.pre||[]).map(x=>'<span class="'+(czDone(x)?'good':'bad')+'">'+(czDone(x)?'✓ ':'✗ ')+esc(CZ[x].n)+'</span>');if(o.anyp)pre.push('<span class="'+(o.anyp.some(czDone)?'good':'bad')+'">'+(o.anyp.some(czDone)?'✓ ':'✗ ')+o.anyp.map(x=>esc(CZ[x].n)).join(' 或 ')+'</span>');if(o.need)pre.push('<span class="'+(czCount()>=o.need?'good':'bad')+'">'+(czCount()>=o.need?'✓ ':'✗ ')+'已推行國策 '+o.need+' 項</span>');if(o.req)pre.push('<span class="'+(o.req.f()?'good':'bad')+'">'+(o.req.f()?'✓ ':'✗ ')+o.req.t+'</span>');
+ h+='<div class="tzmx"><b>前置</b><div class="small">'+(pre.join('　')||'無')+'</div>'+(o.ex?'<div class="small warnc">與「'+o.ex.map(x=>esc(CZ[x].n)).join('」「')+'」二選一。</div>':'')+'</div>';
+ const syn=CZSYN.filter(s=>s.a.includes(id));if(syn.length)h+='<div class="tzmx"><b>協同</b>'+syn.map(s=>'<div class="small">'+esc(s.n)+'：與「'+s.a.filter(x=>x!==id).map(x=>esc(CZ[x].n)).join('」「')+'」同行 '+czModsHtml(s.mods)+'</div>').join('')+'</div>';
+ h+='<div class="opts" style="margin-top:12px">'+(c.done?'<button disabled>已推行</button>':a?'<button class="warn" data-act="czx" data-arg="'+id+'">中止此策</button>':'<button class="gold" data-act="czgo" data-arg="'+id+'"'+(c.ok?'':' disabled')+'>開辦</button>'+(c.ok?'':'<span class="small bad">'+esc(c.why[0])+'</span>'))+'</div>';
+ modal(h);$('#md').classList.add('wide')}
+Object.assign(ACT,{czopen(a){czModal(a)},czgo(a){const r=czStart(a);closeModal();res(r)},czx(a){const r=czCancel(a);closeModal();res(r)}});
