@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#140805"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <title>皇帝模擬器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -860,6 +860,34 @@ body.ingame .tzn.s-act{background:#f1e4c2 !important}
 .faces .fp img,.faces .fp svg{width:100%;height:auto;display:block}
 .faces figcaption{margin-top:5px;font-size:.92rem;color:#3a2a18;letter-spacing:.08em}.faces figcaption small{display:block;font-size:.76rem;opacity:.75;letter-spacing:0}
 @media(max-height:520px) and (orientation:landscape){.faces figure{width:64px}.faces figcaption{font-size:.8rem}}
+
+/* ===== 極矮橫向（手機橫拿且有網址列，可視高度≤420） ===== */
+@media(max-height:420px) and (orientation:landscape){
+ html:has(body.ingame),body.ingame{font-size:12.5px}
+ body.ingame #top{position:static;padding:3px 12px}
+ body.ingame #stats{margin:2px -10px}
+ body.ingame .hero{display:none}
+ body.ingame .chero{padding:2px 0;min-height:0}body.ingame .chero .ch-med,body.ingame .chero .ch-t{display:none}
+ body.ingame .duty{gap:6px}body.ingame .duty .dchip{padding:1px 9px}body.ingame .dchip b{font-size:1.05rem}
+ body.ingame #wrap{padding-bottom:50px}
+ body.ingame .tabs button{min-height:34px;padding:2px 8px;font-size:.66rem;gap:0}
+ body.ingame .tabs button svg{width:15px;height:15px}
+ body.ingame #qb{bottom:calc(42px + env(safe-area-inset-bottom));right:8px}
+ body.ingame #qb button{padding:5px 14px;min-height:0;font-size:.85rem}
+ body.ingame #toasts{bottom:50px}
+ body.ingame #ov.on{padding:3px}
+ body.ingame #md{padding:8px 12px}body.ingame #md.wide{max-width:97vw}
+ body.ingame .pm-top{gap:12px}body.ingame .pm-top .port{width:104px;box-shadow:0 0 0 2px #efe4c9,0 0 0 3px #b99f6b}
+ body.ingame #md h2,body.ingame #md h1{font-size:1.4rem}
+ body.ingame .card{padding:7px 10px;margin-bottom:8px}
+ body.ingame h4{margin:8px 0 4px}
+ body.ingame .tzl{margin-bottom:8px}
+}
+@media(max-height:420px) and (orientation:landscape){
+ body.ingame .pm-top .port{height:auto !important;align-self:flex-start;aspect-ratio:auto}
+ body.ingame .pm-top .port .portimg,body.ingame .pm-top .port svg{aspect-ratio:4/5;height:auto}
+ body.ingame #top{padding-right:56px}
+}
 </style></head><body>
 <div id="amb"></div><div id="wrap"><div id="top"></div><div id="app"></div></div>
 <div id="ov"><div id="md"></div></div><div id="toasts"></div>
@@ -2698,7 +2726,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const n0=v=>Math.round(v);
 const SAVEKEY='emperor_sim_v1';
-let TAB='court';const UI={sel:'jing',fl:{role:'all',fac:'all',q:''},all:false,pid:null,last:null,start:{scn:'a',name:'承嗣',focus:'pol'},ask:null};
+let TAB='court';const UI={sel:'jing',fl:{role:'court',fac:'all',q:''},all:false,pid:null,last:null,start:{scn:'a',name:'承嗣',focus:'pol'},ask:null};
 const ROLEN={emp:'皇帝',official:'官員',general:'將領',eunuch:'宦官',consort:'妃嬪',dowager:'太后太妃',prince:'皇子',princess:'皇女',kin:'宗室',maiden:'閨秀',son:'世家子弟',wife:'命婦'};
 const roleLabel=p=>{if(p.role==='consort')return RK[p.rank];if(p.role==='dowager')return p.title||'太妃';if(p.role==='prince'&&p.fa!==G.emp)return'宗室親王';if(p.role==='princess'&&p.fa!==G.emp)return'宗室郡主';return ROLEN[p.role]||p.role};
 const facTag=f=>'<span class="fac" style="background:'+FAC[f].c+'">'+FAC[f].n+'</span>';
@@ -3234,9 +3262,9 @@ function tabFamily(){const e=emp();const kids=myKids().sort((a,b)=>age(b)-age(a)
  h+='<h4>宗室</h4><div class="card"><table>'+kin.map(p=>'<tr class="click" data-act="person" data-arg="'+p.id+'"><td>'+esc(nmt(p))+'</td><td>'+age(p)+'歲</td><td class="small">'+roleLabel(p)+(p.fief?' · 封地'+G.reg[p.fief].n:'')+'</td><td class="small">'+attLabel(p)+'</td></tr>').join('')+'</table></div>';
  const root=e.fa!=null&&P(e.fa)?P(e.fa):e;h+='<h4>族譜</h4><div class="card small">'+famTree(root,0)+'</div>';return h}
 function tabPeople(){const F=UI.fl;let ps=alivePs().filter(p=>p.id!==G.emp&&p.title!=='先帝');
- if(F.role!=='all')ps=ps.filter(p=>p.role===F.role);if(F.fac!=='all')ps=ps.filter(p=>facOf(p)===F.fac);if(F.q)ps=ps.filter(p=>nm(p).includes(F.q));
+ if(F.role==='court'){if(!F.q)ps=ps.filter(p=>['consort','dowager','official','general','eunuch'].includes(p.role))}else if(F.role!=='all')ps=ps.filter(p=>p.role===F.role);if(F.fac!=='all')ps=ps.filter(p=>facOf(p)===F.fac);if(F.q)ps=ps.filter(p=>nm(p).includes(F.q));
  ps.sort((a,b)=>weight(b)-weight(a)||b.st.pol-a.st.pol);const tot=ps.length;ps=ps.slice(0,70);
- let h=heroHtml('人　物','朝野百官・盡在案頭')+'<div class="row"><select id="fr"><option value="all">全部身分</option>'+['official','general','eunuch','consort','dowager','prince','princess','kin','maiden','son','wife'].map(r=>'<option value="'+r+'"'+(F.role===r?' selected':'')+'>'+ROLEN[r]+'</option>').join('')+'</select><select id="ff"><option value="all">全部派系</option>'+Object.keys(FAC).filter(k=>k!=='none').map(k=>'<option value="'+k+'"'+(F.fac===k?' selected':'')+'>'+FAC[k].n+'</option>').join('')+'</select><input id="fq" placeholder="搜尋姓名" value="'+esc(F.q)+'" size="8"><span class="small dim">共 '+tot+' 人</span></div>';
+ let h=heroHtml('人　物','朝野百官・盡在案頭')+'<div class="row"><select id="fr"><option value="court"'+(F.role==='court'?' selected':'')+'>宮廷與朝臣（后妃至臣子）</option><option value="all"'+(F.role==='all'?' selected':'')+'>全部身分</option>'+['official','general','eunuch','consort','dowager','prince','princess','kin','maiden','son','wife'].map(r=>'<option value="'+r+'"'+(F.role===r?' selected':'')+'>'+ROLEN[r]+'</option>').join('')+'</select><select id="ff"><option value="all">全部派系</option>'+Object.keys(FAC).filter(k=>k!=='none').map(k=>'<option value="'+k+'"'+(F.fac===k?' selected':'')+'>'+FAC[k].n+'</option>').join('')+'</select><input id="fq" placeholder="搜尋姓名" value="'+esc(F.q)+'" size="8"><span class="small dim">共 '+tot+' 人</span></div>';
  h+='<div class="card"><table><tr><th></th><th>姓名</th><th>身分／官職</th><th>齡</th><th>派系</th><th>態度</th><th>野心</th></tr>'+ps.map(p=>'<tr class="click" data-act="person" data-arg="'+p.id+'"><td class="av">'+portrait(p,40)+'</td><td>'+esc(nmt(p))+'</td><td class="small">'+roleLabel(p)+(p.off?' · '+offName(p.off):'')+(p.exile?' · 流放':'')+'</td><td>'+age(p)+'</td><td>'+(facOf(p)!=='none'?facTag(facOf(p)):'')+'</td><td class="small">'+attLabel(p)+'</td><td class="small">'+ambLabel(p)+'</td></tr>').join('')+'</table></div>';return h}
 function tabHist(){let h=heroHtml('史　書','一朝得失・留待後人')+'<div class="row sp"><h3>歷代帝王</h3><span><button class="sm" data-act="coll">典藏</button> <button class="sm gold" data-act="recap">本朝回顧</button></span></div><div class="card"><table><tr><th>帝</th><th>年號</th><th>在位</th><th>廟號</th><th>評價</th></tr>'+G.emps.map(x=>{const p=P(x.pid);const v=x.v;const yrs=Math.round(((x.t1==null?G.t:x.t1)-x.t0)/12);
   return '<tr class="click" data-act="person" data-arg="'+p.id+'"><td>'+esc(nm(p))+'</td><td>'+x.era+'</td><td>'+yrs+'年</td><td>'+(v?v.temple:'在位')+'</td><td class="small">'+(v?'<b>'+v.label+'</b>'+(v.official!==v.key?'<br><span class="warnc">官修史書：'+TEMPLE[v.official][0]+(v.edited?'（曲筆）':v.hostile?'（史官懷怨）':'')+'</span>':'')+(v.revised?'<br><span class="good">後世翻案</span>':'')+'<br><span class="dim">民心'+v.mm+' 皇權'+v.am+' 勝'+v.wins+'負'+v.losses+' 誅'+v.exec+'</span>':'<span class="dim">待後世評說</span>')+'</td></tr>'}).join('')+'</table></div>';
