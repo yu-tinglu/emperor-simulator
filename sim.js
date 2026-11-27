@@ -439,7 +439,7 @@ function previewFin(){const keep=JSON.stringify({reg:G.reg,tre:G.tre,gra:G.gra,b
  economy();const fin=G.fin;const k=JSON.parse(keep);G.reg=k.reg;G.tre=k.tre;G.gra=k.gra;G.burden=k.burden;G.morale=k.morale;G.mind=k.mind;G.debt=k.debt;G.army=k.army;G.proj=k.proj;for(const id in k.P)G.P[id].wealth=k.P[id];G.fin=fin}
 /* ---------- 月度推進 ---------- */
 function endMonth(){if(G.over)return;
- lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();czMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
+ lifeEffects();economy();peopleMonth();if(G.over)return;plotsMonth();foreignMonth();sitMonth();spawnEvents();memoMonth();arcsMonth();echoMonth();mandateMonth();decMonth();czMonth();seedMonth();trackMonth();dilemmaMonth();omenMonth();envoyMonth();allyMonth();borderMonth();localMonth();evtMonth();echoMonth2();powerMonth();vacancyMonth();
  G.reign.authSum+=G.auth;G.reign.mindSum+=G.mind;G.reign.n++;
  G.t++;G.ap=apMax();G.held=false;G.visited={};G.mw=0;
  if(G.t%12===0)yearEnd();

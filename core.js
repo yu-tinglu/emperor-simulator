@@ -150,5 +150,5 @@ function newGame(o){
  bio(e,'即位為帝，年號'+G.era.n+'。');
  chron((S==='c'?'新朝肇建，':'')+nm(e)+'即位，改元'+G.era.n+'。',3,[e.id]);
  for(let k=0;k<2;k++)genMemos();
- previewFin();snapRec();chapterStart(false);G.diff=o.diff||'n';if(typeof diffApply==='function')diffApply();if(o.cust&&typeof custApply==='function')custApply(o.cust);if(o.legacy&&typeof legacyApply==='function')legacyApply(o.legacy);
+ previewFin();snapRec();chapterStart(false);G.diff=o.diff||'n';if(typeof diffApply==='function')diffApply();if(o.cust&&typeof custApply==='function')custApply(o.cust);if(o.legacy&&typeof legacyApply==='function')legacyApply(o.legacy);if(o.vari&&typeof variantApply==='function')variantApply(o.vari);if(o.perk&&typeof perkApply==='function')perkApply(o.perk);
  return G}

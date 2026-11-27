@@ -258,3 +258,97 @@ const __mo9=memoOpts;memoOpts=function(m){if(m.k!=='cz')return __mo9(m);const a=
  return[{l:'堅持推行',h:'皇權-2，'+fn+'態度-6，工期不變',fn:()=>{G.auth=cl(G.auth-2);czMood(fac,-6);return OKK('你不為所動，下旨照辦。'+fn+'退下時面色難看。')}},
   {l:'折中讓步',h:'工期+4個月、加撥一成經費，'+fn+'態度-2',fn:()=>{if(G.tre<o.cost*.1)return NO('國庫不足以加撥。');G.tre-=Math.round(o.cost*.1);a.left+=4;a.dur+=4;czMood(fac,-2);return OKK('你酌情修改條款，'+fn+'的怨氣稍平。')}},
   {l:'暫緩一年',h:'國策停擺12個月，'+fn+'態度+4',fn:()=>{a.pause=12;czMood(fac,4);return OKK('你下旨暫緩推行，'+fn+'如釋重負。')}}]};
+
+/* ===== 批示建議 ===== */
+function memoSuggest(m){const O=memoOpts(m);if(!O.length)return -1;const poor=G.tre<250;let best=0,bs=-1e9;
+ O.forEach((o,i)=>{let s=0;const l=String(o.l),h=String(o.h||'');if(o.ask)s-=100;
+  if(/准|賑|開倉|賞|納|允|任|升|嘉|重用|從輕|徹查/.test(l))s+=1;
+  if(/駁|拒|斥|罷|削|處死|流放|賜死|留中|不予|留在京/.test(l))s-=1;
+  const mm=h.match(/(\d+)萬兩/);if(mm){const c=+mm[1];if(poor&&c>=30)s-=3;else if(c>G.tre*.3)s-=2}
+  if(/耗糧/.test(h)&&G.gra<250)s-=2;if(/傷民|惡化|失望|下降|後患/.test(h))s-=.5;
+  if(m.k==='taxup'){if(/^准/.test(l))s+=(G.tre<400||G.debt>0?3:0)-(G.mind<50||G.tax>=4?3:0)}
+  if(m.k==='warreq'){if(/^准/.test(l))s+=(G.army<45||G.tre<400?-3:1)}
+  if(m.k==='fiefreq'){if(/^准/.test(l))s-=2}
+  if(m.k==='festival'||m.k==='project'){if(poor&&!/駁|婉|拒/.test(l))s-=3}
+  if(m.k==='impeach'&&/徹查/.test(l))s+=1.5;
+  if(m.k==='relief'&&/蠲免/.test(l))s-=(G.tre<500?2:.5);
+  if(s>bs+1e-9){bs=s;best=i}});return best}
+function batchMemo(list){let done=0,left=0,msg='';for(const [id,i] of list){const m=G.memo.find(x=>x.id===id);if(!m)continue;
+  if(i<0){leaveMemo(id);done++;continue}
+  const oo=memoOpts(m)[i];if(!oo||oo.ask){left++;continue}
+  const r=runMemo(id,i);if(r.ok)done++;else{left++;if(/精力/.test(r.msg)){msg='精力用盡，餘下奏摺留待下旬。';break}}}
+ return{done,left,msg}}
+
+/* ===== 伏筆：決定的遲來後果 ===== */
+const SEEDR={taxup:/^准/,relief:/^駁回/,impeach:/從輕|^駁回|^不予/,fiefreq:/^准其就藩/,warreq:/^准其統兵/,recommend:/^准/};
+function seedHook(m,o){const R=SEEDR[m.k];if(!R||!o||!R.test(String(o.l)))return;const x=m.x||{};G.sd=G.sd||[];const add=(d,why,e)=>{G.sd.push(Object.assign({t:G.t+d,t0:G.t,why},e));if(G.sd.length>30)G.sd.shift()};
+ if(m.k==='taxup')add(ri(20,36),'准加賦稅',{k:'tax'});
+ else if(m.k==='relief'&&x.reg)add(ri(14,26),'駁回賑災之請',{k:'famine',reg:x.reg});
+ else if(m.k==='impeach'&&x.guilty&&x.tg!=null)add(ri(18,36),'輕縱貪腐之臣',{k:'scandal',p:x.tg});
+ else if(m.k==='fiefreq'&&m.from!=null)add(ri(24,48),'准其就藩',{k:'fief',p:m.from});
+ else if(m.k==='warreq'&&m.from!=null)add(ri(18,40),'准其統兵',{k:'warfame',p:m.from});
+ else if(m.k==='recommend'&&x.cand!=null)add(ri(20,40),'准其任命',{k:'protege',p:x.cand})}
+{const __dr=decRec;decRec=function(m,o,s0){__dr(m,o,s0);try{seedHook(m,o)}catch(e){}}}
+function seedFire(s){const y=Math.max(1,Math.round((G.t-s.t0)/12));const tail='（此乃'+y+'年前你'+s.why+'之果）';const p=s.p!=null?P(s.p):null;
+ if(s.k==='tax'){const rs=Object.values(G.reg);const r=rs.slice().sort((a,b)=>b.un-a.un)[0];if(!r)return;r.un=cl(r.un+14);r.food=cl(r.food-6);G.mind=cl(G.mind-2);chron(r.n+'民怨沸騰，流民漸多。'+tail,3,[])}
+ else if(s.k==='famine'){const r=G.reg[s.reg];if(!r)return;r.un=cl(r.un+16);r.food=cl(r.food-12);G.mind=cl(G.mind-1);chron(r.n+'饑民四起，當初賑濟被駁，如今禍患已成。'+tail,3,[])}
+ else if(s.k==='scandal'){if(!p||!p.alive)return;p.cor=cl(p.cor+25);G.mind=cl(G.mind-1.5);chron(nmt(p)+'貪墨事發，數額遠逾當年所劾。'+tail,3,[p.id])}
+ else if(s.k==='fief'){if(!p||!p.alive)return;p.amb=cl(p.amb+12);G.pow.kin=(G.pow.kin||0)+3;chron(nmt(p)+'就藩多年，封地坐大，漸有尾大不掉之勢。'+tail,3,[p.id])}
+ else if(s.k==='warfame'){if(!p||!p.alive)return;p.amb=cl(p.amb+10);p.op=cl(p.op-4);chron(nmt(p)+'統兵有功，威望日隆，朝中已有「功高難賞」之議。'+tail,3,[p.id])}
+ else if(s.k==='protege'){if(!p||!p.alive)return;if(chance(.4)){p.cor=cl(p.cor+20);G.mind=cl(G.mind-1);chron(nmt(p)+'所任非人，其人營私舞弊，被御史揭發。'+tail,3,[p.id])}else{p.st.pol=Math.min(100,p.st.pol+6);G.rep=cl(G.rep+1);chron(nmt(p)+'政績斐然，士林稱你知人善任。'+tail,3,[p.id])}}}
+function seedMonth(){const L=G.sd;if(!L||!L.length)return;const due=L.filter(s=>s.t<=G.t);if(!due.length)return;G.sd=L.filter(s=>s.t>G.t);for(const s of due){try{seedFire(s)}catch(e){}}}
+{const __mo2=memoOpts;memoOpts=function(m){const O=__mo2(m);const R=SEEDR[m.k];if(R&&!(m.k==='impeach'&&!(m.x&&m.x.guilty)))for(const o of O)if(R.test(String(o.l)))o.h=(o.h?o.h+'｜':'')+'恐留後患';return O}}
+
+/* ===== 朝會 ===== */
+const HUI={
+ tax:{t:'賦稅之議',d:'國用吃緊，朝臣對加徵賦稅與節流開支各執一詞。',need:()=>G.tre<1500,
+  A:{n:'加徵賦稅',f:['chan','army'],say:'臣以為當增賦以充國用，否則邊餉難繼。',h:'賦稅升一級，國庫+40，民心-1',ok:()=>{if(G.tax<5)G.tax++;G.tre+=40;G.mind=cl(G.mind-1)}},
+  B:{n:'節流開支',f:['clean','wai'],say:'臣請削減浮費，與民休息，不可竭澤而漁。',h:'省銀70，民心+1，聲望+0.5',ok:()=>{G.tre+=70;G.mind=cl(G.mind+1);G.rep=cl(G.rep+.5)}}},
+ army:{t:'軍備之議',d:'邊報頻傳，朝堂上為擴軍還是休兵爭論不休。',need:()=>true,
+  A:{n:'擴編軍隊',f:['army','eun'],say:'邊患未平，臣請增兵固防。',h:'軍力+3，國庫-70',ok:()=>{G.army=Math.min(200,G.army+3);G.tre-=70}},
+  B:{n:'裁軍息民',f:['clean','chan'],say:'養兵耗費太巨，請裁冗兵以紓民力。',h:'軍力-2，國庫+50，賦稅負擔-2',ok:()=>{G.army=Math.max(10,G.army-2);G.tre+=50;G.burden=cl(G.burden-2)}}},
+ govern:{t:'吏治之議',d:'御史屢奏官場積弊，朝臣對整肅與寬仁意見相左。',need:()=>true,
+  A:{n:'整肅吏治',f:['clean','wai'],say:'吏治不清，天下難安，臣請嚴查貪墨。',h:'官員貪腐下降，皇權+1，部分權臣不悅',ok:()=>{for(const p of alivePs())if(p.off&&p.cor>0)p.cor=cl(p.cor-8);G.auth=cl(G.auth+1)}},
+  B:{n:'寬仁為本',f:['chan','eun'],say:'水至清則無魚，官場穩定要緊，不宜大動干戈。',h:'民心+1，官員貪腐小增',ok:()=>{G.mind=cl(G.mind+1);for(const p of alivePs())if(p.off)p.cor=cl(p.cor+2)}}},
+ relief:{t:'賑濟之議',d:'各地奏報災情，朝臣對賑濟的規模爭論不下。',need:()=>Object.values(G.reg).some(r=>r.un>32||r.food<48),
+  A:{n:'大規模賑濟',f:['clean','wai'],say:'民為邦本，請速開倉賑濟。',h:'各地存糧+8，國庫-60',ok:()=>{for(const r of Object.values(G.reg))r.food=cl(r.food+8);G.tre-=60}},
+  B:{n:'量力而行',f:['chan','army'],say:'國庫有限，賑濟當擇要而行，不可耗盡府庫。',h:'國庫不變，部分地方民怨+3',ok:()=>{for(const r of Object.values(G.reg))if(r.food<55)r.un=cl(r.un+3)}}},
+ frontier:{t:'邊事之議',d:'使節與邊報並至，朝堂上主戰與主和兩派爭執不休。',need:()=>true,
+  A:{n:'主戰',f:['army','eun'],say:'外邦輕我，當以兵威示之。',h:'軍心+4，民心-1，威懾+2',ok:()=>{G.morale=cl(G.morale+4);G.mind=cl(G.mind-1);G.fear=cl(G.fear+2)}},
+  B:{n:'主和',f:['clean','chan'],say:'兵凶戰危，不如以歲幣換邊境安寧。',h:'國庫-40，民心+1，聲望-1',ok:()=>{G.tre-=40;G.mind=cl(G.mind+1);G.rep=cl(G.rep-1)}}}};
+function huiAvail(){return !G.hz&&G.t-(G.huiT==null?-99:G.huiT)>=3}
+function huiSpeaker(f){const L=alivePs().filter(p=>(p.role==='official'||p.role==='general'||p.role==='eunuch')&&facOf(p)===f);return L.length?L.slice().sort((a,b)=>weight(b)-weight(a))[0]:null}
+function huiPow(fs){return fs.reduce((s,f)=>s+(G.pow[f]||0),0)}
+function huiOpen(){if(G.hz)return OKK('朝會正在進行。');if(!huiAvail())return NO('朝會三個月至多召開一次。');const q=needAP(1);if(q)return q;
+ const ks=Object.keys(HUI).filter(k=>HUI[k].need());const k=pick(ks);const T=HUI[k];G.ap--;G.huiT=G.t;
+ G.hz={k,A:T.A.f.map(f=>{const p=huiSpeaker(f);return{f,p:p?p.id:null}}),B:T.B.f.map(f=>{const p=huiSpeaker(f);return{f,p:p?p.id:null}})};return OKK('百官入朝。')}
+function huiOps(side){const T=HUI[G.hz.k][side];return T}
+function huiAdj(fs,d){for(const p of alivePs())if((p.role==='official'||p.role==='general'||p.role==='eunuch')&&fs.includes(facOf(p)))p.op=cl(p.op+d)}
+function huiPick(c){const z=G.hz;if(!z)return NO('沒有進行中的朝會。');const T=HUI[z.k];G.hz=null;
+ if(c==='D'){G.auth=cl(G.auth-1);chron('朝會無果而散，'+T.t+'懸而未決。',2);return OKK('散朝。議而不決，皇權微損。')}
+ if(c==='P'){if(G.auth<40){G.auth=cl(G.auth-3);huiAdj(T.A.f.concat(T.B.f),-2);chron('你欲強壓'+T.t+'，群臣不服，場面尷尬。',3);return NO('皇權不足，壓制不成，反失威信。')}
+  G.auth=cl(G.auth+2);huiAdj(T.A.f.concat(T.B.f),-3);chron('朝會上你一言作罷'+T.t+'，群臣噤聲。',2);return OKK('你壓下爭議，此議作罷。群臣心有不平。')}
+ const S=T[c],O=T[c==='A'?'B':'A'];const win=huiPow(S.f)+G.auth*.5+ri(-10,10)>huiPow(O.f);
+ if(win){S.ok();huiAdj(S.f,4);huiAdj(O.f,-3);chron('朝會議'+T.t+'，從「'+S.n+'」。',2);return OKK('你採納「'+S.n+'」。'+S.h+'。')}
+ G.auth=cl(G.auth-2);huiAdj(S.f,2);huiAdj(O.f,-4);chron('朝會議'+T.t+'，你主張「'+S.n+'」，反對者勢大，陽奉陰違。',3);return NO('反對的一派勢力太大，此議擱淺，皇權受損。')}
+
+/* ===== 開局變局與傳承稟賦、擴充成就 ===== */
+const VARI={late:{n:'盛世晚期',d:'府庫豐盈、民心安定，但官場腐化、積弊已深。',ap:()=>{G.tre+=1500;G.mind=cl(G.mind+10);G.auth=cl(G.auth+8);G.burden=cl(G.burden+12);for(const p of alivePs())if(p.off)p.cor=cl(p.cor+18);chron('盛世之下，暗藏積弊：官場腐化已深。',2)}},
+ regent:{n:'權臣當道',d:'皇權旁落，權臣黨羽遍佈朝堂。',ap:()=>{G.auth=cl(G.auth-18);G.fd.chan=(G.fd.chan||0)+15;chron('權臣一手遮天，你的詔令出不了宮門。',2)}},
+ border:{n:'烽火邊關',d:'邊軍強而軍心不穩，國庫不足，外邦虎視眈眈。',ap:()=>{G.army=Math.min(200,G.army+15);G.morale=cl(G.morale-12);G.tre-=250;for(const f of Object.values(G.foe))f.str=cl(f.str+10);chron('邊關烽火連天，軍心浮動。',2)}}};
+function variantApply(k){const v=VARI[k];if(!v)return;G.vari=k;v.ap()}
+const PERKS={inh:{n:'先帝遺澤',d:'國庫+300',need:0,ap:()=>{G.tre+=300}},ben:{n:'寬厚之名',d:'民心+6',need:2,ap:()=>{G.mind=cl(G.mind+6)}},maj:{n:'威儀天成',d:'皇權+6',need:4,ap:()=>{G.auth=cl(G.auth+6)}},
+ ele:{n:'精銳之師',d:'軍力+4，軍心+8',need:6,ap:()=>{G.army=Math.min(200,G.army+4);G.morale=cl(G.morale+8)}},wis:{n:'舊臣輔弼',d:'官員好感+6',need:8,ap:()=>{for(const p of alivePs())if(p.off)p.op=cl(p.op+6)}},
+ fam:{n:'名聲在外',d:'聲望+8，民心+3',need:11,ap:()=>{G.rep=cl(G.rep+8);G.mind=cl(G.mind+3)}}};
+function perkApply(k){const v=PERKS[k];if(!v)return;G.perk=k;v.ap();chron('傳承稟賦：「'+v.n+'」。',2)}
+function trackMonth(){G.lt=(G.tax<=2)?(G.lt||0)+1:0;const war=G.sit.some(s=>s.k==='war'||s.k==='revolt');G.pc=war?0:(G.pc||0)+1}
+Object.assign(ACH,{
+ lowtax:{n:'輕徭薄賦',d:'連續十年賦稅維持在輕稅以下。',chk:()=>(G.lt||0)>=120},
+ peace:{n:'天下無事',d:'連續十年沒有戰事或民變。',chk:()=>(G.pc||0)>=120},
+ beloved:{n:'萬民擁戴',d:'民心達到九十以上。',chk:()=>G.mind>=90},
+ strong:{n:'乾綱獨斷',d:'皇權達到九十五以上。',chk:()=>G.auth>=95},
+ famous:{n:'威震四海',d:'聲望達到九十以上。',chk:()=>G.rep>=90},
+ host:{n:'勤於朝會',d:'一朝之內召開十次朝會。',chk:()=>(G.huiN||0)>=10},
+ rule50:{n:'五十載春秋',d:'一位皇帝在位滿五十年。',chk:()=>G.t-G.emps[G.emps.length-1].t0>=600},
+ army120:{n:'百萬雄師',d:'軍力超過一百二十萬。',chk:()=>G.army>=120}});
+{const __ho=huiOpen;huiOpen=function(){const r=__ho();if(r.ok&&G.hz)G.huiN=(G.huiN||0)+1;return r}}

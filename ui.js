@@ -18,7 +18,7 @@ function corLabel(p){const v=shown(p,p.cor+10);return v>=60?'疑有貪墨':v>=40
 
 /* ---------- 立繪 ---------- */
 function portHash(id){let h=7;const t=String(id);for(let i=0;i<t.length;i++)h=(Math.imul(h^t.charCodeAt(i),2654435761)+0x9e3779b9)>>>0;h=Math.imul(h^(h>>>15),2246822519)>>>0;return (h^(h>>>13))>>>0}
-function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" decoding="async" draggable="false">'}
+function portImg(src,w,cls){return '<img class="portimg '+(cls||'')+'" src="'+src+'" width="'+w+'" height="'+Math.round(w*1.25)+'" alt="" decoding="async" loading="lazy" draggable="false">'}
 const PORT_ROLES={consort:1,maiden:1,wife:1,princess:1},PORT_SLOT={consort:1};
 let _pm=null,_pmKey='';
 function portPool(){if(!portPool.a){const a=[];for(let i=0;i<PORT_F.length;i++)if(PORT_SAD.indexOf(i)<0)a.push(PORT_F[i]);portPool.a=a.concat(PORT_F2,PORT_X)}return portPool.a}
@@ -69,7 +69,7 @@ function portraitInk(p,w){
  s+='<ellipse cx="30" cy="62" rx="3.6" ry="7" fill="'+skin+'" stroke="#00000033" stroke-width=".6"/><ellipse cx="90" cy="62" rx="3.6" ry="7" fill="'+skin+'" stroke="#00000033" stroke-width=".6"/>';
  // 五官
  const bro=f[2]%3,ey=62+(f[3]%3)-1;
- s+='<path d="M40 '+(ey-8-bro)+' Q47 '+(ey-12-bro)+' 55 '+(ey-8)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/><path d="M65 '+(ey-8)+' Q73 '+(ey-12-bro)+'80 '+(ey-8-bro)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/>';
+ s+='<path d="M40 '+(ey-8-bro)+' Q47 '+(ey-12-bro)+' 55 '+(ey-8)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/><path d="M65 '+(ey-8)+' Q73 '+(ey-12-bro)+' 80 '+(ey-8-bro)+'" stroke="#17110e" stroke-width="'+(2.2+bro*.5)+'" fill="none" stroke-linecap="round"/>';
  for(const x of [47,73]){s+='<path d="M'+(x-6)+' '+ey+' Q'+x+' '+(ey-4)+' '+(x+6)+' '+ey+' Q'+x+' '+(ey+3)+' '+(x-6)+' '+ey+'Z" fill="#fbf6ea" stroke="#17110e" stroke-width=".9"/><circle cx="'+x+'" cy="'+(ey-.4)+'" r="2.6" fill="#2a1a12"/><circle cx="'+(x+.9)+'" cy="'+(ey-1.2)+'" r=".8" fill="#fff"/>'}
  s+='<path d="M60 '+(ey+2)+' Q57 '+(ey+12)+' 60 '+(ey+14)+' Q64 '+(ey+14)+' 63 '+(ey+12)+'" fill="none" stroke="'+skS+'" stroke-width="1.5" stroke-linecap="round"/>';
  const mood=(f[4]%3)-1;
@@ -190,6 +190,8 @@ function startScreen(){document.body.classList.remove('ingame');document.documen
  +'<div class="stp-b">'
  +'<div class="fld"><label class="fl" for="nm">朕名</label><input id="nm" value="'+esc(S.name)+'" maxlength="4" size="6" autocomplete="off" aria-describedby="sthint"><span class="fs">至多四字</span></div>'
  +'<div class="fld"><div class="fl">難度</div><div class="ops ops3">'+Object.keys(DIFF).map(k=>opt((S.diff||'n')===k,'diff',k,DIFF[k].n,DIFF[k].d)).join('')+'</div></div>'
+ +'<div class="fld"><div class="fl">開局變局<span class="fs">可不選；讓開局更有挑戰</span></div><div class="ops ops4">'+[''].concat(Object.keys(VARI)).map(k=>opt((S.vari||'')===k,'vari',k||'none',k?VARI[k].n:'平穩',k?VARI[k].d.split('，')[0]:'依劇本')).join('')+'</div></div>'
+ +'<div class="fld"><div class="fl">傳承稟賦<span class="fs">達成成就解鎖（已達成 '+Object.keys(hist.a||{}).length+' 項）</span></div><div class="ops ops3">'+[''].concat(Object.keys(PERKS)).map(k=>{const lk=k&&Object.keys(hist.a||{}).length<PERKS[k].need;return lk?'<button class="op" disabled><b>🔒 '+PERKS[k].n+'</b><small>需 '+PERKS[k].need+' 項成就</small></button>':opt((S.perk||'')===k,'perk',k||'none',k?PERKS[k].n:'不取',k?PERKS[k].d:'白手登基')}).join('')+'</div></div>'
  +'<div class="fld"><div class="fl">志向<span class="fs">可不立；史官將據此論你</span></div><div class="ops ops4">'+[''].concat(Object.keys(ASP)).map(k=>opt((S.asp||'')===k,'asp',k||'none',k?ASP[k].n:'隨緣',k?ASP[k].d.split('：')[0]:'不預設')).join('')+'</div></div>'
  +'<div class="fld"><div class="fl">天賦所長<span class="fs">開局該項能力較高</span></div><div class="ops ops3">'+Object.keys(STN).map(k=>opt(S.focus===k,'focus',k,STN[k],FOCUSD[k])).join('')+'</div></div>'
  +'<details class="cust"><summary>自訂劇本（進階）</summary><div class="cust-b">'+Object.keys(CUST).map(k=>'<div class="fld"><div class="fl">'+({tre:'起始國庫',foe:'外邦強弱',fac:'朝堂派系'}[k])+'</div><div class="ops ops3 sm">'+CUST[k].map((n,i)=>opt(CS[k]===i,'cust',k+'|'+i,n)).join('')+'</div></div>').join('')+'</div></details>'
@@ -273,18 +275,18 @@ function webSvg(pw){pw=pw||G.pow;const W=920,C=460;const {e,roy,grp}=webData();c
  for(const ed of edges){const st=ST[ed.t];if(!L[st.l])continue;const A=N[ed.a],B=N[ed.b];const mx=(A.x+B.x)/2,my=(A.y+B.y)/2;let cx=mx+(C-mx)*.32,cy=my+(C-my)*.32;
   const dx=B.x-A.x,dy=B.y-A.y,len=Math.hypot(dx,dy)||1;const off=((ed.a+ed.b)%2?1:-1)*(A.p.id===e.id||B.p.id===e.id?26:14);cx+=-dy/len*off;cy+=dx/len*off;
   const d='M'+A.x.toFixed(1)+' '+A.y.toFixed(1)+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+B.x.toFixed(1)+' '+B.y.toFixed(1);
-  s+='<path d="'+d+'" fill="none" stroke="'+st.c+'" stroke-width="'+(st.w*3.2)+'" stroke-opacity=".10" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+st.c+'" stroke-width="'+st.w+'" stroke-opacity="'+(ed.t==='bond'?.55:.8)+'" stroke-linecap="round"'+(st.d?' stroke-dasharray="'+st.d+'"':'')+'/>';
-  if(ed.t==='spouse'&&A.p.id!==e.id&&B.p.id!==e.id)s+='<path d="'+d+'" fill="none" stroke="#fff" stroke-width=".8" stroke-opacity=".7"/>';
+  s+='<g class="we" data-a="'+ed.a+'" data-b="'+ed.b+'">';s+='<path d="'+d+'" fill="none" stroke="'+st.c+'" stroke-width="'+(st.w*3.2)+'" stroke-opacity=".10" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+st.c+'" stroke-width="'+st.w+'" stroke-opacity="'+(ed.t==='bond'?.55:.8)+'" stroke-linecap="round"'+(st.d?' stroke-dasharray="'+st.d+'"':'')+'/>';
+  if(ed.t==='spouse'&&A.p.id!==e.id&&B.p.id!==e.id)s+='<path d="'+d+'" fill="none" stroke="#fff" stroke-width=".8" stroke-opacity=".7"/>';s+='</g>';
   const px=.25*A.x+.5*cx+.25*B.x,py=.25*A.y+.5*cy+.25*B.y;
-  if(ed.t==='grudge'||ed.t==='bond')marks+='<g><circle cx="'+px+'" cy="'+py+'" r="11" fill="'+(ed.t==='grudge'?'#1B2630':'#2E6B57')+'"/><text x="'+px+'" y="'+(py+.5)+'" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#F6F8F6">'+(ed.t==='grudge'?'怨':'誼')+'</text></g>';
-  if(ed.t==='arc')marks+='<g><rect x="'+(px-30)+'" y="'+(py-11)+'" width="60" height="22" rx="2" fill="#F6F0DC" stroke="#8C6A1F"/><text x="'+px+'" y="'+(py+1)+'" text-anchor="middle" dominant-baseline="middle" font-size="12.5" fill="#6b4f12">'+esc(ed.lab)+'</text></g>'}
+  if(ed.t==='grudge'||ed.t==='bond')marks+='<g class="wm" data-a="'+ed.a+'" data-b="'+ed.b+'"><circle cx="'+px+'" cy="'+py+'" r="11" fill="'+(ed.t==='grudge'?'#1B2630':'#2E6B57')+'"/><text x="'+px+'" y="'+(py+.5)+'" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#F6F8F6">'+(ed.t==='grudge'?'怨':'誼')+'</text></g>';
+  if(ed.t==='arc')marks+='<g class="wm" data-a="'+ed.a+'" data-b="'+ed.b+'"><rect x="'+(px-30)+'" y="'+(py-11)+'" width="60" height="22" rx="2" fill="#F6F0DC" stroke="#8C6A1F"/><text x="'+px+'" y="'+(py+1)+'" text-anchor="middle" dominant-baseline="middle" font-size="12.5" fill="#6b4f12">'+esc(ed.lab)+'</text></g>'}
  s+=marks;
  // 中心花飾
  let pet='';for(let i=0;i<16;i++){pet+='<ellipse cx="'+C+'" cy="'+(C-62)+'" rx="7" ry="17" transform="rotate('+(i*22.5)+' '+C+' '+C+')" fill="#F6F0DC" stroke="#8C6A1F" stroke-width="1"/>'}
  s+='<g opacity=".95">'+pet+'</g>';
  // 人物
  for(const id in N){const o=N[id];const p=o.p;const isE=p.id===e.id;
-  s+='<g data-act="person" data-arg="'+p.id+'" style="cursor:pointer">'+medallion(p,o.x,o.y,o.r,o.ring,o.gold)
+  s+='<g class="wn" data-n="'+p.id+'" data-act="person" data-arg="'+p.id+'" style="cursor:pointer">'+medallion(p,o.x,o.y,o.r,o.ring,o.gold)
    +'<text x="'+o.x+'" y="'+(o.y+o.r+(isE?42:17))+'" text-anchor="middle" font-size="'+(isE?17:15)+'" font-weight="700" fill="#1B2630" stroke="#F6F8F6" stroke-width="4" paint-order="stroke" stroke-linejoin="round">'+esc(nm(p))+'</text>'
    +'<text x="'+o.x+'" y="'+(o.y+o.r+(isE?57:32))+'" text-anchor="middle" font-size="11.5" fill="#5E6B74" stroke="#F6F8F6" stroke-width="3" paint-order="stroke" stroke-linejoin="round">'+esc(o.sub||'')+'</text></g>'}
  // 題字與印
@@ -463,9 +465,9 @@ function courtHero(){const e=emp(),nS=G.sit.length,nM=G.memo.length,nI=G.intel.l
 function tabCourt(){let h='';const nIdle=G.memo.filter(m=>memoTier(m)===2).length;
  h+=courtHero();
  if(UI.last)h+='<div class="lastbar '+(UI.last.ok?'ok':'no')+'"><span>最近</span>'+esc(UI.last.msg).replace(/\n/g,'　')+'</div>';
- h+=digestHtml()+fw('arcs','人物故事線',arcsHtml(),false);const urgent=G.sit.filter(s=>s.k!=='case');const cases=G.sit.filter(s=>s.k==='case');
+ h+=huiBar()+digestHtml()+fw('arcs','人物故事線',arcsHtml(),false);const urgent=G.sit.filter(s=>s.k!=='case');const cases=G.sit.filter(s=>s.k==='case');
  if(urgent.length||cases.length){h+='<h4>急報與要務</h4>'+urgent.map(sitCard).join('')+cases.map(sitCard).join('')}
- h+='<div class="row sp"><h4 style="flex:1">奏摺（'+G.memo.length+'）</h4><span class="small dim">每批閱三份耗一旬 · 今已批 '+G.mw+' 份'+(nIdle>=2?' <button class="sm" data-act="idleall">閒事'+nIdle+'件一併留中</button>':'')+(G.memo.length>8?' <span class="bad">積壓過多，權臣趁機代批</span>':'')+'</span></div>';
+ h+='<div class="row sp"><h4 style="flex:1">奏摺（'+G.memo.length+'）</h4>'+(G.memo.length>=2?'<button class="sm pri" data-act="msug">整批照建議批示</button> ':'')+'<span class="small dim">每批閱三份耗一旬 · 今已批 '+G.mw+' 份'+(nIdle>=2?' <button class="sm" data-act="idleall">閒事'+nIdle+'件一併留中</button>':'')+(G.memo.length>8?' <span class="bad">積壓過多，權臣趁機代批</span>':'')+'</span></div>';
  const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);const PS=6,np=Math.max(1,Math.ceil(ms.length/PS));UI.mi=Math.min(Math.max(UI.mi||0,0),np-1);
  h+=ms.length?'<div class="mgrid">'+ms.slice(UI.mi*PS,UI.mi*PS+PS).map((m,i)=>memoCard(m,i)).join('')+'</div>'+(np>1?'<div class="row sp pager"><button class="sm" data-act="mpage" data-arg="-1"'+(UI.mi<=0?' disabled':'')+'>◀ 上一頁</button><span class="small dim">第 '+(UI.mi+1)+' / '+np+' 頁</span><button class="sm" data-act="mpage" data-arg="1"'+(UI.mi>=np-1?' disabled':'')+'>下一頁 ▶</button></div>':''):'<div class="empty">今日無事，可靜觀一月。</div>';
  if(G.intel.length)h+='<h4>密報（'+G.intel.length+'）</h4>'+G.intel.slice(0,6).map(intelCard).join('');
@@ -609,7 +611,7 @@ function sfx(k){try{const s=setg();if(!s.snd)return;AC=AC||new(window.AudioConte
  if(k==='stamp'){const o=AC.createOscillator();o.type='sine';o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(48,t+.18);g.gain.setValueAtTime(.32,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);o.start(t);o.stop(t+.27)}
  else if(k==='bell'){[523,785,1047].forEach((f,i)=>{const o=AC.createOscillator(),gg=AC.createGain();o.type='sine';o.frequency.value=f;gg.gain.setValueAtTime(.09/(i+1),t);gg.gain.exponentialRampToValueAtTime(.0005,t+1.4);o.connect(gg);gg.connect(AC.destination);o.start(t);o.stop(t+1.5)})}
  else{const n=AC.createBufferSource(),b=AC.createBuffer(1,AC.sampleRate*.18,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);n.buffer=b;const fl=AC.createBiquadFilter();fl.type='bandpass';fl.frequency.value=2200;g.gain.value=.05;n.connect(fl);fl.connect(g);n.start(t)}}catch(e){}}
-function settingsHtml(){const s=setg();return '<div class="card"><h3>閱讀與聲音</h3><div class="opts"><button class="sm '+(s.snd?'gold':'')+'" data-act="set" data-arg="snd">音效：'+(s.snd?'開':'關')+'</button><button class="sm '+(s.hc?'gold':'')+'" data-act="set" data-arg="hc">高對比：'+(s.hc?'開':'關')+'</button><button class="sm '+(s.rm?'gold':'')+'" data-act="set" data-arg="rm">減少動畫：'+(s.rm?'開':'關')+'</button></div><div class="opts" style="margin-top:6px"><span class="small dim" style="align-self:center">字級</span>'+[[15,'小'],[16,'中'],[18,'大'],[20,'特大']].map(([v,n])=>'<button class="sm '+(s.fs===v?'gold':'')+'" data-act="set" data-arg="fs|'+v+'">'+n+'</button>').join('')+'</div></div>'}
+function settingsHtml(){const s=setg();return '<div class="card"><h3>閱讀與聲音</h3><div class="opts"><button class="sm '+(s.snd?'gold':'')+'" data-act="set" data-arg="snd">音效：'+(s.snd?'開':'關')+'</button><button class="sm '+(s.hc?'gold':'')+'" data-act="set" data-arg="hc">高對比：'+(s.hc?'開':'關')+'</button><button class="sm '+(s.rm?'gold':'')+'" data-act="set" data-arg="rm">減少動畫：'+(s.rm?'開':'關')+'</button><button class="sm '+(!s.novib?'gold':'')+'" data-act="set" data-arg="novib">震動：'+(!s.novib?'開':'關')+'</button><button class="sm '+(!s.nohint?'gold':'')+'" data-act="set" data-arg="nohint">情境提示：'+(!s.nohint?'開':'關')+'</button></div><div class="opts" style="margin-top:6px"><span class="small dim" style="align-self:center">字級</span>'+[[15,'小'],[16,'中'],[18,'大'],[20,'特大']].map(([v,n])=>'<button class="sm '+(s.fs===v?'gold':'')+'" data-act="set" data-arg="fs|'+v+'">'+n+'</button>').join('')+'</div></div>'}
 function zhupi(l){sfx('stamp');const t=/駁|拒|婉|不|斥|罷|削|謝|退/.test(l)&&!/不再/.test(l)?'駁':/留/.test(l)?'留':'准';const d=document.createElement('div');d.className='zp';d.innerHTML='<b class="'+(t==='駁'?'bk':'')+'">'+t+'</b>';document.body.appendChild(d);setTimeout(()=>d.remove(),900)}
 const BZ={sage:'在位之日，朝野清明，民有餘糧，可謂得其人矣。',warrior:'威加四夷，開疆拓土，雖勞民力，而國威遠播。',revive:'承衰敝之後，能撥亂反正，社稷賴以不墜。',tyrant:'刑罰苛酷，誅戮無度，天下側目，不敢發言。',fool:'政出多門，賞罰失當，終使人心離散。',puppet:'大權旁落，徒擁虛名，朝堂之上，不知有君。',normal:'無大功，亦無大過，守成而已。',fall:'運祚不終，社稷傾覆，非獨天命，抑亦人事也。'};
 function bjProse(i){const x=G.emps[i],p=P(x.pid),end=x.t1==null?G.t:x.t1;const ev=G.chr.filter(c=>c.imp>=3&&c.t>=x.t0&&c.t<=end);const st=Math.max(1,Math.ceil(ev.length/10));const pk=ev.filter((_,k)=>k%st===0).slice(0,10);const v=x.v;const yrs=Math.round((end-x.t0)/12);
@@ -621,7 +623,7 @@ function bjModal(i){modal('<div class="recap"><h2 class="rh">'+esc(G.emps[i].era
 function legModal(){const L=G.over?G.over.type:'fall';modal('<h2>承前朝而起</h2><p>前朝「'+esc(G.era.n)+'」已成歷史。你可以選擇下一局的身份：</p><div class="opts"><button class="pri" data-act="legpick" data-arg="a">旁支入繼<small>承其遺澤，聲望+8；天下仍在</small></button><button data-act="legpick" data-arg="c">起於草莽<small>開國之君；有前朝遺老輔佐</small></button></div><div class="opts" style="margin-top:8px"><button data-act="close">返回</button></div>')}
 function legacyBegin(sc){const type=G.over?G.over.type:'fall';const L={era:G.era.n,type:sc==='a'?'extinct':type==='extinct'?'fall':type};beginGame({scn:sc,legacy:L})}
 function beginGame(o){o=o||{};const nmv=(($('#nm')||{}).value||'承嗣').trim().slice(0,4)||'承嗣';{const M=metaGet();M.games++;metaSave()}
- const a={scn:o.scn||UI.start.scn,name:nmv,focus:UI.start.focus||'pol',diff:o.daily?'n':(UI.start.diff||'n'),asp:(!o.daily&&UI.start.asp)||null};if(o.daily){const k=dailyKey();a.seed=dailySeed(k);a.scn='a'}if(o.legacy)a.legacy=o.legacy;if(!o.daily&&UI.start.cust)a.cust=UI.start.cust;
+ const a={scn:o.scn||UI.start.scn,name:nmv,focus:UI.start.focus||'pol',diff:o.daily?'n':(UI.start.diff||'n'),asp:(!o.daily&&UI.start.asp)||null};if(o.daily){const k=dailyKey();a.seed=dailySeed(k);a.scn='a'}if(o.legacy)a.legacy=o.legacy;if(!o.daily){a.vari=UI.start.vari||null;a.perk=UI.start.perk||null}if(!o.daily&&UI.start.cust)a.cust=UI.start.cust;
  newGame(a);if(o.daily){G.daily=dailyKey()}UI.last=null;UI.overShown=false;UI.empId=G.emp;TAB='court';ALERTS.length=0;saveG('auto');render();showPro()}
 function dailyKey(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()}
 function dailySeed(k){let h=k*2654435761%2147483647;return h|0}
@@ -832,3 +834,69 @@ document.addEventListener('change',ev=>{if(ev.target.id==='fs'){UI.pf.sort=ev.ta
  document.addEventListener('touchend',e=>{if(!ok)return;ok=false;const x=e.changedTouches[0];const dx=x.clientX-sx,dy=x.clientY-sy;if(Date.now()-st>600||Math.abs(dx)<110||Math.abs(dy)>45||Math.abs(dx)<Math.abs(dy)*2.5)return;
   if(document.getElementById('md')&&document.getElementById('md').offsetParent)return;const L=TL();let i=L.indexOf(TAB);if(i<0)return;i=Math.max(0,Math.min(L.length-1,i+(dx<0?1:-1)));if(L[i]!==TAB){TAB=L[i];render();window.scrollTo(0,0)}},{passive:true});
 })();
+
+/* ===== 批示建議・朝會・聚焦・提示・音效（v6） ===== */
+{const __mc=memoCard;memoCard=function(m,ix){let h=__mc(m,ix);try{if(h.includes('<div class="opts">')){const O=memoOpts(m);if(O.length>1){const i=memoSuggest(m);if(i>=0&&!O[i].ask){const b='<button class="sm" data-act="memo" data-arg="'+m.id+'|'+i+'">';h=h.replace(b,b.replace('class="sm"','class="sm sug"')).replace('<div class="opts">','<div class="small sugl">建議：<b>'+esc(O[i].l)+'</b></div><div class="opts">')}}}}catch(e){}return h}}
+function msugHtml(){const ms=G.memo.slice().sort((a,b)=>memoTier(a)-memoTier(b)||a.t-b.t);
+ return '<h3>整批批示</h3><div class="small dim">已依國庫、民心與近況預選建議，可逐項更改；確認後依序批閱（每三份耗一旬精力，精力不足時餘下留待下旬）。標「需另選」的項目不會自動處理。</div><div class="msl">'+ms.map(m=>{const O=memoOpts(m);const i=memoSuggest(m);return '<div class="msr"><div class="small">'+esc(m.txt.length>50?m.txt.slice(0,50)+'…':m.txt)+'</div><select data-mid="'+m.id+'">'+O.map((o,k)=>'<option value="'+k+'"'+(k===i?' selected':'')+'>'+esc(o.l)+(o.ask?'（需另選）':'')+(o.h?'｜'+esc(o.h):'')+'</option>').join('')+'<option value="-1"'+(i<0?' selected':'')+'>留中不發</option></select></div>'}).join('')+'</div><div class="opts"><button class="pri" data-act="msugrun">確認批閱</button><button data-act="close">取消</button></div>'}
+function huiBar(){if(G.hz)return '<div class="card hui"><b>朝會進行中</b> <button class="sm pri" data-act="huim">回到朝堂</button></div>';
+ return '<div class="card hui"><div class="row sp"><span><b>朝會</b> <span class="small dim">百官議政，依派系勢力與皇權定奪；三個月一次，耗一旬</span></span><button class="sm'+(huiAvail()?' pri':'')+'" data-act="hui"'+(huiAvail()?'':' disabled')+'>'+(huiAvail()?'召開朝會':'近期已議')+'</button></div></div>'}
+function huiModalHtml(){const z=G.hz,T=HUI[z.k];const side=(c)=>'<div class="hs"><h4>'+T[c].n+'</h4>'+z[c].map(x=>{const p=x.p!=null?P(x.p):null;return '<div class="hsp">'+(p?'<div class="hav">'+portrait(p,44)+'</div>':'')+'<div><b>'+(p?esc(nmt(p)):FAC[x.f].n)+'</b> <span class="small dim">'+FAC[x.f].n+'</span><div class="small">'+esc(T[c].say)+'</div></div></div>'}).join('')+'<div class="small dim">'+esc(T[c].h)+'｜勢力 '+Math.round(huiPow(T[c].f))+'</div></div>';
+ return '<h3>朝會：'+T.t+'</h3><div class="small dim">'+esc(T.d)+'　你的皇權 '+Math.round(G.auth)+'</div><div class="hcols">'+side('A')+side('B')+'</div><div class="opts"><button class="pri" data-act="huip" data-arg="A">支持「'+T.A.n+'」</button><button class="pri" data-act="huip" data-arg="B">支持「'+T.B.n+'」</button><button data-act="huip" data-arg="P">強行壓制<small>皇權需四十以上</small></button><button data-act="huip" data-arg="D">散朝</button></div>'}
+function webApplyFocus(){const g=$('#webg');if(!g)return;const svg=g.querySelector('svg');if(!svg)return;const f=UI.webF;const near=new Set();
+ if(f!=null){svg.querySelectorAll('.we').forEach(x=>{if(+x.dataset.a===f||+x.dataset.b===f){near.add(+x.dataset.a);near.add(+x.dataset.b)}});near.add(f)}
+ svg.querySelectorAll('.we,.wm').forEach(x=>{x.style.opacity=f==null?'':(+x.dataset.a===f||+x.dataset.b===f?'1':'.06')});
+ svg.querySelectorAll('.wn').forEach(x=>{x.style.opacity=f==null?'':(near.has(+x.dataset.n)?'1':'.22')});
+ const inf=$('#webinfo');if(inf){const p=f!=null?P(f):null;inf.innerHTML=p?'<b>'+esc(nmt(p))+'</b> <span class="small dim">'+roleLabel(p)+(p.off?' · '+offName(p.off):'')+'　連結 '+Math.max(0,near.size-1)+' 人</span> <button class="sm" data-act="webopen" data-arg="'+p.id+'">查看卷宗</button> <button class="sm" data-act="webclr">取消聚焦</button>':'<span class="small dim">點選任一人物，只顯示與其相連的關係；再點「查看卷宗」看詳情。</span>'}}
+{const __r=render;render=function(){__r.apply(this,arguments);try{if(TAB==='web')webApplyFocus();hintCheck()}catch(e){}}}
+{const __wu=webUpdate;webUpdate=function(i){__wu(i);webApplyFocus()}}
+{const __tw=tabWeb;tabWeb=function(){let h=__tw();return h.replace('<div class="webwrap" id="webg">','<div class="opts" style="margin:0 0 4px"><button class="sm'+(UI.webFm?' pri':'')+'" data-act="webfm">'+(UI.webFm?'聚焦模式：開':'聚焦模式：關')+'</button><span id="webinfo" style="align-self:center"></span></div><div class="webwrap" id="webg">')}}
+/* 情境提示 */
+const HINTS=[
+ ['memo',()=>G.memo.length>=3&&TAB==='court','奏摺一多，可用「整批照建議批示」：系統預選後你只需改幾項再確認。'],
+ ['hui',()=>TAB==='court'&&typeof huiAvail==='function'&&huiAvail()&&G.t-G.emps[0].t0>=3,'可以召開「朝會」讓派系公開辯論，結果取決於各派勢力與你的皇權。'],
+ ['people',()=>TAB==='people','人物表預設只列后妃至臣子；用 ☆ 關注重要的人，「只看需留意」能快速找出有問題的人。'],
+ ['tree',()=>TAB==='tree','國策需要時間推行，同時推行的數量受名額限制；完成後有長期加成，也有維持費。'],
+ ['web',()=>TAB==='web','打開「聚焦模式」後點人物，只留下與他相連的關係，一眼看出誰是誰的人。'],
+ ['low',()=>TAB==='court'&&alivePs().some(p=>p.off&&p.role==='official'&&shown(p,p.op)<28),'有臣子已心懷怨望。召見、賞賜或調任都能緩和；放著不管，可能釀成結黨。'],
+ ['poor',()=>G.tre<150,'國庫告急。可在朝堂議「節流開支」，或在國策開源；長期赤字會讓一切變難。'],
+ ['seed',()=>(G.chr||[]).slice(-4).some(c=>/之果）/.test(c.txt)),'這是你多年前某個決定的後果。有些選項在奏摺上標了「恐留後患」，就是這種。']];
+function hintCheck(){if(!G||G.over||!document.body.classList.contains('ingame'))return;const M=metaGet();M.hint=M.hint||{};const s=setg();if(s.nohint)return;if(!M.tut)return;
+ if($('#hintb')||$('#ov').classList.contains('on'))return;
+ for(const [id,chk,txt] of HINTS){if(M.hint[id])continue;let ok=false;try{ok=chk()}catch(e){}if(!ok)continue;
+  const d=document.createElement('div');d.id='hintb';d.innerHTML='<span>💡 '+esc(txt)+'</span><button class="sm" data-act="hintx" data-arg="'+id+'">知道了</button><button class="sm" data-act="hintoff">不再提示</button>';document.body.appendChild(d);setTimeout(()=>{if(d.parentNode){M.hint[id]=1;metaSave();d.remove()}},14000);return}}
+Object.assign(ACT,{
+ msug(){modal(msugHtml())},
+ msugrun(){const L=[...document.querySelectorAll('#md select[data-mid]')].map(s=>[+s.dataset.mid,+s.value]);closeModal();const r=batchMemo(L);toast('已批閱 '+r.done+' 份'+(r.left?'，'+r.left+' 份需另行處理或留待下旬':'')+(r.msg?'。'+r.msg:'。'),true);sfx('stamp');autosave();render()},
+ hui(){const r=huiOpen();if(!r.ok){toast(r.msg,false);return}sfx('bell');autosave();render();modal(huiModalHtml())},
+ huim(){if(G.hz)modal(huiModalHtml())},
+ huip(c){const r=huiPick(c);closeModal();UI.last=r;toast(r.msg,r.ok);sfx(r.ok?'stamp':'page');autosave();render()},
+ webfm(){UI.webFm=!UI.webFm;if(!UI.webFm)UI.webF=null;render()},
+ webopen(a){const p=P(+a);if(p)personModal(p)},
+ webclr(){UI.webF=null;webApplyFocus()},
+ hintx(a){const M=metaGet();M.hint=M.hint||{};M.hint[a]=1;metaSave();const h=$('#hintb');if(h)h.remove()},
+ hintoff(){setg().nohint=1;metaSave();const h=$('#hintb');if(h)h.remove();toast('已關閉情境提示（可在存檔分頁重新開啟）。',true)},
+ vari(a){UI.start.vari=a==='none'?'':a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()},
+ perk(a){UI.start.perk=a==='none'?'':a;UI.start.name=($('#nm')||{}).value||UI.start.name;startScreen()}
+});
+{const __pp=ACT.person;ACT.person=function(a,el){if(UI.webFm&&el&&el.closest&&el.closest('#webg')){UI.webF=UI.webF===+a?null:+a;webApplyFocus();return}__pp(a,el)}}
+
+/* ===== 音效擴充與震動 ===== */
+function vib(p){try{if(setg().novib||!navigator.vibrate)return;navigator.vibrate(p)}catch(e){}}
+function tone(f1,f2,dur,vol,type){try{const s=setg();if(!s.snd)return;AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f1,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0005,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.02)}catch(e){}}
+{const __sf=sfx;sfx=function(k){const V={stamp:14,bell:[18,50,18],page:6,coin:8,drum:[26,40,26],no:[30,30,30]}[k];if(V)vib(V);
+  if(k==='coin'){tone(1320,1760,.12,.07,'triangle');setTimeout(()=>tone(1760,2200,.16,.06,'triangle'),90)}
+  else if(k==='drum'){tone(110,55,.3,.3);setTimeout(()=>tone(110,55,.3,.25),220)}
+  else if(k==='no'){tone(220,150,.22,.1,'square')}
+  else __sf(k)}}
+{const __ts=toast;toast=function(msg,ok){__ts(msg,ok);try{if(ok===false)sfx('no');else if(/賞|賜|賑|俸|獎/.test(msg))sfx('coin');else if(/出征|開戰|迎戰|大捷|兵/.test(msg))sfx('drum')}catch(e){}}}
+/* ===== 天象氛圍：災年陰沉、盛世明亮 ===== */
+{const __am=ambience;ambience=function(){__am();try{if(!G){document.body.classList.remove('gloom','glow');return}
+  const gloom=G.weather<.9||G.mind<32||G.sit.some(s=>s.k==='disaster'||s.k==='revolt');const glow=!gloom&&G.mind>=72&&G.weather>=1.02;
+  document.body.classList.toggle('gloom',!!gloom);document.body.classList.toggle('glow',!!glow);document.body.dataset.se=seasonOf()[1]}catch(e){}}}
+
+/* ===== 圖像延後載入：先出畫面，圖資在背景載入 ===== */
+const artReady=()=>typeof PORT_EMP!=='undefined'&&typeof SCN_IMG!=='undefined';
+function artWait(){$('#app').innerHTML='<div class="splash"><div class="sp-title"><h1>皇帝模擬器</h1><div class="sp-tag">圖像載入中……</div></div></div>'}
+{const __ss=startScreen;startScreen=function(){if(UI.splashDone&&!artReady()){artWait();window.__onArt=()=>startScreen();return}return __ss()}}
+{const __r2=render;render=function(){if(G&&!artReady()){artWait();window.__onArt=()=>render();return}return __r2.apply(this,arguments)}}

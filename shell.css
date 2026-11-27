@@ -706,3 +706,29 @@ button,[data-act],select,input,summary{touch-action:manipulation}
  .pbar .prow2 .dim{display:none}
 }
 .prow .pn{font-size:.95rem!important}.prow .ps,.prow .patt{font-size:.78rem!important}.pcd .small{font-size:.78rem}
+
+/* ===== v6：批示建議・朝會・提示 ===== */
+.sugl{margin:2px 0 0;opacity:.85}.sugl b{color:#e0b341}
+button.sug{outline:2px solid #c9a24a;outline-offset:1px}
+.msl{display:flex;flex-direction:column;gap:8px;margin:10px 0;max-height:52vh;overflow:auto}
+.msr{padding:6px 8px;border:1px solid rgba(128,128,128,.3);border-radius:4px}.msr select{width:100%;margin-top:4px;padding:6px}
+.hui{margin:8px 0}.hcols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.hs{border:1px solid rgba(201,162,74,.4);border-radius:4px;padding:8px}.hs h4{margin:0 0 6px}
+.hsp{display:flex;gap:8px;margin-bottom:6px}.hav,.hav .port,.hav img,.hav svg{width:44px!important;height:44px!important;flex:0 0 44px;object-fit:cover;border-radius:3px}
+#hintb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom));z-index:60;max-width:min(92vw,720px);display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;border:1px solid #c9a24a;border-radius:6px;background:rgba(30,16,8,.96);color:#f1e3c0;box-shadow:0 6px 20px rgba(0,0,0,.5);font-size:.9rem}
+#hintb span{flex:1 1 220px}
+@media(max-width:520px){.hcols{grid-template-columns:1fr}}
+@media(max-width:760px),(max-height:520px) and (orientation:landscape){#hintb{bottom:calc(52px + env(safe-area-inset-bottom));left:8px;right:8px;transform:none;max-width:none}}
+/* ===== 季節色調與天象 ===== */
+body.ingame #scene{transition:filter 1.6s ease}
+body.ingame[data-se=sp] #scene{filter:saturate(1.08) hue-rotate(-6deg)}
+body.ingame[data-se=su] #scene{filter:saturate(1.15) brightness(1.06)}
+body.ingame[data-se=au] #scene{filter:sepia(.22) saturate(1.1) hue-rotate(-14deg)}
+body.ingame[data-se=wi] #scene{filter:saturate(.7) brightness(.92) hue-rotate(10deg)}
+body.ingame.gloom #scene{filter:grayscale(.45) brightness(.7) contrast(1.05)}
+body.ingame.gloom::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 50% 20%,transparent 30%,rgba(10,8,14,.45));transition:opacity 1.6s}
+body.ingame.glow::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 50% 0%,rgba(255,226,150,.16),transparent 60%)}
+body.rm #scene{transition:none}
+
+body:has(#ov.on) #hintb{display:none}
+@media(max-height:520px) and (orientation:landscape){#hintb{font-size:.76rem;padding:3px 8px;gap:6px;bottom:calc(46px + env(safe-area-inset-bottom));max-width:calc(100vw - 150px);right:auto}#hintb .sm{min-height:30px;padding:2px 8px}}
