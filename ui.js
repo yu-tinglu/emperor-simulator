@@ -539,11 +539,6 @@ function tabFamily(){const e=emp();const kids=myKids().sort((a,b)=>age(b)-age(a)
  const kin=alivePs().filter(p=>(p.role==='prince'||p.role==='kin'||p.role==='princess')&&p.fa!==G.emp&&p.id!==G.emp&&p.title!=='先帝'&&age(p)>=14).sort((a,b)=>weight(b)-weight(a)).slice(0,14);
  h+='<h4>宗室</h4><div class="card"><table>'+kin.map(p=>'<tr class="click" data-act="person" data-arg="'+p.id+'"><td>'+esc(nmt(p))+'</td><td>'+age(p)+'歲</td><td class="small">'+roleLabel(p)+(p.fief?' · 封地'+G.reg[p.fief].n:'')+'</td><td class="small">'+attLabel(p)+'</td></tr>').join('')+'</table></div>';
  const root=e.fa!=null&&P(e.fa)?P(e.fa):e;h+='<h4>族譜</h4><div class="card small">'+famTree(root,0)+'</div>';return h}
-function tabPeople(){const F=UI.fl;let ps=alivePs().filter(p=>p.id!==G.emp&&p.title!=='先帝');
- if(F.role==='court'){if(!F.q)ps=ps.filter(p=>['consort','dowager','official','general','eunuch'].includes(p.role))}else if(F.role!=='all')ps=ps.filter(p=>p.role===F.role);if(F.fac!=='all')ps=ps.filter(p=>facOf(p)===F.fac);if(F.q)ps=ps.filter(p=>nm(p).includes(F.q));
- ps.sort((a,b)=>weight(b)-weight(a)||b.st.pol-a.st.pol);const tot=ps.length;ps=ps.slice(0,70);
- let h=heroHtml('人　物','朝野百官・盡在案頭')+'<div class="row"><select id="fr"><option value="court"'+(F.role==='court'?' selected':'')+'>宮廷與朝臣（后妃至臣子）</option><option value="all"'+(F.role==='all'?' selected':'')+'>全部身分</option>'+['official','general','eunuch','consort','dowager','prince','princess','kin','maiden','son','wife'].map(r=>'<option value="'+r+'"'+(F.role===r?' selected':'')+'>'+ROLEN[r]+'</option>').join('')+'</select><select id="ff"><option value="all">全部派系</option>'+Object.keys(FAC).filter(k=>k!=='none').map(k=>'<option value="'+k+'"'+(F.fac===k?' selected':'')+'>'+FAC[k].n+'</option>').join('')+'</select><input id="fq" placeholder="搜尋姓名" value="'+esc(F.q)+'" size="8"><span class="small dim">共 '+tot+' 人</span></div>';
- h+='<div class="card"><table><tr><th></th><th>姓名</th><th>身分／官職</th><th>齡</th><th>派系</th><th>態度</th><th>野心</th></tr>'+ps.map(p=>'<tr class="click" data-act="person" data-arg="'+p.id+'"><td class="av">'+portrait(p,40)+'</td><td>'+esc(nmt(p))+'</td><td class="small">'+roleLabel(p)+(p.off?' · '+offName(p.off):'')+(p.exile?' · 流放':'')+'</td><td>'+age(p)+'</td><td>'+(facOf(p)!=='none'?facTag(facOf(p)):'')+'</td><td class="small">'+attLabel(p)+'</td><td class="small">'+ambLabel(p)+'</td></tr>').join('')+'</table></div>';return h}
 function tabHist(){let h=heroHtml('史　書','一朝得失・留待後人')+'<div class="row sp"><h3>歷代帝王</h3><span><button class="sm" data-act="coll">典藏</button> <button class="sm gold" data-act="recap">本朝回顧</button></span></div><div class="card"><table><tr><th>帝</th><th>年號</th><th>在位</th><th>廟號</th><th>評價</th></tr>'+G.emps.map(x=>{const p=P(x.pid);const v=x.v;const yrs=Math.round(((x.t1==null?G.t:x.t1)-x.t0)/12);
   return '<tr class="click" data-act="person" data-arg="'+p.id+'"><td>'+esc(nm(p))+'</td><td>'+x.era+'</td><td>'+yrs+'年</td><td>'+(v?v.temple:'在位')+'</td><td class="small">'+(v?'<b>'+v.label+'</b>'+(v.official!==v.key?'<br><span class="warnc">官修史書：'+TEMPLE[v.official][0]+(v.edited?'（曲筆）':v.hostile?'（史官懷怨）':'')+'</span>':'')+(v.revised?'<br><span class="good">後世翻案</span>':'')+'<br><span class="dim">民心'+v.mm+' 皇權'+v.am+' 勝'+v.wins+'負'+v.losses+' 誅'+v.exec+'</span>':'<span class="dim">待後世評說</span>')+'</td></tr>'}).join('')+'</table></div>';
  h+='<h3>歷代本紀</h3>'+G.emps.map(x=>{const b=benji(x);return '<details class="card"><summary>'+esc(b.head)+'</summary><button class="sm gold" data-act="bjread" data-arg="'+G.emps.indexOf(x)+'">以史筆讀之</button>'+(b.events.length?b.events.slice(-60).map(e=>'<div class="small"><span class="dim">'+e.y+'</span> '+esc(e.txt)+'</div>').join(''):'<div class="dim small">暫無大事可記。</div>')+'</details>'}).join('')+'<div class="row sp"><h3>王朝編年史</h3><label class="small"><input type="checkbox" id="ca" '+(UI.all?'checked':'')+'> 含次要記事</label></div><div class="card feed" style="max-height:none">';
@@ -758,3 +753,82 @@ function alertFaces(a){if(!a||!G)return '';const seen=new Set(),L=[];
   const hit=all.filter(p=>{const n=nm(p);return n&&n.length>=2&&a.txt.indexOf(n)>=0}).sort((x,y)=>rk(x)-rk(y));for(const p of hit){if(L.length>=3)break;if(!seen.has(p.id)){seen.add(p.id);L.push(p)}}}
  if(!L.length)return '';
  return '<div class="faces">'+L.slice(0,3).map(p=>{const isEmp=(G.emps||[]).some(x=>x.pid===p.id);const im=isEmp?portImg(PORT_EMP,84,'emp'):portrait(p,84);return '<figure><div class="fp">'+im+'</div><figcaption>'+esc(nm(p))+(p.title?'<small>'+esc(p.title)+'</small>':'')+'</figcaption></figure>'}).join('')+'</div>'}
+
+/* ---------- 人物分頁改版：分組・標記・排序・列表/卡片・關注・快捷 ---------- */
+const PGRP=[['wai','后妃太后'],['kin','宗親'],['top','宰輔重臣'],['off','百官'],['gen','將領'],['eun','宦官'],['idle','待用之臣'],['oth','閨秀世家']];
+const PSORT=[['attn','最需留意'],['power','權勢最大'],['loy','態度最差'],['amb','野心最大'],['tal','才幹最高'],['age','年紀最長']];
+function pGrp(p){const r=p.role;if(r==='consort'||r==='dowager')return'wai';if(r==='prince'||r==='princess'||r==='kin')return'kin';
+ if(r==='general')return'gen';if(r==='eunuch')return'eun';
+ if(r==='official'){if(!p.off)return'idle';const o=offDef(p.off);return o&&o.r>=6?'top':'off'}return'oth'}
+function pStarred(p){return !!(G.star&&G.star.includes(p.id))}
+function pFlags(p){const F=[];const r=p.role,a=age(p),w=weight(p);const court=r==='official'||r==='general'||r==='eunuch';
+ if(p.exile)F.push({t:'流放',c:'dim',s:1});
+ if(p.ill>0)F.push({t:'染病',c:'bad',s:3});
+ if(p.preg)F.push({t:'有孕',c:'good',s:1});
+ if(court){const o=shown(p,p.op),am=shown(p,p.amb);
+  if(o<30)F.push({t:'怨望',c:'bad',s:4});else if(o<45)F.push({t:'離心',c:'warn',s:2});
+  if(am>=78&&w>=8)F.push({t:'野心大',c:'warn',s:3});
+  if(w>=20)F.push({t:'權重',c:'warn',s:2});
+  if(r==='official'&&!p.off&&!p.exile)F.push({t:'待用',c:'dim',s:1});
+  if(a>=70)F.push({t:'年邁',c:'dim',s:1})}
+ if(r==='consort'){if(p.lock>0)F.push({t:'禁足',c:'dim',s:1});if(p.fav<25)F.push({t:'失寵',c:'warn',s:1})}
+ if((r==='prince'||r==='princess')&&a<18&&p.pot)F.push({t:'待教',c:'good',s:1});
+ if(pStarred(p))F.push({t:'★',c:'gold',s:2});
+ return F}
+function pAttn(p){return pFlags(p).reduce((s,f)=>s+f.s,0)}
+function pMatch(p,q){const o=p.off?offName(p.off):'';const f=facOf(p);const hay=nmt(p)+' '+roleLabel(p)+' '+o+' '+(f!=='none'&&FAC[f]?FAC[f].n:'')+' '+((p.tr||[]).join?(p.tr||[]).join(' '):'');return hay.includes(q)}
+function pSortFn(k){const tal=p=>Math.max(p.st.pol,p.st.mil,p.st.lit,p.st.biz||0);
+ return{attn:(a,b)=>pAttn(b)-pAttn(a)||weight(b)-weight(a),power:(a,b)=>weight(b)-weight(a)||b.st.pol-a.st.pol,
+ loy:(a,b)=>shown(a,a.op)-shown(b,b.op)||weight(b)-weight(a),amb:(a,b)=>shown(b,b.amb)-shown(a,a.amb)||weight(b)-weight(a),
+ tal:(a,b)=>tal(b)-tal(a),age:(a,b)=>age(b)-age(a)}[k]||pSortFn('attn')}
+function pQuick(p){const r=p.role;const Q=[];if(!p.alive||p.id===G.emp)return Q;
+ if(r==='official'||r==='general'||r==='eunuch'){Q.push(['召見垂詢','召']);Q.push(['賞賜','賞']);if(r==='official'&&!p.off&&!p.exile)Q.push(['任命官職','任'])}
+ else if(r==='consort'){Q.push(['臨幸','幸']);Q.push(['賞賜','賞'])}return Q}
+function pQuickHtml(p){return pQuick(p).map(q=>'<button class="sm pq" data-act="pq" data-arg="'+p.id+'|'+q[0]+'" title="'+q[0]+'" aria-label="'+q[0]+'">'+q[1]+'</button>').join('')}
+function pFlagsHtml(p){return pFlags(p).map(f=>'<span class="pfl '+f.c+'">'+f.t+'</span>').join('')}
+function pRow(p){const f=facOf(p);
+ return '<div class="prow" data-act="person" data-arg="'+p.id+'"><div class="pav">'+portrait(p,44)+'</div><div class="pmain"><div class="pn">'+esc(nmt(p))+' <span class="pfls">'+pFlagsHtml(p)+'</span></div><div class="ps small dim">'+roleLabel(p)+(p.off?' · '+offName(p.off):'')+' · '+age(p)+'歲'+(f!=='none'&&FAC[f]?' · '+FAC[f].n:'')+'</div></div><div class="patt small"><b>'+attLabel(p)+'</b><span class="dim">'+ambLabel(p)+'</span></div><div class="pact"><button class="sm pq pstar'+(pStarred(p)?' on':'')+'" data-act="pstar1" data-arg="'+p.id+'" title="關注" aria-label="關注">'+(pStarred(p)?'★':'☆')+'</button>'+pQuickHtml(p)+'</div></div>'}
+function pCard(p){const f=facOf(p);
+ return '<div class="pcd" data-act="person" data-arg="'+p.id+'"><div class="pcp">'+portrait(p,92)+'</div><div class="pcn">'+esc(nmt(p))+'</div><div class="small dim">'+roleLabel(p)+(p.off?' · '+offName(p.off):'')+' · '+age(p)+'歲</div><div class="pfls">'+pFlagsHtml(p)+'</div><div class="small">'+attLabel(p)+' · <span class="dim">'+ambLabel(p)+'</span></div><div class="pact"><button class="sm pq pstar'+(pStarred(p)?' on':'')+'" data-act="pstar1" data-arg="'+p.id+'" aria-label="關注">'+(pStarred(p)?'★':'☆')+'</button>'+pQuickHtml(p)+'</div></div>'}
+function tabPeople(){const F=UI.fl;const V=UI.pf=UI.pf||{sort:'attn',view:'list',star:false,attn:false,col:{}};
+ let ps=alivePs().filter(p=>p.id!==G.emp&&p.title!=='先帝');
+ const OTH=['maiden','son','wife','kin','prince','princess'];
+ if(F.q){ps=ps.filter(p=>pMatch(p,F.q))}
+ else if(F.role==='court')ps=ps.filter(p=>['consort','dowager','official','general','eunuch'].includes(p.role));
+ else if(F.role==='other')ps=ps.filter(p=>OTH.includes(p.role));
+ else if(F.role!=='all')ps=ps.filter(p=>p.role===F.role);
+ if(F.fac!=='all')ps=ps.filter(p=>facOf(p)===F.fac);
+ if(V.star)ps=ps.filter(pStarred);
+ const nAttn=ps.filter(p=>pAttn(p)-(pStarred(p)?2:0)>=3).length;
+ if(V.attn)ps=ps.filter(p=>pAttn(p)-(pStarred(p)?2:0)>=3);
+ ps.sort(pSortFn(V.sort));const tot=ps.length;
+ const sel=(id,opts,cur)=>'<select id="'+id+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
+ let h=heroHtml('人　物','朝野百官・盡在案頭')+'<div class="pbar'+(V.fo?' open':'')+'"><input id="fq" type="search" placeholder="搜尋姓名、官職、派系、特質" value="'+esc(F.q)+'">'
+ +'<div class="prow2 sel">'+sel('fr',[['court','后妃至臣子'],['all','全部身分'],['other','閨秀・宗親・皇族']].concat(['official','general','eunuch','consort','dowager','prince','princess','kin','maiden','son','wife'].map(r=>[r,ROLEN[r]])),F.role)
+ +sel('ff',[['all','全部派系']].concat(Object.keys(FAC).filter(k=>k!=='none').map(k=>[k,FAC[k].n])),F.fac)
+ +sel('fs',PSORT,V.sort)+'</div>'
+ +'<div class="prow2"><button class="sm" id="pfold" data-act="ptog" data-arg="fo">'+(V.fo?'收起篩選':'篩選')+'</button><button class="sm'+(V.attn?' on':'')+'" data-act="ptog" data-arg="attn">只看需留意'+(nAttn?'（'+nAttn+'）':'')+'</button><button class="sm'+(V.star?' on':'')+'" data-act="ptog" data-arg="star">★ 只看關注</button><button class="sm" data-act="pview">'+(V.view==='list'?'改看卡片':'改看列表')+'</button><span class="small dim">共 '+tot+' 人</span></div></div>';
+ if(!tot)return h+'<div class="card dim">沒有符合的人。放寬篩選，或清除搜尋字詞。</div>';
+ const groups={};ps.forEach(p=>{(groups[pGrp(p)]=groups[pGrp(p)]||[]).push(p)});
+ for(const [k,nmG] of PGRP){const L=groups[k];if(!L)continue;
+  const dflt=(k==='oth'||k==='idle')&&!F.q&&!V.star&&!V.attn?1:0;const closed=V.col[k]!=null?V.col[k]:dflt;const na=L.filter(p=>pAttn(p)-(pStarred(p)?2:0)>=3).length;
+  h+='<div class="pgh'+(closed?' closed':'')+'" data-act="pgrp" data-arg="'+k+'" role="button" aria-expanded="'+(!closed)+'"><span class="pgc">'+(closed?'▸':'▾')+'</span><b>'+nmG+'</b><span class="small dim">'+L.length+' 人</span>'+(na?'<span class="pfl bad">'+na+' 需留意</span>':'')+'</div>';
+  if(!closed)h+=V.view==='list'?'<div class="plist">'+L.slice(0,80).map(pRow).join('')+'</div>':'<div class="pcg">'+L.slice(0,80).map(pCard).join('')+'</div>'}
+ return h}
+Object.assign(ACT,{
+ pgrp(k){const V=UI.pf;const cur=V.col[k];const dflt=(k==='oth'||k==='idle')?1:0;V.col[k]=(cur!=null?cur:dflt)?0:1;render()},
+ ptog(k){UI.pf[k]=!UI.pf[k];render()},
+ pview(){UI.pf.view=UI.pf.view==='list'?'card':'list';render()},
+ pstar1(id){const p=P(+id);if(!p)return;G.star=G.star||[];const i=G.star.indexOf(p.id);if(i>=0){G.star.splice(i,1);toast('已取消關注 '+nm(p),true)}else{G.star.push(p.id);toast('已關注 '+nm(p),true)}autosave();render()},
+ pq(arg){const [id,l]=String(arg).split('|');const p=P(+id);if(!p||!p.alive)return;const o=personActions(p).find(x=>x.l===l);if(!o)return;
+  if(o.ask)askModal(o.ask,i=>{const r=o.fn(isNaN(+i)?i:+i);UI.last=r;toast(r.msg,r.ok);autosave();render()});else{const r=o.fn();UI.last=r;toast(r.msg,r.ok);autosave();render()}}
+});
+{const __pa=personActions;personActions=function(p){const O=__pa(p);if(p.alive&&p.id!==G.emp)O.push({l:pStarred(p)?'★ 取消關注':'☆ 加入關注',h:'置於人物表前列',fn:()=>{G.star=G.star||[];const i=G.star.indexOf(p.id);if(i>=0)G.star.splice(i,1);else G.star.push(p.id);return OKK(i>=0?'已取消關注。':'已加入關注。')}});return O}}
+document.addEventListener('change',ev=>{if(ev.target.id==='fs'){UI.pf.sort=ev.target.value;render()}});
+
+(function(){let sx=0,sy=0,st=0,ok=false;const TL=()=>TABS.map(t=>t[0]);
+ document.addEventListener('touchstart',e=>{ok=false;if(!G||e.touches.length!==1||!document.body.classList.contains('ingame'))return;const t=e.target;
+  if(t.closest&&t.closest('#md,.webwrap,input,select,textarea,table,.mgrid,#lb,.modal,[data-noswipe]'))return;const x=e.touches[0];sx=x.clientX;sy=x.clientY;st=Date.now();ok=true},{passive:true});
+ document.addEventListener('touchend',e=>{if(!ok)return;ok=false;const x=e.changedTouches[0];const dx=x.clientX-sx,dy=x.clientY-sy;if(Date.now()-st>600||Math.abs(dx)<110||Math.abs(dy)>45||Math.abs(dx)<Math.abs(dy)*2.5)return;
+  if(document.getElementById('md')&&document.getElementById('md').offsetParent)return;const L=TL();let i=L.indexOf(TAB);if(i<0)return;i=Math.max(0,Math.min(L.length-1,i+(dx<0?1:-1)));if(L[i]!==TAB){TAB=L[i];render();window.scrollTo(0,0)}},{passive:true});
+})();

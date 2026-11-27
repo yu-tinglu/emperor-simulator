@@ -650,3 +650,59 @@ body.ingame .tzn.s-act{background:#f1e4c2 !important}
  body.ingame .pm-top .port .portimg,body.ingame .pm-top .port svg{aspect-ratio:4/5;height:auto}
  body.ingame #top{padding-right:56px}
 }
+
+/* ===== 人物分頁：列表／卡片／分組 ===== */
+.pbar{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
+.pbar input[type=search]{width:100%;box-sizing:border-box;padding:8px 10px;font-size:1rem}
+.pbar .prow2{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pbar select{flex:1 1 120px;min-width:0;padding:7px 6px}
+.pbar button.on{background:var(--indigo,#243F73);color:#fff;border-color:var(--indigo,#243F73)}
+body.ingame .pbar button.on{background:#7a5a1c;color:#fff4d6;border-color:#c9a24a}
+.pgh{display:flex;align-items:center;gap:10px;min-height:42px;padding:6px 10px;margin:10px 0 4px;border-bottom:1px solid rgba(201,162,74,.45);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.pgh b{font-size:1.02em;letter-spacing:.08em}.pgc{width:1em;opacity:.7}
+.pgh.closed{opacity:.78}
+.plist{display:flex;flex-direction:column}
+.prow{display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.22);cursor:pointer;min-height:54px}
+.prow:hover,.pcd:hover{background:rgba(201,162,74,.12)}
+.prow:active,.pcd:active{background:rgba(201,162,74,.22)}
+.pav{flex:0 0 44px;height:44px;overflow:hidden;border-radius:3px}.pav .port,.pav img,.pav svg{width:44px!important;height:44px!important;object-fit:cover;display:block}
+.pmain{flex:1 1 auto;min-width:0}.pn{font-weight:600;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.ps{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.patt{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;line-height:1.3;min-width:5.2em}
+.pact{display:flex;gap:4px;flex:0 0 auto}
+.pq{min-width:34px;min-height:34px;padding:2px 6px;font-size:.9rem}
+.pq.pstar.on{color:#e0b341}
+.pfls{display:inline-flex;flex-wrap:wrap;gap:3px}
+.pfl{font-size:.72rem;padding:0 5px;border-radius:2px;border:1px solid currentColor;line-height:1.5;white-space:nowrap}
+.pfl.bad{color:#d4574b}.pfl.warn{color:#d89a2b}.pfl.good{color:#5aa786}.pfl.dim{opacity:.7}.pfl.gold{color:#e0b341}
+.pcg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:6px 0}
+.pcd{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;padding:8px;border:1px solid rgba(128,128,128,.3);border-radius:4px;cursor:pointer}
+.pcp{width:92px;height:92px;overflow:hidden;border-radius:3px}.pcp .port,.pcp img,.pcp svg{width:92px!important;height:92px!important;object-fit:cover;display:block}
+.pcn{font-weight:600}.pcd .pact{margin-top:4px}
+@media(pointer:coarse){.pq{min-width:40px;min-height:40px}.pgh{min-height:46px}.pbar select,.pbar input[type=search]{min-height:40px}.pbar button{min-height:40px}}
+@media(max-height:520px) and (orientation:landscape){.pbar{flex-direction:row;flex-wrap:wrap;align-items:center}.pbar input[type=search]{flex:1 1 200px;width:auto}.pbar .prow2{flex:1 1 auto}.prow{min-height:46px;padding:3px 6px}.pav,.pav .port,.pav img,.pav svg{width:36px!important;height:36px!important;flex-basis:36px}.pgh{min-height:36px;margin:6px 0 2px}}
+
+/* ===== 手機友善：防誤觸、不被浮動鈕遮住、觸控目標 ===== */
+html,body{overscroll-behavior-y:none}
+#pfold{display:none}
+button,[data-act],select,input,summary{touch-action:manipulation}
+@media(max-width:760px),(max-height:520px) and (orientation:landscape){
+ body.ingame #pane{padding-bottom:84px}
+ #pfold{display:inline-flex}
+ .pbar .prow2.sel{display:none}.pbar.open .prow2.sel{display:flex;flex:1 1 100%}
+}
+@media(pointer:coarse){
+ body.ingame button:not(.sm):not(.tab){min-height:42px}
+ body.ingame button.sm{min-height:38px;padding:6px 12px}
+ #md button,#md .opts button{min-height:44px}
+ #md .close,#md [data-act=close],.mclose{min-width:44px;min-height:44px}
+ .tabs button,.tabs a,#tabbar button{min-height:44px}
+ .click td,tr.click{min-height:44px}
+ select,input[type=search],input[type=text]{font-size:16px}
+}
+@media(max-height:520px) and (orientation:landscape){
+ .pbar{gap:4px}
+ .pbar .prow2:not(.sel){flex:0 0 auto;flex-wrap:nowrap}
+ .pbar .prow2 .dim{display:none}
+}
+.prow .pn{font-size:.95rem!important}.prow .ps,.prow .patt{font-size:.78rem!important}.pcd .small{font-size:.78rem}
